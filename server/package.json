@@ -1,11 +1,11 @@
 {
-  "name": "data-collector-api-server",
+  "name": "near-accounting-report",
   "version": "0.1.0",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "start-dev": "nodemon -r dotenv/config src/index.js dotenv_config_path=.env.development",
+    "start-dev": "nodemon -r dotenv/config src/index.js dotenv_config_path=.env.development.local",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

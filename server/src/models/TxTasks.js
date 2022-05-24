@@ -7,16 +7,12 @@ const schema = new Schema({
         type: String,
         index: true,
         required: true,
+        unique: true,
     },
-    txType: {
-        type: String,
-        index: true,
-        required: true,
-    },
-    status: {
+    lastUpdate: {
         type: Number,
         default: 0,
-    }
+    },
 });
 
 export const TxTasks = model('TxTasks', schema);

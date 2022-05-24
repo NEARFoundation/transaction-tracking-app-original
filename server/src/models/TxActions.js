@@ -20,7 +20,8 @@ const schema = new Schema({
     block_height: {
         type: Number,
     },
-    args: {type: String},
+    deposit: {type: String},
+    args_base64: {type: String},
     transaction_hash: {type: String},
 
 

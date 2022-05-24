@@ -3,17 +3,34 @@ import {TxActions} from "../models/TxActions.js";
 import {TxTypes} from "../models/TxTypes.js";
 import {TxTasks} from "../models/TxTasks.js";
 
+let IsRun = 0;
+
 export const runTasks = async () => {
-    let tasks = await TxTasks.find({});
-    tasks.map((item) => {
-        updateTransactions(item.accountId, item.txType);
-    })
+    if (IsRun === 0) {
+        try {
+            IsRun = 1;
+            //await new Promise(resolve => setTimeout(resolve, 1000 * 90));
+            let types = await TxTypes.find({});
+            let tasks = await TxTasks.find({});
+            tasks.map((task) => {
+                types.map((type) => {
+                    updateTransactions(task.accountId, type.name);
+                });
+                TxTasks.findOneAndUpdate({accountId: task.accountId}, {lastUpdate: Math.floor(Date.now())}).then().catch(e => console.log(e));
+            })
+        } catch (e) {
+            console.log(e);
+        }
+        IsRun = 0;
+    } else {
+        console.log('SyncedCron: runTasks is already running');
+    }
 }
 
 async function getTransactions(accountId, txType, block_timestamp, length) {
     try {
         const POSTGRESQL_CONNECTION_STRING = process.env.POSTGRESQL_CONNECTION_STRING;
-        let TxType = await TxTypes.findOne({id: txType});
+        let TxType = await TxTypes.findOne({name: txType});
         const client = new pg.Client({
             connectionString: POSTGRESQL_CONNECTION_STRING
         });
@@ -34,7 +51,6 @@ async function getTransactions(accountId, txType, block_timestamp, length) {
 
 async function updateTransactions(accountId, txType) {
     console.log(`updateTransactions(${accountId}, ${txType})`);
-    TxTasks.findOneAndUpdate({accountId: accountId, txType: txType}, {status: 0}).then().catch(e => console.log(e));
     let blockTimestamp = 0;
     const length = 100;
     const lastBlockTimestamp = await TxActions.findOne({
@@ -52,8 +68,9 @@ async function updateTransactions(accountId, txType) {
                     txType: txType,
                     block_timestamp: item.block_timestamp,
                     block_height: item.block_height,
-                    args: JSON.stringify(item.args),
+                    args_base64: item.args_base64,
                     transaction_hash: item.transaction_hash,
+                    deposit: item.deposit,
                 }, {upsert: true}
             ).then().catch(e => console.log(e));
         })
@@ -74,5 +91,4 @@ async function updateTransactions(accountId, txType) {
             transactions = await getTransactions(accountId, txType, blockTimestamp, length);
         }
     }
-    TxTasks.findOneAndUpdate({accountId: accountId, txType: txType}, {status: 1}).then().catch(e => console.log(e));
 }

@@ -1,61 +1,28 @@
 import {TxTypes} from "../models/TxTypes.js";
+import fs from "node:fs";
+import path from "node:path";
 
-let NewTxTypes = [];
-NewTxTypes.push({
-    'id': 'generate_account_and_claim_name',
-    'name': 'Generate account & claim name',
-    'sql': `SELECT *
-            FROM receipts r
-                     INNER JOIN execution_outcomes e ON e.receipt_id = r.receipt_id
-                     INNER JOIN blocks b ON b.block_hash = r.included_in_block_hash
-                     INNER JOIN transaction_actions a ON a.transaction_hash = r.originated_from_transaction_hash
-            WHERE r.predecessor_account_id = $1
-              AND e.status = 'SUCCESS_VALUE'
-              AND a.action_kind = 'TRANSFER'
-              AND b.block_timestamp > $2
-            ORDER BY b.block_timestamp
-                LIMIT $3`
-});
-NewTxTypes.push({
-    'id': 'receive_near',
-    'name': 'Receive NEAR',
-    'sql': `SELECT *
-            FROM receipts r
-                     INNER JOIN execution_outcomes e ON e.receipt_id = r.receipt_id
-                     INNER JOIN blocks b ON b.block_hash = r.included_in_block_hash
-                     INNER JOIN transaction_actions a ON a.transaction_hash = r.originated_from_transaction_hash
-            WHERE r.receiver_account_id = $1
-              AND e.status = 'SUCCESS_VALUE'
-              AND a.action_kind = 'TRANSFER'
-              AND r.predecessor_account_id != 'system'
-              AND b.block_timestamp > $2
-            ORDER BY b.block_timestamp
-                LIMIT $3`
-});
-
-NewTxTypes.push({
-    'id': 'send_near',
-    'name': 'Send NEAR',
-    'sql': `SELECT *
-            FROM receipts r
-                     INNER JOIN execution_outcomes e ON e.receipt_id = r.receipt_id
-                     INNER JOIN blocks b ON b.block_hash = r.included_in_block_hash
-                     INNER JOIN transaction_actions a ON a.transaction_hash = r.originated_from_transaction_hash
-            WHERE r.predecessor_account_id = $1
-              AND e.status = 'SUCCESS_VALUE'
-              AND a.action_kind = 'TRANSFER'
-              AND b.block_timestamp > $2
-            ORDER BY b.block_timestamp
-                LIMIT $3`
-});
 
 export const addDefaultTypesTx = async () => {
-    NewTxTypes.map((item) => {
-        TxTypes.findOneAndUpdate({id: item.id}, {
-                id: item.id,
-                name: item.name,
-                sql: item.sql
-            }, {upsert: true}
-        ).then().catch(e => console.log(e));
-    })
+
+    const sql_Folder = './src/helpers/TxTypes/';
+
+    fs.readdir(sql_Folder, (err, files) => {
+        files.forEach(file => {
+            if (path.extname(file) === ".sql") {
+                fs.readFile(sql_Folder + file, 'utf8', function (err, data) {
+                    if (data) {
+                        console.log(path.parse(file).name);
+                        TxTypes.findOneAndUpdate({name: path.parse(file).name}, {
+                                name: path.parse(file).name,
+                                sql: data
+                            }, {upsert: true}
+                        ).then().catch(e => console.log(e));
+                    }
+                });
+
+            }
+        });
+    });
+
 }

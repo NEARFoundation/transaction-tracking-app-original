@@ -1,7 +1,9 @@
 import {getTransactions} from "../services/getTransactions.js";
-import {addTask} from "../services/addTask.js";
+import {addTasks} from "../services/addTasks.js";
+import {getTypes} from "../services/getTypes.js";
 
 export const routes = app => {
-    app.get('/transactions', getTransactions);
-    app.get('/add-task', addTask);
+    app.post('/transactions', getTransactions);
+    app.get('/types', getTypes);
+    app.post('/add-tasks', addTasks);
 }
