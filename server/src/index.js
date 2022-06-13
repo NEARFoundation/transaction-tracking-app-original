@@ -6,9 +6,7 @@ import {SyncedCron} from "./helpers/syncedCron.js";
 import "./helpers/updateTransactions.js"
 import {addDefaultTypesTx} from "./helpers/addDefaultTypesTx.js";
 
-
 await mongoose.connect(process.env.MONGO);
-
 const app = express();
 app.use(cors());
 app.use(express.json())

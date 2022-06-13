@@ -120,4 +120,4 @@ AND EXISTS(
       AND r3.receiver_account_id = r.receiver_account_id
       AND ra3.action_kind = 'DELETE_KEY'
 )
-ORDER BY b.block_timestamp LIMIT $3
+ORDER BY block_timestamp LIMIT $3

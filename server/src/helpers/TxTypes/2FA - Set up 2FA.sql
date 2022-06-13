@@ -1,11 +1,11 @@
 SELECT b.block_timestamp,
-    r.predecessor_account_id from_account,
-    b.block_height,
-    convert_from(decode(ra.args ->> 'args_base64', 'base64'), 'UTF8') args_base64,
-    r.originated_from_transaction_hash transaction_hash,
-    ra.args ->>'deposit' amount_transferred,
-    'NEAR' currency_transferred,
-    r.receiver_account_id receiver_owner_account
+       r.predecessor_account_id from_account,
+       b.block_height,
+       convert_from(decode(ra.args ->> 'args_base64', 'base64'), 'UTF8') args_base64,
+       r.originated_from_transaction_hash transaction_hash,
+       ra.args ->>'deposit' amount_transferred,
+       'NEAR' currency_transferred,
+       r.receiver_account_id receiver_owner_account
 FROM receipts r
     INNER JOIN execution_outcomes e ON e.receipt_id = r.receipt_id
     INNER JOIN blocks b ON b.block_hash = r.included_in_block_hash
@@ -24,7 +24,7 @@ WHERE r.predecessor_account_id = $1
     WHERE r2.receipt_id = r.receipt_id
   AND ra2.action_kind = 'ADD_KEY'
   AND COALESCE((((ra2.args::json->'access_key')::json->'permission')::json->'permission_details')::json->>'receiver_id', '') = r.predecessor_account_id
-  AND COALESCE((((ra2.args::json->'access_key')::json->'permission')::json->'permission_details')::json->>'method_names', '') = '[""confirm""]'
+  AND COALESCE((((ra2.args::json->'access_key')::json->'permission')::json->'permission_details')::json->>'method_names', '') = '["confirm"]'
     )
   AND EXISTS(
     SELECT 1

@@ -1,8 +1,9 @@
 SELECT b.block_timestamp,
        r.predecessor_account_id from_account,
        b.block_height,
-       r.originated_from_transaction_hash,
+       r.originated_from_transaction_hash transaction_hash,
        ra.args ->>'deposit' amount_transferred,
+       convert_from(decode(ra.args ->> 'args_base64', 'base64'), 'UTF8') args_base64,
        'NEAR' currency_transferred,
        r.receiver_account_id receiver_owner_account
 FROM receipts r

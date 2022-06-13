@@ -1,8 +1,12 @@
-import pg from 'pg';
 import {TxActions} from "../models/TxActions.js";
 import {TxTypes} from "../models/TxTypes.js";
 import {TxTasks} from "../models/TxTasks.js";
 import {getCurrencyByPool, getCurrencyByContract} from "./getCurrency.js"
+import pg from "pg";
+
+
+const pgClient = new pg.Client({connectionString: process.env.POSTGRESQL_CONNECTION_STRING});
+await pgClient.connect();
 
 let IsRun = 0;
 
@@ -12,11 +16,11 @@ export const runTasks = async () => {
             IsRun = 1;
             let types = await TxTypes.find({});
             let tasks = await TxTasks.find({});
-            tasks.map((task) => {
-                types.map((type) => {
-                    updateTransactions(task.accountId, type.name);
+            tasks.map(async (task) => {
+                types.map(async (type) => {
+                    await updateTransactions(task.accountId, type.name);
                 });
-                TxTasks.findOneAndUpdate({accountId: task.accountId}, {lastUpdate: Math.floor(Date.now())}).then().catch(e => console.log(e));
+                await TxTasks.findOneAndUpdate({accountId: task.accountId}, {lastUpdate: Math.floor(Date.now())}).then().catch(e => console.log(e));
             })
         } catch (e) {
             console.log(e);
@@ -29,16 +33,10 @@ export const runTasks = async () => {
 
 async function getTransactions(accountId, txType, block_timestamp, length) {
     try {
-        const POSTGRESQL_CONNECTION_STRING = process.env.POSTGRESQL_CONNECTION_STRING;
         let TxType = await TxTypes.findOne({name: txType});
-        const client = new pg.Client({
-            connectionString: POSTGRESQL_CONNECTION_STRING
-        });
         if (TxType) {
             console.log(`getTransactions(${accountId}, ${txType}, ${block_timestamp.toString()}, ${length})`);
-            await client.connect()
-            const res = await client.query(TxType.sql, [accountId, block_timestamp.toString(), length]);
-            await client.end();
+            const res = await pgClient.query(TxType.sql, [accountId, block_timestamp.toString(), length]);
             return res.rows;
         } else {
             return [];
@@ -64,7 +62,7 @@ async function updateTransactions(accountId, txType) {
         transactions.map(async (item) => {
             console.log('Received: ', item.block_timestamp);
             if (item.pool_id) item.currency_transferred2 = await getCurrencyByPool(parseInt(item.pool_id));
-            if (item.get_currency_by_contract)item.currency_transferred = await getCurrencyByContract(item.get_currency_by_contract);
+            if (item.get_currency_by_contract) item.currency_transferred = await getCurrencyByContract(item.get_currency_by_contract);
             await TxActions.findOneAndUpdate({transaction_hash: item.transaction_hash, txType: txType}, {
                     accountId: accountId,
                     txType: txType,
