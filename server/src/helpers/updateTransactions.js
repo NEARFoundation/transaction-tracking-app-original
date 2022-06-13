@@ -1,6 +1,7 @@
 import pg from 'pg';
 import {TxActions} from "../models/TxActions.js";
 import {TxTypes} from "../models/TxTypes.js";
+import {TxTasks} from "../models/TxTasks.js";
 import {getCurrencyByPool, getCurrencyByContract} from "./getCurrency.js"
 
 let IsRun = 0;
@@ -9,7 +10,6 @@ export const runTasks = async () => {
     if (IsRun === 0) {
         try {
             IsRun = 1;
-            //await new Promise(resolve => setTimeout(resolve, 1000 * 90));
             let types = await TxTypes.find({});
             let tasks = await TxTasks.find({});
             tasks.map((task) => {
