@@ -1,7 +1,7 @@
 import pg from 'pg';
 import {TxActions} from "../models/TxActions.js";
 import {TxTypes} from "../models/TxTypes.js";
-import {TxTasks} from "../models/TxTasks.js";
+import {getCurrencyByPool, getCurrencyByContract} from "./getCurrency.js"
 
 let IsRun = 0;
 
@@ -61,16 +61,27 @@ async function updateTransactions(accountId, txType) {
     let transactions = await getTransactions(accountId, txType, blockTimestamp, length);
 
     while (transactions.length > 0) {
-        transactions.map((item) => {
+        transactions.map(async (item) => {
             console.log('Received: ', item.block_timestamp);
-            TxActions.findOneAndUpdate({transaction_hash: item.transaction_hash, txType: txType}, {
+            if (item.pool_id) item.currency_transferred2 = await getCurrencyByPool(parseInt(item.pool_id));
+            if (item.get_currency_by_contract)item.currency_transferred = await getCurrencyByContract(item.get_currency_by_contract);
+            await TxActions.findOneAndUpdate({transaction_hash: item.transaction_hash, txType: txType}, {
                     accountId: accountId,
                     txType: txType,
                     block_timestamp: item.block_timestamp,
+                    from_account: item.from_account,
                     block_height: item.block_height,
                     args_base64: item.args_base64,
                     transaction_hash: item.transaction_hash,
-                    deposit: item.deposit,
+                    amount_transferred: item.amount_transferred,
+                    currency_transferred: item.currency_transferred,
+                    amount_transferred2: item.amount_transferred2,
+                    currency_transferred2: item.currency_transferred2,
+                    receiver_owner_account: item.receiver_owner_account,
+                    receiver_lockup_account: item.receiver_lockup_account,
+                    lockup_start: item.lockup_start,
+                    lockup_duration: item.lockup_duration,
+                    cliff_duration: item.cliff_duration,
                 }, {upsert: true}
             ).then().catch(e => console.log(e));
         })

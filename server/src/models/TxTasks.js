@@ -15,4 +15,4 @@ const schema = new Schema({
     },
 });
 
-export const TxTasks = model('TxTasks', schema);
+export const TxTasks = model('TxTasks', schema, 'TxTasks');

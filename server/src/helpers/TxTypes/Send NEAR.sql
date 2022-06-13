@@ -1,7 +1,10 @@
-SELECT block_timestamp,
-       transaction_hash,
-       block_height,
-       args ->> 'deposit' deposit
+SELECT b.block_timestamp,
+       r.predecessor_account_id from_account,
+       b.block_height,
+       a.transaction_hash,
+       a.args ->>'deposit' amount_transferred,
+       'NEAR' currency_transferred,
+       r.receiver_account_id receiver_owner_account
 FROM receipts r
     INNER JOIN execution_outcomes e ON e.receipt_id = r.receipt_id
     INNER JOIN blocks b ON b.block_hash = r.included_in_block_hash

@@ -1,7 +1,11 @@
-SELECT block_timestamp,
-       transaction_hash,
-       ra.args ->> 'args_base64' args_base64,
-    block_height
+SELECT b.block_timestamp,
+       r.predecessor_account_id from_account,
+       b.block_height,
+       convert_from(decode(ra.args ->> 'args_base64', 'base64'), 'UTF8') args_base64,
+       a.transaction_hash,
+       ra.args ->'args_json'->>'amount' amount_transferred,
+       'NEAR' currency_transferred,
+       r.receiver_account_id receiver_owner_account
 FROM receipts r
     INNER JOIN execution_outcomes e ON e.receipt_id = r.receipt_id
     INNER JOIN blocks b ON b.block_hash = r.included_in_block_hash

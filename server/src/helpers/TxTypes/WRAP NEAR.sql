@@ -1,8 +1,11 @@
-SELECT block_timestamp,
-       originated_from_transaction_hash transaction_hash,
-       block_height,
-       args ->> 'deposit' deposit,
-    args ->> 'args_base64' args_base64
+SELECT b.block_timestamp,
+       r.predecessor_account_id from_account,
+       b.block_height,
+       convert_from(decode(ra.args ->> 'args_base64', 'base64'), 'UTF8') args_base64,
+       r.originated_from_transaction_hash transaction_hash,
+       ra.args ->>'deposit' amount_transferred,
+       'NEAR' currency_transferred,
+       r.receiver_account_id receiver_owner_account
 FROM receipts r
     INNER JOIN execution_outcomes e ON e.receipt_id = r.receipt_id
     INNER JOIN blocks b ON b.block_hash = r.included_in_block_hash
@@ -11,6 +14,6 @@ WHERE r.receiver_account_id = 'wrap.near'
   AND r.predecessor_account_id = $1
   AND e.status = 'SUCCESS_VALUE'
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'near_deposit'
+  AND COALESCE(ra.args::json->>'method_name', '') IN ('near_deposit', 'near_withdraw')
   AND b.block_timestamp > $2
 ORDER BY b.block_timestamp LIMIT $3

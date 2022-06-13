@@ -9,5 +9,5 @@ const schema = new Schema({
     sql: {type: String},
 });
 
-export const TxTypes = model('TxTypes', schema);
+export const TxTypes = model('TxTypes', schema, 'TxTypes');
 
