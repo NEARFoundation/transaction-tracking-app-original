@@ -38,7 +38,7 @@ export const getTransactions = async (req, res) => {
             });
         })
 
-        res.send({transactions: transactions2, lastUpdate: task.lastUpdate});
+        res.send({transactions: transactions2, lastUpdate: task ? task.lastUpdate : null});
     } catch (e) {
         console.log(e);
         res

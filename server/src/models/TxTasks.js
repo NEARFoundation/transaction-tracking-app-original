@@ -13,6 +13,10 @@ const schema = new Schema({
         type: Number,
         default: 0,
     },
+    isRunning: {
+        type: Boolean,
+        default: false,
+    }
 });
 
 export const TxTasks = model('TxTasks', schema, 'TxTasks');

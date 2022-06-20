@@ -9,7 +9,8 @@
     "deploy": "npm run build && npm run deploy:pages",
     "start": "echo The app is starting! It will automatically open in your browser when ready && env-cmd -f ./.env parcel src/index.html --open",
     "dev": "nodemon --ext js --exec \"env-cmd -f ./.env.local parcel src/index.html --open\" --ignore \"dist\"",
-    "test": "jest test --runInBand"
+    "test": "jest test --runInBand",
+    "start:server": "(cd server && yarn start-dev)"
   },
   "devDependencies": {
     "@babel/core": "~7.14.0",
@@ -26,7 +27,7 @@
     "shelljs": "~0.8.4"
   },
   "dependencies": {
-    "multiselect-react-dropdown": "^2.0.22",
+    "react-select": "^5.3.2",
     "near-api-js": "~0.43.1",
     "react": "~17.0.1",
     "react-datepicker": "^4.7.0",

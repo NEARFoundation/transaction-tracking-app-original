@@ -4,7 +4,7 @@ import './global.css'
 import CsvDownload from 'react-json-to-csv'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Multiselect from 'multiselect-react-dropdown';
+import MultiSelect from "react-select";
 
 export default function App() {
     const [msg, setMsg] = useState('');
@@ -43,14 +43,21 @@ export default function App() {
         const initialValue = JSON.parse(saved);
         return initialValue || [];
     });
+    const [accountsStatus, setAccountsStatus] = useState([]);
 
     useEffect(() => {
-        getTypes();
+        getTypes().then();
+        getAccounts().then();
+        setInterval(() => {
+            getAccounts().then();
+        }, 30000);
+
     }, []);
 
     useEffect(() => {
         localStorage.setItem("accountIDs", JSON.stringify(accountIDs));
         setAllTransactions([]);
+        getAccounts().then();
     }, [accountIDs]);
 
     useEffect(() => {
@@ -60,6 +67,52 @@ export default function App() {
         setAllTransactions([]);
     }, [startDate, endDate, selectedTypes]);
 
+    const MultiSelectStyles = {
+        valueContainer: (base) => ({
+            ...base,
+            maxHeight: 500,
+            overflowY: "auto"
+        }),
+    };
+
+    function onChangeTypes(value, event) {
+        if (event.action === "select-option" && event.option.value === '*') {
+            if (selectedTypes.length === types.length) setSelectedTypes([]);
+            else setSelectedTypes(types);
+        } else {
+            setSelectedTypes(value);
+        }
+    }
+
+    const getAccounts = async () => {
+
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({accountId: JSON.parse(localStorage.getItem("accountIDs"))})
+        };
+        await fetch(
+            process.env.REACT_APP_API + "/accounts", requestOptions
+        ).then(async response => {
+            const data = await response.json();
+            //console.log(data['accounts']);
+            setAccountsStatus(data['accounts']);
+        }).catch(error => {
+            setAccountsStatus([]);
+            console.error('There was an error!', error);
+            setMsg('Unknown error!');
+        });
+    }
+
+    const getAccountStatus = (accountId) => {
+        if (accountsStatus.length > 0) {
+            const res = accountsStatus.filter(function (item) {
+                return item.accountId === accountId;
+            });
+            return res[0] ? res[0]: [];
+        }
+    }
+
     const getTransactions = async (accountId) => {
         setMsg('');
         setSelectedAccountId(accountId);
@@ -68,7 +121,7 @@ export default function App() {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                types: Array.isArray(selectedTypes) ? selectedTypes.map(x => x.name) : [],
+                types: Array.isArray(selectedTypes) ? selectedTypes.map(x => x.value) : [],
                 accountId: [accountId],
                 startDate: startDate,
                 endDate: endDate
@@ -95,7 +148,7 @@ export default function App() {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                types: Array.isArray(selectedTypes) ? selectedTypes.map(x => x.name) : [],
+                types: Array.isArray(selectedTypes) ? selectedTypes.map(x => x.value) : [],
                 accountId: accountIDs,
                 startDate: startDate,
                 endDate: endDate
@@ -107,6 +160,7 @@ export default function App() {
             const data = await response.json();
             setAllTransactions(data.transactions);
             console.log(data.transactions);
+            if (data.transactions.length === 0) setMsg(' Check back later. No data for the csv file');
         }).catch(error => {
             console.error('There was an error!', error);
             setMsg('Unknown error!');
@@ -169,35 +223,84 @@ export default function App() {
         <main>
             <nav>
                 <h1>Welcome to NEAR!</h1>
-                <p>
-                    Enter your account id:
-                </p>
-                <div style={{display: 'flex'}}>
-                    <form onSubmit={handleSubmit}>
-                        <input type="text" onChange={handleChange} value={newAccountId}/>
-                        <button type="submit">Add</button>
-                    </form>
+                <div style={{textAlign: "center"}}>
+
+
+                    {accountIDs.length > 0 ?
+                        <>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>accountId</th>
+                                    <th>status</th>
+                                    <th>last update</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {accountIDs.map((accountId, index) => (
+                                    <tr key={index}>
+                                        <td>
+                                            <div className="accountId"
+                                                 onClick={() => getTransactions(accountId)}>{accountId}</div>
+                                        </td>
+                                        <td>{getAccountStatus(accountId) ? getAccountStatus(accountId).status : null }</td>
+                                        <td>{getAccountStatus(accountId) ? getAccountStatus(accountId).lastUpdate : null }</td>
+                                        <td>
+                                            <button style={{backgroundColor: "#ccc", color: "#000000"}}
+                                                    onClick={() => setAccountIDs(accountIDs.filter(item => item !== accountId))}>Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                <tr key="addAccountId">
+                                    <td>
+                                        <form onSubmit={handleSubmit}>
+                                            <input type="text" onChange={handleChange} value={newAccountId}
+                                                   placeholder="Add new account"/>
+                                        </form>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </>
+                        : <>
+                            <p>
+                                Enter your account id:
+                            </p>
+                            <form onSubmit={handleSubmit}>
+                                <input type="text" onChange={handleChange} value={newAccountId}/>
+                                <button type="submit">Add</button>
+                            </form>
+                        </>
+                    }
+
                 </div>
                 {msg ? <div className="msg">{msg}</div> : null}
                 <div>
                     <hr/>
                     {accountIDs.length > 0 ?
                         <>
-                            <div>
+
+                            <div style={{textAlign: 'center', paddingBottom: '6px'}}>
                                 From: <DatePicker selected={startDate} onChange={(date) => setStartDate(date)}
                                                   showMonthDropdown showYearDropdown/>
                                 To: <DatePicker selected={endDate} onChange={(date) => setEndDate(date)}
                                                 showMonthDropdown showYearDropdown/>
                             </div>
 
-                            <Multiselect
-                                options={types} // Options to display in the dropdown
-                                selectedValues={selectedTypes} // Preselected value to persist in dropdown
-                                onSelect={(selectedList) => setSelectedTypes(selectedList)} // Function will trigger on select event
-                                onRemove={(selectedList) => setSelectedTypes(selectedList)} // Function will trigger on remove event
-                                displayValue="name" // Property name to display in the dropdown options
-                                placeholder="Select transaction type"
-                                maxDisplayedItems={10}
+
+                            <MultiSelect
+                                options={[{label: "--- Select All ---", value: "*"}, ...types]}
+                                placeholder="Select transaction types"
+                                value={selectedTypes}
+                                onChange={onChangeTypes}
+                                setState={setSelectedTypes}
+                                isMulti
+                                styles={MultiSelectStyles}
                             />
 
 
@@ -219,13 +322,6 @@ export default function App() {
                             <hr/>
                         </>
                         : null}
-
-                    {accountIDs.map((accountId, index) => (
-                        <span key={index}>
-                            <button onClick={() => getTransactions(accountId)}>{accountId}</button>
-                        </span>
-                    ))}
-
                 </div>
             </nav>
             <div style={{paddingTop: "10px", textAlign: "center"}}>

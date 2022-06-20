@@ -16,12 +16,15 @@ export const runTasks = async () => {
             IsRun = 1;
             let types = await TxTypes.find({});
             let tasks = await TxTasks.find({});
-            tasks.map(async (task) => {
-                types.map(async (type) => {
+            for (const task of tasks) {
+                for (const type of types) {
                     await updateTransactions(task.accountId, type.name);
-                });
-                await TxTasks.findOneAndUpdate({accountId: task.accountId}, {lastUpdate: Math.floor(Date.now())}).then().catch(e => console.log(e));
-            })
+                }
+                await TxTasks.findOneAndUpdate({accountId: task.accountId}, {
+                    lastUpdate: Math.floor(Date.now()),
+                    isRunning: false
+                }).then().catch(e => console.log(e));
+            }
         } catch (e) {
             console.log(e);
         }
@@ -49,6 +52,9 @@ async function getTransactions(accountId, txType, block_timestamp, length) {
 
 async function updateTransactions(accountId, txType) {
     console.log(`updateTransactions(${accountId}, ${txType})`);
+    await TxTasks.findOneAndUpdate({accountId: accountId}, {
+        isRunning: true
+    }).then().catch(e => console.log(e));
     let blockTimestamp = 0;
     const length = 100;
     const lastBlockTimestamp = await TxActions.findOne({

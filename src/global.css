@@ -15,7 +15,6 @@ html {
     background-color: var(--bg);
     color: var(--fg);
     font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-    font-size: calc(0.9em + 0.5vw);
     line-height: 1.3;
 }
 
@@ -30,7 +29,7 @@ main {
 
 nav {
     margin: 0 auto;
-    max-width: 25em;
+    max-width: 40em;
 }
 
 h1 {
@@ -227,6 +226,7 @@ table {
     margin-left: auto;
     margin-right: auto;
     font-size: small;
+    text-align: left;
 }
 
 
@@ -239,7 +239,6 @@ td {
     word-break: break-all;
     max-width: 25ch;
     overflow: hidden;
-
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -247,6 +246,15 @@ td {
 
 .msg {
     color: crimson;
+    text-align: center;
+}
+
+.accountId {
+    cursor: pointer;
+}
+.accountId:hover {
+    text-decoration: underline;
+    color: var(--secondary);
 }
 
 .react-datepicker__input-container input {
@@ -256,4 +264,8 @@ td {
 .react-datepicker-wrapper
  {
     width: auto !important;
+}
+
+.react-datepicker__tab-loop {
+    display: inline-block;
 }
