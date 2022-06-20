@@ -18,6 +18,40 @@ Now you'll have a local development environment backed by the NEAR TestNet!
 
 Go ahead and play with the app and the code. As you make code changes, the app will automatically reload.
 
+Docker Deploys
+==================
+Frontend
+------------------
+Preload
+
+    cd docker
+    ./prepare.sh
+
+Build Docker image
+
+    ./build.sh
+
+docker/Dockerfile - contains all the commands a user could call on the command line to assemble an image.
+
+Run a new container
+
+    ./run_server.sh
+
+Backend
+------------------
+Preload
+
+    cd server/docker
+    ./prepare.sh
+
+Build Docker image
+
+    ./build.sh
+
+Run a new container
+
+    docker-compose --file docker-compose.mainnet.yml --project-name api-near-accounting-report up -d
+
 
 Exploring The Code
 ==================

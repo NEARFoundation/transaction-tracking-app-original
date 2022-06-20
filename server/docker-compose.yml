@@ -1,16 +1,33 @@
-version: "3.8"
+version: "3.3"
 
 services:
   mongodb:
     image: mongo:5.0.2
     restart: always
+    env_file: ./.env
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=MongoDbUser
-      - MONGO_INITDB_ROOT_PASSWORD=MongoDbSecretPhrase
+      - MONGO_INITDB_ROOT_USERNAME=$MONGODB_USER
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_PASSWORD
     ports:
-      - 27017:27017
+      - $MONGODB_LOCAL_PORT:$MONGODB_DOCKER_PORT
     volumes:
       - db:/data/db
+  server:
+    image: api-near-accounting-report:0.0.2
+    depends_on:
+      - mongodb
+    restart: always
+    env_file: ./.env
+    volumes:
+      - /var/www/api-near-accounting-report:/var/www/api-near-accounting-report
+    ports:
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    environment:
+      - MONGO=$MONGO
+      - POSTGRESQL_CONNECTION_STRING=$POSTGRESQL_CONNECTION_STRING
+      - PORT=$NODE_DOCKER_PORT
+    stdin_open: true
+    tty: true
 
 volumes:
   db:

@@ -1,0 +1,12 @@
+{
+  "name": "near-accounting-report",
+  "version": "1.0.0",
+  "description": "near-accounting-report",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "scripts": {
+    "start": "npm run frontend",
+    "frontend": "node ./frontend.js"
+  }
+}
