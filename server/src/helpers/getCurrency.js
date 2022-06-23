@@ -7,24 +7,34 @@ const provider = new nearApi.providers.JsonRpcProvider(connectionInfo);
 const connection = new nearApi.Connection(NEAR_RPC_URL, provider, {});
 
 export const getCurrencyByPool = async (pool_id) => {
-
-    const currency = await PoolsCurrencies.findOne({pool: pool_id});
-    if (currency) {
-        return currency.currency;
+    const currency1 = await PoolsCurrencies.findOne({pool: pool_id, token_account: 1});
+    const currency2 = await PoolsCurrencies.findOne({pool: pool_id, token_account: 2});
+    if (currency1 && currency2) {
+        return [currency1.currency, currency2.currency];
     } else {
         const res_pools = await new nearApi.Account(connection, null).viewFunction('v2.ref-finance.near', 'get_pools', {
             "from_index": pool_id,
             "limit": 1
         });
-        console.log(res_pools);
-        const res_symbol = await new nearApi.Account(connection, null).viewFunction(res_pools[0].token_account_ids[0], 'ft_metadata', {});
-        await PoolsCurrencies.findOneAndUpdate({pool: pool_id}, {
+        const res_symbol1 = await new nearApi.Account(connection, null).viewFunction(res_pools[0].token_account_ids[0], 'ft_metadata', {});
+        await PoolsCurrencies.findOneAndUpdate({pool: pool_id, contract: res_pools[0].token_account_ids[0]}, {
                 pool: pool_id,
-                currency: res_symbol.symbol,
+                currency: res_symbol1.symbol,
                 contract: res_pools[0].token_account_ids[0],
+                token_account: 1,
             }, {upsert: true}
         ).then().catch(e => console.log(e));
-        return res_symbol.symbol;
+
+        const res_symbol2 = await new nearApi.Account(connection, null).viewFunction(res_pools[0].token_account_ids[1], 'ft_metadata', {});
+        await PoolsCurrencies.findOneAndUpdate({pool: pool_id, contract: res_pools[0].token_account_ids[1]}, {
+                pool: pool_id,
+                currency: res_symbol2.symbol,
+                contract: res_pools[0].token_account_ids[1],
+                token_account: 2,
+            }, {upsert: true}
+        ).then().catch(e => console.log(e));
+
+        return [res_symbol1.symbol, res_symbol2.symbol];
     }
 
 }

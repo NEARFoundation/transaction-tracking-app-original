@@ -21,7 +21,7 @@ export const getAccounts = async (req, res) => {
                 if (account.lastUpdate > 0) lastUpdate = new Date(account.lastUpdate).toLocaleString()
             }
             accounts.push({accountId, lastUpdate, status});
-            console.log(accounts);
+            //console.log(accounts);
         }
         res.send({accounts});
     } catch (e) {

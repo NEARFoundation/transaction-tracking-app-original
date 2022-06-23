@@ -6,12 +6,7 @@ SELECT b.block_timestamp,
        ra.args ->> 'deposit' amount_transferred,
        'NEAR' currency_transferred,
        r.receiver_account_id receiver_owner_account,
-       (SELECT r7.receiver_account_id FROM receipts r7
-           INNER JOIN action_receipt_actions ra7 ON ra7.receipt_id = r7.receipt_id
-           WHERE r7.originated_from_transaction_hash = r.originated_from_transaction_hash
-             AND r7.predecessor_account_id = r.receiver_account_id
-             AND r7.receiver_account_id LIKE '%.lockup.near'
-             AND ra7.action_kind = 'CREATE_ACCOUNT') receiver_lockup_account,
+       args -> 'args_json' ->> 'owner_account_id' receiver_lockup_account,
        args->'args_json' ->> 'lockup_timestamp' lockup_start,
        args->'args_json' ->> 'release_duration' release_duration,
        args->'args_json' -> 'vesting_schedule' -> 'VestingSchedule' ->> 'cliff_timestamp' cliff_timestamp

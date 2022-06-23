@@ -7,8 +7,11 @@ SELECT b.block_timestamp,
           INNER JOIN action_receipt_actions ra2 ON ra2.receipt_id = r2.receipt_id
           where ra2.action_kind='TRANSFER' AND r2.originated_from_transaction_hash = r.originated_from_transaction_hash
             AND ra2.receipt_predecessor_account_id <> 'system')->>'deposit' amount_transferred,
-       'NEAR' currency_transferred,
-       r.receiver_account_id receiver_owner_account
+       (SELECT r2.receiver_account_id FROM receipts r2
+          INNER JOIN action_receipt_actions ra2 ON ra2.receipt_id = r2.receipt_id
+          where ra2.action_kind='TRANSFER' AND r2.originated_from_transaction_hash = r.originated_from_transaction_hash
+            AND ra2.receipt_predecessor_account_id <> 'system') receiver_owner_account,
+       'NEAR' currency_transferred
 FROM receipts r
 INNER JOIN execution_outcomes e ON e.receipt_id = r.receipt_id
 INNER JOIN blocks b ON b.block_hash = r.included_in_block_hash
@@ -25,7 +28,7 @@ AND EXISTS(
     FROM receipts r2
     INNER JOIN execution_outcomes e2 ON e2.receipt_id = r2.receipt_id
     WHERE r2.originated_from_transaction_hash = r.originated_from_transaction_hash
-      AND e2.status = 'SUCCESS_VALUE'
+      AND e2.status IN ('SUCCESS_VALUE', 'SUCCESS_RECEIPT_ID')
       AND r2.predecessor_account_id = r.receiver_account_id
       AND r2.receipt_id <> r.receipt_id
 )
@@ -34,7 +37,7 @@ AND NOT EXISTS(
     FROM receipts r3
     INNER JOIN execution_outcomes e3 ON e3.receipt_id = r3.receipt_id
     WHERE r3.originated_from_transaction_hash = r.originated_from_transaction_hash
-      AND e3.status <> 'SUCCESS_VALUE'
+      AND e3.status NOT IN ('SUCCESS_VALUE', 'SUCCESS_RECEIPT_ID')
       AND r3.predecessor_account_id = r.receiver_account_id
       AND r3.receipt_id <> r.receipt_id
 )

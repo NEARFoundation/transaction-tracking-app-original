@@ -51,7 +51,7 @@ async function getTransactions(accountId, txType, block_timestamp, length) {
 }
 
 async function updateTransactions(accountId, txType) {
-    console.log(`updateTransactions(${accountId}, ${txType})`);
+    //console.log(`updateTransactions(${accountId}, ${txType})`);
     await TxTasks.findOneAndUpdate({accountId: accountId}, {
         isRunning: true
     }).then().catch(e => console.log(e));
@@ -65,9 +65,9 @@ async function updateTransactions(accountId, txType) {
     let transactions = await getTransactions(accountId, txType, blockTimestamp, length);
 
     while (transactions.length > 0) {
-        transactions.map(async (item) => {
-            console.log('Received: ', item.block_timestamp);
-            if (item.pool_id) item.currency_transferred2 = await getCurrencyByPool(parseInt(item.pool_id));
+        for (const item of transactions) {
+            console.log('Received: ', item.block_timestamp, item.transaction_hash);
+            if (item.pool_id) [item.currency_transferred, item.currency_transferred2] = await getCurrencyByPool(parseInt(item.pool_id));
             if (item.get_currency_by_contract) item.currency_transferred = await getCurrencyByContract(item.get_currency_by_contract);
             await TxActions.findOneAndUpdate({transaction_hash: item.transaction_hash, txType: txType}, {
                     accountId: accountId,
@@ -88,7 +88,7 @@ async function updateTransactions(accountId, txType) {
                     cliff_duration: item.cliff_duration,
                 }, {upsert: true}
             ).then().catch(e => console.log(e));
-        })
+        }
 
         let nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
         let i = 1;

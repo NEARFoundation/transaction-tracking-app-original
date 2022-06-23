@@ -236,6 +236,10 @@ td {
     padding: 0.2rem;
     border-bottom: 1px solid black;
     border-right: 1px solid black;
+}
+
+#transactionsTable th,
+#transactionsTable td {
     word-break: break-all;
     max-width: 25ch;
     overflow: hidden;
@@ -252,6 +256,7 @@ td {
 .accountId {
     cursor: pointer;
 }
+
 .accountId:hover {
     text-decoration: underline;
     color: var(--secondary);
@@ -261,11 +266,15 @@ td {
     width: 180px;
 }
 
-.react-datepicker-wrapper
- {
+.react-datepicker-wrapper {
     width: auto !important;
 }
 
 .react-datepicker__tab-loop {
     display: inline-block;
+}
+
+.silverBtn {
+    background-color: #ccc;
+    color: #000000;
 }

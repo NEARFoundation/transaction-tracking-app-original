@@ -21,7 +21,7 @@ export default function App() {
         if (initialValue) {
             return new Date(initialValue.startDate);
         } else {
-            const start = new Date();
+            const start = new Date(2020, 7, 1);
             start.setUTCHours(0, 0, 0, 0);
             return new Date(start);
         }
@@ -85,7 +85,6 @@ export default function App() {
     }
 
     const getAccounts = async () => {
-
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -95,7 +94,6 @@ export default function App() {
             process.env.REACT_APP_API + "/accounts", requestOptions
         ).then(async response => {
             const data = await response.json();
-            //console.log(data['accounts']);
             setAccountsStatus(data['accounts']);
         }).catch(error => {
             setAccountsStatus([]);
@@ -244,10 +242,10 @@ export default function App() {
                                             <div className="accountId"
                                                  onClick={() => getTransactions(accountId)}>{accountId}</div>
                                         </td>
-                                        <td>{getAccountStatus(accountId) ? getAccountStatus(accountId).status : null }</td>
-                                        <td>{getAccountStatus(accountId) ? getAccountStatus(accountId).lastUpdate : null }</td>
+                                        <td>{getAccountStatus(accountId) ? getAccountStatus(accountId).status : null}</td>
+                                        <td>{getAccountStatus(accountId) ? getAccountStatus(accountId).lastUpdate : null}</td>
                                         <td>
-                                            <button style={{backgroundColor: "#ccc", color: "#000000"}}
+                                            <button className="silverBtn"
                                                     onClick={() => setAccountIDs(accountIDs.filter(item => item !== accountId))}>Delete
                                             </button>
                                         </td>
@@ -258,6 +256,7 @@ export default function App() {
                                         <form onSubmit={handleSubmit}>
                                             <input type="text" onChange={handleChange} value={newAccountId}
                                                    placeholder="Add new account"/>
+                                            <button type="submit" className="silverBtn">Add</button>
                                         </form>
                                     </td>
                                     <td></td>
@@ -335,7 +334,7 @@ export default function App() {
 
                 {transactions.length > 0 ?
                     <>
-                        <table>
+                        <table id="transactionsTable">
                             <thead>
                             <tr>
                                 <th>accountId</th>
