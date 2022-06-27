@@ -4,8 +4,9 @@ SELECT b.block_timestamp,
        convert_from(decode(ra.args ->> 'args_base64', 'base64'), 'UTF8') args_base64,
        r.originated_from_transaction_hash transaction_hash,
        ra.args ->'args_json'->>'amount' amount_transferred,
-      'NEAR' currency_transferred,
-       r.receiver_account_id receiver_owner_account
+       'NEAR' currency_transferred,
+       r.receiver_account_id get_currency_by_contract,
+       ra.args -> 'args_json' ->> 'receiver_id' receiver_owner_account
 FROM receipts r
     INNER JOIN execution_outcomes e ON e.receipt_id = r.receipt_id
     INNER JOIN blocks b ON b.block_hash = r.included_in_block_hash
@@ -25,8 +26,9 @@ SELECT b.block_timestamp,
        convert_from(decode(ra.args ->> 'args_base64', 'base64'), 'UTF8') args_base64,
        r.originated_from_transaction_hash transaction_hash,
        ra.args ->'args_json'->>'amount' amount_transferred,
-      'token' currency_transferred,
-      r.receiver_account_id receiver_owner_account
+       'NEAR' currency_transferred,
+       r.receiver_account_id get_currency_by_contract,
+       ra.args -> 'args_json' ->> 'receiver_id' receiver_owner_account
 FROM receipts r
     INNER JOIN execution_outcomes e ON e.receipt_id = r.receipt_id
     INNER JOIN blocks b ON b.block_hash = r.included_in_block_hash

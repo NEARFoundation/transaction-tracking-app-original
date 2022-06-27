@@ -54,6 +54,7 @@ function convertAmount(amount, currency) {
         case 'wNEAR':
             return new Decimal(amount).div(new Decimal(Math.pow(10, 24))).toDecimalPlaces(10)
         case 'USDC':
+        case 'USDT':
             return new Decimal(amount).div(new Decimal(Math.pow(10, 6))).toDecimalPlaces(10)
         case 'DAI':
         case 'USN':

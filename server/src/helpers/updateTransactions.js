@@ -67,8 +67,8 @@ async function updateTransactions(accountId, txType) {
     while (transactions.length > 0) {
         for (const item of transactions) {
             console.log('Received: ', item.block_timestamp, item.transaction_hash);
-            if (item.pool_id) [item.currency_transferred, item.currency_transferred2] = await getCurrencyByPool(parseInt(item.pool_id));
             if (item.get_currency_by_contract) item.currency_transferred = await getCurrencyByContract(item.get_currency_by_contract);
+            if (item.pool_id) [item.currency_transferred, item.currency_transferred2] = await getCurrencyByPool(parseInt(item.pool_id));
             await TxActions.findOneAndUpdate({transaction_hash: item.transaction_hash, txType: txType}, {
                     accountId: accountId,
                     txType: txType,
