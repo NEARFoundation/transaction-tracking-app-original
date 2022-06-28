@@ -248,6 +248,10 @@ td {
     white-space: nowrap;
 }
 
+.accountsTable {
+    width: max-content;
+}
+
 .msg {
     color: crimson;
     text-align: center;

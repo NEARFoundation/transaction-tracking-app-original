@@ -111,6 +111,24 @@ export default function App() {
         }
     }
 
+    const runTask = async (accountId) => {
+        setMsg('');
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({accountId: accountId})
+        };
+        await fetch(
+            process.env.REACT_APP_API + "/run-task", requestOptions
+        ).then(async response => {
+            await response.json();
+        }).catch(error => {
+            console.error('There was an error!', error);
+            setMsg('Unknown error!');
+        });
+        getAccounts().then();
+    }
+
     const getTransactions = async (accountId) => {
         setMsg('');
         setSelectedAccountId(accountId);
@@ -226,7 +244,7 @@ export default function App() {
 
                     {accountIDs.length > 0 ?
                         <>
-                            <table>
+                            <table className="accountsTable">
                                 <thead>
                                 <tr>
                                     <th>accountId</th>
@@ -247,6 +265,9 @@ export default function App() {
                                         <td>
                                             <button className="silverBtn"
                                                     onClick={() => setAccountIDs(accountIDs.filter(item => item !== accountId))}>Delete
+                                            </button>
+                                            <button className="silverBtn"
+                                                    onClick={() => runTask(accountId)}>Update now
                                             </button>
                                         </td>
                                     </tr>

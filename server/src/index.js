@@ -3,7 +3,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import {routes} from './routes/collector.routes.js';
 import {SyncedCron} from "./helpers/syncedCron.js";
-import "./helpers/updateTransactions.js"
 import {addDefaultTypesTx} from "./helpers/addDefaultTypesTx.js";
 
 await mongoose.connect(process.env.MONGO);

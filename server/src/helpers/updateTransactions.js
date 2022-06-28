@@ -15,7 +15,7 @@ export const runTasks = async () => {
         try {
             IsRun = 1;
             let types = await TxTypes.find({});
-            let tasks = await TxTasks.find({});
+            let tasks = await TxTasks.find({isRunning: false});
             for (const task of tasks) {
                 for (const type of types) {
                     await updateTransactions(task.accountId, type.name);
@@ -31,6 +31,34 @@ export const runTasks = async () => {
         IsRun = 0;
     } else {
         console.log('SyncedCron: runTasks is already running');
+    }
+}
+
+export const runTask = async (req, res) => {
+    try {
+        const account = await TxTasks.findOne({accountId: req.body.accountId});
+        if (account) {
+            res.send({status: 'ok'});
+            if (account.isRunning === false) {
+                let types = await TxTypes.find({});
+                for (const type of types) {
+                    await updateTransactions(account.accountId, type.name);
+                }
+                await TxTasks.findOneAndUpdate({accountId: account.accountId}, {
+                    lastUpdate: Math.floor(Date.now()),
+                    isRunning: false
+                }).then().catch(e => console.log(e));
+            }
+        } else {
+            res
+                .status(500)
+                .send({error: 'accountId not found'});
+        }
+    } catch (e) {
+        console.log(e);
+        res
+            .status(500)
+            .send({error: 'Please try again'});
     }
 }
 

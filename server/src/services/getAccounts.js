@@ -11,7 +11,7 @@ export const getAccounts = async (req, res) => {
             let lastUpdate;
             let status;
             if (!account) {
-                status = 'The account is not monitored';
+                status = 'The account is not monitored. Please add the account again';
             } else {
                 if (account.lastUpdate === 0) status = 'Pending';
                 if (account.isRunning) status = 'In progress';
