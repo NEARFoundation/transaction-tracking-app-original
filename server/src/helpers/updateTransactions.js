@@ -3,9 +3,10 @@ import {TxTypes} from "../models/TxTypes.js";
 import {TxTasks} from "../models/TxTasks.js";
 import {getCurrencyByPool, getCurrencyByContract} from "./getCurrency.js"
 import pg from "pg";
+import {performance} from 'perf_hooks';
 
 
-const pgClient = new pg.Client({connectionString: process.env.POSTGRESQL_CONNECTION_STRING});
+const pgClient = new pg.Client({connectionString: process.env.POSTGRESQL_CONNECTION_STRING, statement_timeout: 900000});
 await pgClient.connect();
 
 let IsRun = 0;
@@ -66,8 +67,12 @@ async function getTransactions(accountId, txType, block_timestamp, length) {
     try {
         let TxType = await TxTypes.findOne({name: txType});
         if (TxType) {
-            console.log(`getTransactions(${accountId}, ${txType}, ${block_timestamp.toString()}, ${length})`);
+            //console.log(new Date(), `getTransactions(${accountId}, ${txType}, ${block_timestamp.toString()}, ${length})`);
+            console.log('...');
+            const startTime = performance.now()
             const res = await pgClient.query(TxType.sql, [accountId, block_timestamp.toString(), length]);
+            const  endTime = performance.now()
+            console.log(new Date(), `getTransactions(${accountId}, ${txType}, ${block_timestamp.toString()}, ${length} | `, millisToMinutesAndSeconds(endTime - startTime));
             return res.rows;
         } else {
             return [];
@@ -134,4 +139,10 @@ async function updateTransactions(accountId, txType) {
             transactions = await getTransactions(accountId, txType, blockTimestamp, length);
         }
     }
+}
+
+function millisToMinutesAndSeconds(millis) {
+    let minutes = Math.floor(millis / 60000);
+    let seconds = ((millis % 60000) / 1000).toFixed(0);
+    return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 }

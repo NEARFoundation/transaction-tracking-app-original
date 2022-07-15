@@ -5,7 +5,6 @@ export const getAccounts = async (req, res) => {
     try {
         const accounts = [];
         for (const accountId of req.body.accountId) {
-            //console.log('!', accountId);
             const account = await TxTasks.findOne({accountId: accountId}).select({"_id": 0, "__v": 0});
             const transactions = await TxActions.findOne({accountId: accountId});
             let lastUpdate;
@@ -21,7 +20,6 @@ export const getAccounts = async (req, res) => {
                 if (account.lastUpdate > 0) lastUpdate = new Date(account.lastUpdate).toLocaleString()
             }
             accounts.push({accountId, lastUpdate, status});
-            //console.log(accounts);
         }
         res.send({accounts});
     } catch (e) {

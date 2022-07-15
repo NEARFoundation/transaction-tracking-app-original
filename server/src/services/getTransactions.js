@@ -1,6 +1,7 @@
 import {TxActions} from "../models/TxActions.js";
 import {TxTasks} from "../models/TxTasks.js";
 import Decimal from "decimal.js";
+import {PoolsCurrencies} from "../models/PoolsCurrencies.js";
 
 export const getTransactions = async (req, res) => {
     try {
@@ -17,8 +18,9 @@ export const getTransactions = async (req, res) => {
         const task = await TxTasks.findOne({accountId: req.body.accountId}).select({"_id": 0});
 
         const transactions2 = [];
-        transactions.map((tr) => {
+        for (const tr of transactions) {
             transactions2.push({
+                date: new Date(tr.block_timestamp / 1000000).toLocaleString(),
                 accountId: tr.accountId,
                 txType: tr.txType,
                 block_timestamp: tr.block_timestamp.toString(),
@@ -26,9 +28,9 @@ export const getTransactions = async (req, res) => {
                 block_height: tr.block_height,
                 args_base64: tr.args_base64,
                 transaction_hash: tr.transaction_hash,
-                amount_transferred: tr.amount_transferred ? convertAmount(tr.amount_transferred, tr.currency_transferred) : null,
+                amount_transferred: tr.amount_transferred ? await convertAmount(tr.amount_transferred, tr.currency_transferred) : null,
                 currency_transferred: tr.currency_transferred,
-                amount_transferred2: tr.amount_transferred2 ? convertAmount(tr.amount_transferred2, tr.currency_transferred2) : null,
+                amount_transferred2: tr.amount_transferred2 ? await convertAmount(tr.amount_transferred2, tr.currency_transferred2) : null,
                 currency_transferred2: tr.currency_transferred2,
                 receiver_owner_account: tr.receiver_owner_account,
                 receiver_lockup_account: tr.receiver_lockup_account,
@@ -36,7 +38,7 @@ export const getTransactions = async (req, res) => {
                 lockup_duration: tr.lockup_duration,
                 cliff_duration: tr.cliff_duration,
             });
-        })
+        }
 
         res.send({transactions: transactions2, lastUpdate: task ? task.lastUpdate : null});
     } catch (e) {
@@ -48,18 +50,12 @@ export const getTransactions = async (req, res) => {
 }
 
 
-function convertAmount(amount, currency) {
-    switch (currency) {
-        case 'NEAR':
-        case 'wNEAR':
-            return new Decimal(amount).div(new Decimal(Math.pow(10, 24))).toDecimalPlaces(10)
-        case 'USDC':
-        case 'USDT':
-            return new Decimal(amount).div(new Decimal(Math.pow(10, 6))).toDecimalPlaces(10)
-        case 'DAI':
-        case 'USN':
-            return new Decimal(amount).div(new Decimal(Math.pow(10, 18))).toDecimalPlaces(10)
-        default:
-            return amount;
-    }
+async function convertAmount(amount, currency) {
+    if (currency === 'NEAR' || currency === 'wNEAR')
+        return new Decimal(amount).div(new Decimal(Math.pow(10, 24))).toDecimalPlaces(10)
+    const decimals = await PoolsCurrencies.findOne({currency: currency}).select('decimals');
+    if (decimals)
+        return new Decimal(amount).div(new Decimal(Math.pow(10, decimals.decimals))).toDecimalPlaces(10)
+    else
+        return new Decimal(amount).div(new Decimal(Math.pow(10, 24))).toDecimalPlaces(10)
 }

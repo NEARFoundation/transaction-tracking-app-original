@@ -8,11 +8,17 @@ const connection = new nearApi.Connection(NEAR_RPC_URL, provider, {});
 
 export const addTasks = async (req, res) => {
     try {
+        if (req.body.accountId.slice(-5) !== '.near') {
+            return res
+                .status(400)
+                .send({error: 'Not allowed'});
+        }
         if (!await accountExists(req.body.accountId)) {
             return res
                 .status(400)
                 .send({error: 'Account does not exist'});
         }
+
         TxTasks.findOneAndUpdate({accountId: req.body.accountId},
             {accountId: req.body.accountId}, {upsert: true}).then().catch(e => console.log(e));
         res.send({status: 'ok'});

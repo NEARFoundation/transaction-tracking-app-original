@@ -20,6 +20,8 @@ export const getCurrencyByPool = async (pool_id) => {
         await PoolsCurrencies.findOneAndUpdate({pool: pool_id, contract: res_pools[0].token_account_ids[0]}, {
                 pool: pool_id,
                 currency: res_symbol1.symbol,
+                name: res_symbol1.name,
+                decimals: res_symbol1.decimals,
                 contract: res_pools[0].token_account_ids[0],
                 token_account: 1,
             }, {upsert: true}
@@ -30,6 +32,8 @@ export const getCurrencyByPool = async (pool_id) => {
                 pool: pool_id,
                 currency: res_symbol2.symbol,
                 contract: res_pools[0].token_account_ids[1],
+                name: res_symbol2.name,
+                decimals: res_symbol2.decimals,
                 token_account: 2,
             }, {upsert: true}
         ).then().catch(e => console.log(e));
@@ -49,6 +53,8 @@ export const getCurrencyByContract = async (contract) => {
         const res_symbol = await new nearApi.Account(connection, null).viewFunction(contract, 'ft_metadata', {});
         await PoolsCurrencies.findOneAndUpdate({contract: contract}, {
                 currency: res_symbol.symbol,
+                name: res_symbol.name,
+                decimals: res_symbol.decimals,
                 contract: contract,
             }, {upsert: true}
         ).then().catch(e => console.log(e));

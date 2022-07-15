@@ -250,6 +250,7 @@ td {
 
 .accountsTable {
     width: max-content;
+    min-width: 640px;
 }
 
 .msg {
@@ -264,6 +265,10 @@ td {
 .accountId:hover {
     text-decoration: underline;
     color: var(--secondary);
+}
+
+.accountIdSelected {
+    font-weight: bold;
 }
 
 .react-datepicker__input-container input {

@@ -14,10 +14,11 @@ FROM receipts r
 WHERE r.predecessor_account_id = $1
   AND e.status IN ('SUCCESS_RECEIPT_ID', 'SUCCESS_VALUE')
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'ft_transfer'
-  AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args::json->'args_json', '{}')::jsonb)) IN (2, 3)
-  AND COALESCE((ra.args::json->'args_json')::json->>'amount', '') ~ '^[0-9]+$'
-  AND COALESCE((ra.args::json->'args_json')::json->>'receiver_id', '') <> ''
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'method_name'::text = 'ft_transfer_call'
+  AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args -> 'args_json'::text, '{}')::jsonb)) IN (2, 3)
+  AND (ra.args -> 'args_json'::text) ->> 'amount'::text ~ '^[0-9]+$'
+  AND COALESCE((ra.args -> 'args_json'::text) ->> 'receiver_id'::text, '') <> ''
   AND b.block_timestamp > $2
 UNION
 SELECT b.block_timestamp,
@@ -36,11 +37,12 @@ FROM receipts r
 WHERE r.predecessor_account_id = $1
   AND e.status = 'SUCCESS_RECEIPT_ID'
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'ft_transfer_call'
-  AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args::json->'args_json', '{}')::jsonb)) IN (3, 4)
-  AND COALESCE((ra.args::json->'args_json')::json->>'amount', '') ~ '^[0-9]+$'
-  AND COALESCE((ra.args::json->'args_json')::json->>'receiver_id', '') NOT IN ('', 'v2.ref-finance.near', 'aurora')
-  AND ((ra.args::json->'args_json')::json->'msg') IS NOT NULL
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'method_name'::text = 'ft_transfer_call'
+  AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args -> 'args_json'::text, '{}')::jsonb)) IN (3, 4)
+  AND (ra.args -> 'args_json'::text) ->> 'amount'::text ~ '^[0-9]+$'
+  AND (ra.args -> 'args_json'::text) ->> 'receiver_id'::text NOT IN ('', 'v2.ref-finance.near', 'aurora')
+  AND (ra.args -> 'args_json'::text) ->> 'msg'::text IS NOT NULL
   AND b.block_timestamp > $2
   AND EXISTS(
     SELECT 1
@@ -52,7 +54,8 @@ WHERE r.predecessor_account_id = $1
   AND r2.predecessor_account_id = r.receiver_account_id
   AND r2.receiver_account_id = COALESCE((ra.args::json->'args_json')::json->>'receiver_id', '')
   AND ra2.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra2.args::json->>'method_name', '') = 'ft_on_transfer'
+  AND ra2.args ->> 'args_json'::text IS NOT NULL
+  AND ra2.args ->> 'method_name'::text = 'ft_on_transfer'
     )
   AND EXISTS(
     SELECT 1
@@ -64,6 +67,7 @@ WHERE r.predecessor_account_id = $1
   AND r3.predecessor_account_id = r.receiver_account_id
   AND r3.receiver_account_id = r.receiver_account_id
   AND ra3.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra3.args::json->>'method_name', '') = 'ft_resolve_transfer'
+  AND ra3.args ->> 'args_json'::text IS NOT NULL
+  AND ra3.args ->> 'method_name'::text = 'ft_resolve_transfer'
     )
 ORDER BY block_timestamp LIMIT $3

@@ -14,9 +14,10 @@ WHERE r.predecessor_account_id = $1
   AND r.receiver_account_id = r.predecessor_account_id
   AND e.status = 'SUCCESS_RECEIPT_ID'
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'confirm'
-  AND COALESCE((ra.args::json->'args_json')::json->>'request_id', '') ~ '^[0-9]+$'
-  AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args::json->'args_json', '{}')::jsonb)) = 1
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'method_name'::text = 'confirm'
+  AND (ra.args -> 'args_json'::text) ->> 'request_id'::text ~ '^[0-9]+$'
+  AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args -> 'args_json'::text, '{}')::jsonb)) = 1
   AND EXISTS(
     SELECT 1
     FROM receipts r2
@@ -27,7 +28,7 @@ WHERE r.predecessor_account_id = $1
   AND ra2.receipt_predecessor_account_id = r.predecessor_account_id
   AND ra2.receipt_receiver_account_id = r.receiver_account_id
   AND ra2.action_kind = 'ADD_KEY'
-  AND COALESCE(((ra2.args::json->'access_key')::json->'permission')::json->>'permission_kind', '') = 'FULL_ACCESS'
+  AND ((ra2.args -> 'access_key'::text) -> 'permission'::text) ->> 'permission_kind'::text = 'FULL_ACCESS'
     )
   AND EXISTS(
     SELECT 1
