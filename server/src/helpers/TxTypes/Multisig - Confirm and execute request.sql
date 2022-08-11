@@ -2,7 +2,27 @@ SELECT b.block_timestamp,
        r.predecessor_account_id from_account,
        b.block_height,
        convert_from(decode(ra.args ->> 'args_base64', 'base64'), 'UTF8') args_base64,
-       r.originated_from_transaction_hash transaction_hash
+       r.originated_from_transaction_hash transaction_hash,
+       (SELECT SUM(CAST(ra4.args ->>'deposit' AS numeric))
+        FROM receipts r4
+        INNER JOIN execution_outcomes e4 ON e4.receipt_id = r4.receipt_id
+        INNER JOIN action_receipt_actions ra4 ON ra4.receipt_id = r4.receipt_id
+        WHERE r4.originated_from_transaction_hash = r.originated_from_transaction_hash
+        AND r4.predecessor_account_id <> 'system'
+        AND r4.receipt_id <> r.receipt_id
+        AND e4.status = 'SUCCESS_VALUE'
+        AND ra4.action_kind = 'TRANSFER') amount_transferred,
+       'NEAR' currency_transferred,
+       (SELECT r4.receiver_account_id
+        FROM receipts r4
+        INNER JOIN execution_outcomes e4 ON e4.receipt_id = r4.receipt_id
+        INNER JOIN action_receipt_actions ra4 ON ra4.receipt_id = r4.receipt_id
+        WHERE r4.originated_from_transaction_hash = r.originated_from_transaction_hash
+        AND r4.predecessor_account_id <> 'system'
+        AND r4.receipt_id <> r.receipt_id
+        AND e4.status = 'SUCCESS_VALUE'
+        AND ra4.action_kind = 'TRANSFER'
+        LIMIT 1) receiver_owner_account
 FROM receipts r
 INNER JOIN execution_outcomes e ON e.receipt_id = r.receipt_id
 INNER JOIN blocks b ON b.block_hash = r.included_in_block_hash
