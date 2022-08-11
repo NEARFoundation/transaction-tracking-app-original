@@ -1,7 +1,7 @@
 import 'regenerator-runtime/runtime'
 import React, {useState, useEffect} from 'react'
 import './global.css'
-import CsvDownload from 'react-json-to-csv'
+import * as Papa from "papaparse";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import MultiSelect from "react-select";
@@ -75,6 +75,10 @@ export default function App() {
     }, [startDate, endDate, selectedTypes]);
 
     const MultiSelectStyles = {
+        option: (base) => ({
+            ...base,
+            color: "#444"
+        }),
         valueContainer: (base) => ({
             ...base,
             maxHeight: 500,
@@ -287,6 +291,19 @@ export default function App() {
         });
     }
 
+    const handleExportCsv = () => {
+        if (csvTransactions.length > 0) {
+            let csv = Papa.unparse(csvTransactions);
+            let blob = new Blob([csv]);
+            let a = window.document.createElement("a");
+            a.href = window.URL.createObjectURL(blob, { type: "text/plain" });
+            a.download = `transactions_${startDate.toLocaleString()}-${endDate.toLocaleString()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    };
+
     return (
         <main>
             <nav>
@@ -339,9 +356,11 @@ export default function App() {
                                     <td colSpan="3" style={{textAlign: 'right'}}>
                                         {
                                             csvTransactions.length > 0 ?
-                                                <CsvDownload data={csvTransactions}
-                                                             filename={`transactions_${startDate.toLocaleString()}-${endDate.toLocaleString()}.csv`}>Download
-                                                    as CSV</CsvDownload> : msgCSV
+                                              <button className="downloadBtn"
+                                                      onClick={handleExportCsv}>
+                                                  Download as CSV
+                                              </button>
+                                              : msgCSV
                                         }
                                     </td>
                                 </tr>

@@ -287,3 +287,7 @@ td {
     background-color: #ccc;
     color: #000000;
 }
+
+.downloadBtn {
+    background-color: var(--secondary);
+}
