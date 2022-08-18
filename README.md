@@ -10,7 +10,7 @@ Quick Start
 To run this project locally:
 
 1. Prerequisites: Make sure you've installed [Node.js] ≥ 12 and [Docker](https://docs.docker.com/get-docker/)
-1. `cp .env.local.example .env.local` and `cp .env.development.local.example .env.development.local` and then edit their values.
+1. `cp .env.local.example .env.local` and `cp .env.development.local.example .env.development.local` and `cp server/.env.example server/.env` and then edit their values.
 1. Install dependencies: `yarn install`
 1. Run the local development server: `yarn dev` (see `package.json` for a full list of `scripts` you can run with `yarn`)
 
@@ -50,7 +50,7 @@ Build Docker image
 
 Run a new container
 
-    docker-compose --file docker-compose.mainnet.yml --project-name api-near-accounting-report up -d
+    docker-compose --file docker-compose.yml --project-name api-near-accounting-report up -d
 
 
 Exploring The Code
