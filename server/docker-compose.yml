@@ -5,10 +5,10 @@ services:
     image: mongo:5.0.2
     restart: always
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=MongoDbUser
-      - MONGO_INITDB_ROOT_PASSWORD=
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
     ports:
-      - 27017:27017
+      - "${MONGODB_LOCAL_PORT}:${MONGODB_DOCKER_PORT}"
     volumes:
       - db:/data/db
 

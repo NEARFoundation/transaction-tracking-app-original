@@ -13,9 +13,8 @@ To run this project locally:
 1. You might also need to get your computer's public IP address allow-listed by Denys (or someone who has access to do so). TODO: Document this step better.
 1. `cp .env .env.local`
 1. `cp server/.env.development server/.env.development.local` and then edit the values.
-1. Edit `server/docker-compose.yml` (https://my.1password.com/vaults/if2irxw2lpt6pd7h4t6ietepty/allitems/uqlq4m23ggtoh5gfinuck3yfta but ultimately we want this to use env vars. TODO.)
 1. Install dependencies: `yarn install`
-1. `cd server && yarn install && docker-compose up -d && cd .. && yarn start:server`
+1. `cd server && yarn install && docker-compose up -d --env-file .env.development.local && cd .. && yarn start:server`
 1. In a second terminal: `yarn dev` (see `package.json` for a full list of `scripts` you can run with `yarn`)
 
 Go ahead and play with the app and the code. As you make code changes, the app will automatically reload.
