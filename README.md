@@ -10,16 +10,21 @@ Quick Start
 To run this project locally:
 
 1. Prerequisites: Make sure you've installed [Node.js] ≥ 12 and [Docker](https://docs.docker.com/get-docker/)
-1. `cp .env.local.example .env.local` and `cp .env.development.local.example .env.development.local` and `cp server/.env.example server/.env` and then edit their values.
+1. You might also need to get your computer's public IP address allow-listed by Denys (or someone who has access to do so). TODO: Document this step better.
+1. `cp .env .env.local`
+1. `cp server/.env.development server/.env.development.local` and then edit the values.
+1. Edit `server/docker-compose.yml` (https://my.1password.com/vaults/if2irxw2lpt6pd7h4t6ietepty/allitems/uqlq4m23ggtoh5gfinuck3yfta but ultimately we want this to use env vars. TODO.)
 1. Install dependencies: `yarn install`
-1. Run the local development server: `yarn dev` (see `package.json` for a full list of `scripts` you can run with `yarn`)
-
-Now you'll have a local development environment backed by the NEAR TestNet!
+1. `cd server && yarn install && docker-compose up -d && cd .. && yarn start:server`
+1. In a second terminal: `yarn dev` (see `package.json` for a full list of `scripts` you can run with `yarn`)
 
 Go ahead and play with the app and the code. As you make code changes, the app will automatically reload.
 
 Docker Deploys
 ==================
+
+TODO: Explain this section better.
+
 Frontend
 ------------------
 Preload
@@ -69,6 +74,15 @@ Exploring The Code
 
 Troubleshooting
 ===============
+
+## port conflict 
+
+If you get an error message about a port conflict, try running `docker container ls` and see which containers are active.
+
+Then consider stopping each container via `docker stop {container ID}`, such as `docker stop b72358af5397`. Then try the Quick Start steps above again.
+
+
+## EPERM
 
 On Windows, if you're seeing an error containing `EPERM` it may be related to spaces in your path. Please see [this issue](https://github.com/zkat/npx/issues/209) for more details.
 
