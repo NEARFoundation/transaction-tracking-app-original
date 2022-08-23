@@ -10,7 +10,6 @@ Quick Start
 To run this project locally:
 
 1. Prerequisites: Make sure you've installed [Node.js] ≥ 12 and [Docker](https://docs.docker.com/get-docker/)
-1. You might also need to get your computer's public IP address allow-listed by Denys (or someone who has access to do so). TODO: Document this step better.
 1. `cp .env .env.local`
 1. `cp server/.env.development server/.env.development.local` and then edit the values.
 1. Install dependencies: `yarn install`
