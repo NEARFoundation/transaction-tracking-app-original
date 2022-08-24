@@ -297,7 +297,11 @@ export default function App() {
             let blob = new Blob([csv]);
             let a = window.document.createElement("a");
             a.href = window.URL.createObjectURL(blob, { type: "text/plain" });
-            a.download = `transactions_${startDate.toLocaleString()}-${endDate.toLocaleString()}.csv`;
+            let fileName = selectedAccountCSV.toString() + " ";
+            fileName += ("0" + startDate.getDate()).slice(-2) + "." + ("0"+(startDate.getMonth()+1)).slice(-2) + "." + startDate.getFullYear() + "-";
+            fileName += ("0" + endDate.getDate()).slice(-2) + "." + ("0"+(endDate.getMonth()+1)).slice(-2) + "." + endDate.getFullYear() + " ";
+            fileName += "(" + new Date().toLocaleString() + ").csv";
+            a.download = fileName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -438,6 +442,7 @@ export default function App() {
                                 <th>lockup_start</th>
                                 <th>lockup_duration</th>
                                 <th>cliff_duration</th>
+                                <th>release_duration</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -461,6 +466,7 @@ export default function App() {
                                     <td>{item.lockup_start ? new Date(item.lockup_start / 1000000).toLocaleString() : null}</td>
                                     <td>{item.lockup_duration}</td>
                                     <td>{item.cliff_duration}</td>
+                                    <td>{item.release_duration}</td>
                                 </tr>
                             ))}
                             </tbody>

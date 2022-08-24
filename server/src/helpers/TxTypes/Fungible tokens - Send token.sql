@@ -15,7 +15,7 @@ WHERE r.predecessor_account_id = $1
   AND e.status IN ('SUCCESS_RECEIPT_ID', 'SUCCESS_VALUE')
   AND ra.action_kind = 'FUNCTION_CALL'
   AND ra.args ->> 'args_json'::text IS NOT NULL
-  AND ra.args ->> 'method_name'::text = 'ft_transfer_call'
+  AND ra.args ->> 'method_name'::text = 'ft_transfer'
   AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args -> 'args_json'::text, '{}')::jsonb)) IN (2, 3)
   AND (ra.args -> 'args_json'::text) ->> 'amount'::text ~ '^[0-9]+$'
   AND COALESCE((ra.args -> 'args_json'::text) ->> 'receiver_id'::text, '') <> ''

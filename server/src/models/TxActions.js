@@ -19,6 +19,7 @@ const schema = new Schema({
     lockup_start: {type: String},
     lockup_duration: {type: String},
     cliff_duration: {type: String},
+    release_duration: {type: String},
 });
 
 export const TxActions = model('TxActions', schema, 'TxActions');

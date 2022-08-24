@@ -119,6 +119,7 @@ async function updateTransactions(accountId, txType) {
                     lockup_start: item.lockup_start,
                     lockup_duration: item.lockup_duration,
                     cliff_duration: item.cliff_duration,
+                    release_duration: item.release_duration,
                 }, {upsert: true}
             ).then().catch(e => console.log(e));
         }

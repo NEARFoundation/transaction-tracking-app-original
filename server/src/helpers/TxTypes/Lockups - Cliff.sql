@@ -13,8 +13,9 @@ SELECT b.block_timestamp,
              AND r7.receiver_account_id LIKE '%.lockup.near'
              AND ra7.action_kind = 'CREATE_ACCOUNT') receiver_lockup_account,
        args->'args_json' ->> 'lockup_timestamp' lockup_start,
+       args->'args_json' ->> 'lockup_duration' lockup_duration,
        args->'args_json' ->> 'release_duration' release_duration,
-       args->'args_json' -> 'vesting_schedule' -> 'VestingSchedule' ->> 'cliff_timestamp' cliff_timestamp
+       args->'args_json' -> 'vesting_schedule' -> 'VestingSchedule' ->> 'cliff_timestamp' cliff_duration
 FROM receipts r
 INNER JOIN execution_outcomes e ON e.receipt_id = r.receipt_id
 INNER JOIN blocks b ON b.block_hash = r.included_in_block_hash

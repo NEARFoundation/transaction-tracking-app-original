@@ -53,4 +53,10 @@ AND NOT EXISTS(
       AND r3.predecessor_account_id = r.receiver_account_id
       AND r3.receipt_id <> r.receipt_id
 )
+AND NOT EXISTS(
+    SELECT 1
+    FROM receipts r4
+    WHERE r4.originated_from_transaction_hash = r.originated_from_transaction_hash
+      AND r4.predecessor_account_id = 'lockup.near'
+)
 ORDER BY b.block_timestamp LIMIT $3

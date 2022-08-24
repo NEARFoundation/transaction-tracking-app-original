@@ -37,6 +37,7 @@ export const getTransactions = async (req, res) => {
                 lockup_start: tr.lockup_start ? tr.lockup_start : "",
                 lockup_duration: tr.lockup_duration ? tr.lockup_duration : "",
                 cliff_duration: tr.cliff_duration ? tr.cliff_duration : "",
+                release_duration: tr.release_duration ? tr.release_duration : "",
             });
         }
 
