@@ -5,6 +5,9 @@ import CsvDownload from 'react-json-to-csv'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import MultiSelect from "react-select";
+import getConfig from './config';
+
+const nearConfig = getConfig(process.env.NODE_ENV || 'development');
 
 export default function App() {
     const [msg, setMsg] = useState('');
@@ -219,6 +222,8 @@ export default function App() {
         });
     }
 
+    const { explorerUrl } = nearConfig;
+
     return (
         <main>
             <nav>
@@ -367,7 +372,7 @@ export default function App() {
                                     <td>{item.block_height}</td>
                                     <td>{item.args_base64}</td>
                                     <td><a
-                                        href={`https://explorer.mainnet.near.org/transactions/${item.transaction_hash}`}>{item.transaction_hash}</a>
+                                        href={`${explorerUrl}/transactions/${item.transaction_hash}`}>{item.transaction_hash}</a>
                                     </td>
                                     <td>{item.amount_transferred}</td>
                                     <td>{item.currency_transferred}</td>

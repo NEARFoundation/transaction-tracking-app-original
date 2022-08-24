@@ -1,8 +1,8 @@
-// This file is unfortunately mostly duplicated with `server/src/config.js` because of https://stackoverflow.com/questions/44114436/the-create-react-app-imports-restriction-outside-of-src-directory
+// This file is unfortunately mostly duplicated with `src/config.js` because of https://stackoverflow.com/questions/44114436/the-create-react-app-imports-restriction-outside-of-src-directory
 
 const CONTRACT_NAME = process.env.CONTRACT_NAME || 'near-accounting-report'
 
-function getConfig(env) {
+export default function getConfig(env) {
   switch (env) {
 
   case 'production':
@@ -58,8 +58,6 @@ function getConfig(env) {
       masterAccount: 'test.near',
     }
   default:
-    throw Error(`Unconfigured environment '${env}'. Can be configured in src/config.js.`)
+    throw Error(`Unconfigured environment '${env}'. Can be configured in server/src/config.js.`)
   }
 }
-
-module.exports = getConfig
