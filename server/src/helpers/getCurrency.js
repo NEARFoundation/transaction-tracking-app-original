@@ -1,10 +1,14 @@
 import {PoolsCurrencies} from "../models/PoolsCurrencies.js";
 import nearApi from "near-api-js";
+import getConfig from '../config.js';
 
-const NEAR_RPC_URL = 'https://rpc.mainnet.near.org';
-const connectionInfo = {url: NEAR_RPC_URL};
+const nearConfig = getConfig(process.env.NODE_ENV || 'development');
+
+const { nodeUrl } = nearConfig;
+
+const connectionInfo = {url: nodeUrl};
 const provider = new nearApi.providers.JsonRpcProvider(connectionInfo);
-const connection = new nearApi.Connection(NEAR_RPC_URL, provider, {});
+const connection = new nearApi.Connection(nodeUrl, provider, {});
 
 export const getCurrencyByPool = async (pool_id) => {
 
