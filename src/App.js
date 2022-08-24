@@ -1,13 +1,16 @@
 import 'regenerator-runtime/runtime'
 import React, {useState, useEffect} from 'react'
 import './global.css'
-import CsvDownload from 'react-json-to-csv'
+import CsvDownload from 'react-json-to-CSV'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import MultiSelect from "react-select";
-import getConfig from './config';
+import { getFormattedUtcDatetime, getFilename } from './helpers/datetime';
+import getConfig from './config'
 
 const nearConfig = getConfig(process.env.NODE_ENV || 'development');
+
+const { exampleAccount } = nearConfig;
 
 export default function App() {
     const [msg, setMsg] = useState('');
@@ -135,7 +138,7 @@ export default function App() {
         ).then(async response => {
             const data = await response.json();
             setTransactions(data.transactions);
-            if (data.lastUpdate > 0) setLastUpdate(new Date(data.lastUpdate).toLocaleString());
+            if (data.lastUpdate > 0) setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
             else setLastUpdate('');
         }).catch(error => {
             setTransactions([]);
@@ -163,7 +166,7 @@ export default function App() {
             const data = await response.json();
             setAllTransactions(data.transactions);
             console.log(data.transactions);
-            if (data.transactions.length === 0) setMsg(' Check back later. No data for the csv file');
+            if (data.transactions.length === 0) setMsg(' Check back later. No data for the CSV file');
         }).catch(error => {
             console.error('There was an error!', error);
             setMsg('Unknown error!');
@@ -230,15 +233,14 @@ export default function App() {
                 <h1>Welcome to NEAR!</h1>
                 <div style={{textAlign: "center"}}>
 
-
                     {accountIDs.length > 0 ?
                         <>
                             <table>
                                 <thead>
                                 <tr>
-                                    <th>accountId</th>
-                                    <th>status</th>
-                                    <th>last update</th>
+                                    <th>Account ID</th>
+                                    <th>Status</th>
+                                    <th>Last Update</th>
                                     <th></th>
                                 </tr>
                                 </thead>
@@ -246,11 +248,11 @@ export default function App() {
                                 {accountIDs.map((accountId, index) => (
                                     <tr key={index}>
                                         <td>
-                                            <div className="accountId"
+                                            <div className="accountId" title="Show transactions for this account"
                                                  onClick={() => getTransactions(accountId)}>{accountId}</div>
                                         </td>
                                         <td>{getAccountStatus(accountId) ? getAccountStatus(accountId).status : null }</td>
-                                        <td>{getAccountStatus(accountId) ? getAccountStatus(accountId).lastUpdate : null }</td>
+                                        <td>{getAccountStatus(accountId) ? getFormattedUtcDatetime(getAccountStatus(accountId).lastUpdate) : null }</td>
                                         <td>
                                             <button style={{backgroundColor: "#ccc", color: "#000000"}}
                                                     onClick={() => setAccountIDs(accountIDs.filter(item => item !== accountId))}>Delete
@@ -274,10 +276,10 @@ export default function App() {
                         </>
                         : <>
                             <p>
-                                Enter your account id:
+                                Enter the account ID:
                             </p>
                             <form onSubmit={handleSubmit}>
-                                <input type="text" onChange={handleChange} value={newAccountId}/>
+                                <input type="text" onChange={handleChange} value={newAccountId} placeholder={exampleAccount} />
                                 <button type="submit">Add</button>
                             </form>
                         </>
@@ -292,9 +294,9 @@ export default function App() {
 
                             <div style={{textAlign: 'center', paddingBottom: '6px'}}>
                                 From: <DatePicker selected={startDate} onChange={(date) => setStartDate(date)}
-                                                  showMonthDropdown showYearDropdown/>
+                                                  showMonthDropdown showYearDropdown dateFormat="yyyy-MM-dd"/>
                                 To: <DatePicker selected={endDate} onChange={(date) => setEndDate(date)}
-                                                showMonthDropdown showYearDropdown/>
+                                                showMonthDropdown showYearDropdown dateFormat="yyyy-MM-dd"/>
                             </div>
 
 
@@ -314,15 +316,15 @@ export default function App() {
                                     <>
                                         <button onClick={getAllTransactions}
                                                 style={{backgroundColor: "#175730"}}>Update
-                                            data for the csv file
+                                            data for the CSV file
                                         </button>
                                         <CsvDownload data={allTransactions}
-                                                     filename={`transactions_${startDate.toLocaleString()}-${endDate.toLocaleString()}.csv`}
-                                                     style={{backgroundColor: "#175730"}}>Download csv
+                                                     filename={getFilename(startDate, endDate)}
+                                                     style={{backgroundColor: "#175730"}}>Download CSV
                                             file</CsvDownload>
                                     </>
                                     : <button onClick={getAllTransactions} style={{backgroundColor: "#175730"}}>Prepare
-                                        data for the csv file</button>
+                                        data for the CSV file</button>
                             }
                             <hr/>
                         </>

@@ -1,0 +1,9 @@
+{
+    "compilerOptions": { 
+       "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "lib": [ 
+          "ES2021.String"
+        ]
+    }
+}

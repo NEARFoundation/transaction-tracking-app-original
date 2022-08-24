@@ -14,6 +14,7 @@ function getConfig(env) {
       walletUrl: 'https://wallet.near.org',
       helperUrl: 'https://helper.mainnet.near.org',
       explorerUrl: 'https://explorer.mainnet.near.org',
+      exampleAccount: 'example.near',
     }
   case 'development':
   case 'testnet':
@@ -24,6 +25,7 @@ function getConfig(env) {
       walletUrl: 'https://wallet.testnet.near.org',
       helperUrl: 'https://helper.testnet.near.org',
       explorerUrl: 'https://explorer.testnet.near.org',
+      exampleAccount: 'example.testnet',
     }
   case 'betanet':
     return {
