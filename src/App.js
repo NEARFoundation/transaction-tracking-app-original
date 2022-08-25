@@ -1,4 +1,3 @@
-import 'regenerator-runtime/runtime';
 import React, { useState, useEffect } from 'react';
 import './global.css';
 import DatePicker from 'react-datepicker';
