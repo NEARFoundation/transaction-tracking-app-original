@@ -1,3 +1,15 @@
+// eslint-disable-next-line no-undef
 module.exports = {
-  extends: ["near"]
+  env: {
+    browser: true,
+  },
+  extends: ['near'],
+  globals: {
+    console: true,
+    process: true,
+    window: true,
+  },
+  rules: {
+    'no-console': 'off',
+  },
 };
