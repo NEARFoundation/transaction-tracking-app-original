@@ -8,6 +8,7 @@ import MultiSelect from 'react-select';
 import { MainTable } from './components/MainTable';
 import getConfig from './config';
 import { getFormattedUtcDatetime, getCsvFilename, getBeginningOfTodayUtc, getEndOfTodayUtc } from './helpers/datetime';
+import { logAndDisplayError } from './helpers/errors';
 
 const NODE_ENV = process.env.NODE_ENV;
 const REACT_APP_API = process.env.REACT_APP_API;
@@ -54,7 +55,7 @@ export default function App() {
         setTypes(json.types);
       })
       .catch((error) => {
-        console.error('There was an error!', error);
+        logAndDisplayError(error, setMessage);
       });
   };
 
@@ -88,8 +89,7 @@ export default function App() {
       })
       .catch((error) => {
         setTransactions([]);
-        console.error('There was an error!', error);
-        setMessage('Unknown error!');
+        logAndDisplayError(error, setMessage);
       });
   };
 
@@ -107,8 +107,7 @@ export default function App() {
       })
       .catch((error) => {
         setAccountsStatus([]);
-        console.error('There was an error!', error);
-        setMessage('Unknown error!');
+        logAndDisplayError(error, setMessage);
       });
   };
 
@@ -182,8 +181,7 @@ export default function App() {
         if (data.transactions.length === 0) setMessage(' Check back later. No data for the CSV file');
       })
       .catch((error) => {
-        console.error('There was an error!', error);
-        setMessage('Unknown error!');
+        logAndDisplayError(error, setMessage);
         setAllTransactions([]);
       });
   };
@@ -213,8 +211,7 @@ export default function App() {
         }
       })
       .catch((error) => {
-        console.error('Unknown error!', error);
-        setMessage('Unknown error!');
+        logAndDisplayError(error, setMessage);
       });
   };
 

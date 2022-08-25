@@ -1,22 +1,26 @@
+/* eslint-disable import/extensions */
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
+/* eslint-enable import/extensions */
 
-export const getTransactions = async (req, res) => {
+export const getTransactions = async (request, response) => {
   try {
-    console.log(req.body.endDate);
+    console.log(request.body.endDate);
     let filter = {
-      accountId: req.body.accountId,
+      accountId: request.body.accountId,
       block_timestamp: {
-        $gte: Math.floor(new Date(req.body.startDate).getTime()) * 1000000,
-        $lte: Math.floor(new Date(req.body.endDate).getTime()) * 1000000,
+        $gte: Math.floor(new Date(request.body.startDate).getTime()) * 1_000_000, // TODO: Use helper in datetime.ts
+        $lte: Math.floor(new Date(request.body.endDate).getTime()) * 1_000_000,
       },
     };
-    if (req.body.types.length > 0) filter = { ...filter, txType: req.body.types };
+    if (request.body.types.length > 0) filter = { ...filter, txType: request.body.types };
     const transactions = await TxActions.find(filter).sort({ block_timestamp: -1 });
-    const task = await TxTasks.findOne({ accountId: req.body.accountId }).select({ _id: 0 });
+    const task = await TxTasks.findOne({ accountId: request.body.accountId }).select({ _id: 0 });
 
     const transactions2 = [];
+    // eslint-disable-next-line array-callback-return
     transactions.map((tr) => {
+      /* eslint-disable canonical/sort-keys */
       transactions2.push({
         accountId: tr.accountId,
         txType: tr.txType,
@@ -35,11 +39,12 @@ export const getTransactions = async (req, res) => {
         lockup_duration: tr.lockup_duration,
         cliff_duration: tr.cliff_duration,
       });
+      /* eslint-enable canonical/sort-keys */
     });
 
-    res.send({ transactions: transactions2, lastUpdate: task ? task.lastUpdate : null });
-  } catch (e) {
-    console.log(e);
-    res.status(500).send({ error: 'Please try again' });
+    response.send({ lastUpdate: task ? task.lastUpdate : null, transactions: transactions2 });
+  } catch (error) {
+    console.log(error);
+    response.status(500).send({ error: 'Please try again' });
   }
 };

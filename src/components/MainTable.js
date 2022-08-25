@@ -5,8 +5,8 @@ export const MainTable = ({ transactions, explorerUrl }) => {
     <table>
       <thead>
         <tr>
-          <th>account_id</th>
-          <th>tx_type</th>
+          <th>accountId</th>
+          <th>txType</th>
           <th>block_timestamp</th>
           <th>from_account</th>
           <th>block_height</th>

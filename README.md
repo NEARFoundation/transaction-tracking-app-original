@@ -11,7 +11,7 @@ To run this project locally:
 1. `cp server/.env.development server/.env.development.local` and then edit the values.
 1. Start Mongo (unless you'll be starting Docker) with something like `brew services start mongodb-community@5.0`.
 1. Install dependencies for UI and server; then start the server: `yarn install && cd server && yarn install && cd .. && yarn start:server`
-1. In a second terminal, start the UI: `yarn dev` (see `package.json` for a full list of `scripts` you can run with `yarn`)
+1. In a second terminal, start the UI: `yarn start` (see `package.json` for a full list of `scripts` you can run with `yarn`)
 
 Go ahead and play with the app and the code. As you make code changes, the app will automatically reload.
 
