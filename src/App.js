@@ -228,7 +228,7 @@ export default function App() {
   return (
     <main>
       <nav>
-        <h1>Welcome to NEAR!</h1>
+        <h1>NEAR Transactions Accounting Report</h1>
         <div style={{ textAlign: 'center' }}>
           {accountIDs.length > 0 ? (
             <>
