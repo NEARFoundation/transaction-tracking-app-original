@@ -115,22 +115,22 @@ export default function App() {
   };
 
   useEffect(() => {
-    getTypes().then();
-    getAccounts().then();
+    getTypes();
+    getAccounts();
     setInterval(() => {
-      getAccounts().then();
+      getAccounts();
     }, 30_000);
   }, []);
 
   useEffect(() => {
     localStorage.setItem('accountIDs', JSON.stringify(accountIDs));
     setAllTransactions([]);
-    getAccounts().then();
+    getAccounts();
   }, [accountIDs]);
 
   useEffect(() => {
     setMessage('');
-    if (selectedAccountId) getTransactions(selectedAccountId).then();
+    if (selectedAccountId) getTransactions(selectedAccountId);
     localStorage.setItem('rangeDate', JSON.stringify({ endDate, startDate }));
     setAllTransactions([]);
   }, [startDate, endDate, selectedTypes]);
@@ -219,7 +219,7 @@ export default function App() {
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log('handleSubmit', newAccountId);
-    if (newAccountId) addTasks().then();
+    if (newAccountId) addTasks();
   };
 
   const { explorerUrl } = nearConfig;
