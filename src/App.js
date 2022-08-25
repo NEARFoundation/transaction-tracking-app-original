@@ -14,6 +14,11 @@ const NODE_ENV = process.env.NODE_ENV;
 const REACT_APP_API = process.env.REACT_APP_API;
 const nearConfig = getConfig(NODE_ENV || 'development');
 
+const defaultRequestOptions = {
+  headers: { 'Content-Type': 'application/json' },
+  method: 'POST',
+};
+
 const { exampleAccount } = nearConfig;
 
 export default function App() {
@@ -46,7 +51,7 @@ export default function App() {
 
   const getTypes = async () => {
     const requestOptions = {
-      headers: { 'Content-Type': 'application/json' },
+      ...defaultRequestOptions,
       method: 'GET',
     };
     await fetch(REACT_APP_API + '/types', requestOptions)
@@ -71,14 +76,13 @@ export default function App() {
     setSelectedAccountId(accountId);
     console.log('getTransactions', accountId, startDate, endDate);
     const requestOptions = {
+      ...defaultRequestOptions,
       body: JSON.stringify({
         accountId: [accountId],
         endDate,
         startDate,
         types: Array.isArray(selectedTypes) ? selectedTypes.map((x) => x.value) : [],
       }),
-      headers: { 'Content-Type': 'application/json' },
-      method: 'POST',
     };
     await fetch(REACT_APP_API + '/transactions', requestOptions)
       .then(async (response) => {
@@ -95,9 +99,8 @@ export default function App() {
 
   const getAccounts = async () => {
     const requestOptions = {
+      ...defaultRequestOptions,
       body: JSON.stringify({ accountId: JSON.parse(localStorage.getItem('accountIDs')) }),
-      headers: { 'Content-Type': 'application/json' },
-      method: 'POST',
     };
     await fetch(REACT_APP_API + '/accounts', requestOptions)
       .then(async (response) => {
@@ -164,14 +167,13 @@ export default function App() {
     setMessage('');
     console.log('getAllTransactions', accountIDs);
     const requestOptions = {
+      ...defaultRequestOptions,
       body: JSON.stringify({
         accountId: accountIDs,
         endDate,
         startDate,
         types: Array.isArray(selectedTypes) ? selectedTypes.map((item) => item.value) : [],
       }),
-      headers: { 'Content-Type': 'application/json' },
-      method: 'POST',
     };
     await fetch(REACT_APP_API + '/transactions', requestOptions)
       .then(async (response) => {
@@ -196,9 +198,8 @@ export default function App() {
     setMessage('');
     console.log('newTasks:', newAccountId);
     const requestOptions = {
+      ...defaultRequestOptions,
       body: JSON.stringify({ accountId: newAccountId }),
-      headers: { 'Content-Type': 'application/json' },
-      method: 'POST',
     };
     await fetch(REACT_APP_API + '/add-tasks', requestOptions)
       .then(async (response) => {
