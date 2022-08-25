@@ -1,4 +1,4 @@
-# near-accounting-report
+# NEAR Transactions Accounting Report
 
 This [React] app was initialized with [create-near-app]
 
