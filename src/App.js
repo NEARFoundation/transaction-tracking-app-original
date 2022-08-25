@@ -8,7 +8,7 @@ import MultiSelect from 'react-select';
 
 import { MainTable } from './components/MainTable';
 import getConfig from './config';
-import { getFormattedUtcDatetime, getCsvFilename, getEndOfTodayUtc } from './helpers/datetime';
+import { getFormattedUtcDatetime, getCsvFilename, getBeginningOfTodayUtc, getEndOfTodayUtc } from './helpers/datetime';
 
 const NODE_ENV = process.env.NODE_ENV;
 const REACT_APP_API = process.env.REACT_APP_API;
@@ -31,9 +31,7 @@ export default function App() {
     if (initialValue) {
       return new Date(initialValue.startDate);
     } else {
-      const start = new Date();
-      start.setUTCHours(0, 0, 0, 0);
-      return new Date(start);
+      return getBeginningOfTodayUtc();
     }
   });
   const [endDate, setEndDate] = useState(() => {

@@ -16,6 +16,12 @@ export const getCsvFilename = (startDate: Date, endDate: Date) => {
   return `transactions_${getFormattedUtcDatetimeForFilename(startDate)}_to_${getFormattedUtcDatetimeForFilename(endDate)}.csv`;
 };
 
+export const getBeginningOfTodayUtc = (): Date => {
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  return new Date(today);
+};
+
 export const getEndOfTodayUtc = (): Date => {
   const today = new Date();
   today.setUTCHours(23, 59, 59, 999);
