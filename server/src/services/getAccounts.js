@@ -4,10 +4,12 @@ import { TxTasks } from '../models/TxTasks.js';
 /* eslint-enable import/extensions */
 
 export const getAccounts = async (request, response) => {
+  const accountIds = request.body.accountId;
+  console.log('getAccounts accountIds', accountIds);
   try {
     const accounts = [];
-    for (const accountId of request.body.accountId) {
-      // console.log('!', accountId);
+    for (const accountId of accountIds) {
+      console.log('getAccounts', accountId);
       const account = await TxTasks.findOne({ accountId }).select({ __v: 0, _id: 0 });
       const transactions = await TxActions.findOne({ accountId });
       let lastUpdate;

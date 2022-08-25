@@ -217,10 +217,10 @@ export default function App() {
       });
   };
 
-  const handleSubmit = (event) => {
+  const addNewAccount = async (event) => {
     event.preventDefault();
-    console.log('handleSubmit', newAccountId);
-    if (newAccountId) addTasks();
+    console.log('addNewAccount', newAccountId);
+    if (newAccountId) await addTasks();
   };
 
   const { explorerUrl } = nearConfig;
@@ -260,7 +260,7 @@ export default function App() {
                   ))}
                   <tr key="addAccountId">
                     <td>
-                      <form onSubmit={handleSubmit}>
+                      <form onSubmit={addNewAccount}>
                         <input type="text" onChange={handleChange} value={newAccountId} placeholder="Add new account" />
                       </form>
                     </td>
@@ -274,7 +274,7 @@ export default function App() {
           ) : (
             <>
               <p>Enter the account ID:</p>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={addNewAccount}>
                 <input type="text" onChange={handleChange} value={newAccountId} placeholder={exampleAccount} />
                 <button type="submit">Add</button>
               </form>
