@@ -30,6 +30,7 @@ export default function App() {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [allTransactions, setAllTransactions] = useState([]);
   const [lastUpdate, setLastUpdate] = useState('');
+  const [prependFilenameWithAcctNames, setPrependFilenameWithAcctNames] = useState(true);
   const [startDate, setStartDate] = useState(() => {
     const saved = localStorage.getItem('rangeDate');
     const initialValue = JSON.parse(saved);
@@ -180,7 +181,7 @@ export default function App() {
         const data = await response.json();
         setAllTransactions(data.transactions);
         console.log(data.transactions);
-        if (data.transactions.length === 0) setMessage(' Check back later. No data for the CSV file');
+        if (data.transactions.length === 0) setMessage('No transactions have been received yet. Please check back later.');
       })
       .catch((error) => {
         logAndDisplayError(error, setMessage);
@@ -305,9 +306,17 @@ export default function App() {
                   <button onClick={getAllTransactions} style={{ backgroundColor: '#175730' }}>
                     Update data for the CSV file
                   </button>
-                  <CsvDownload data={allTransactions} filename={getCsvFilename(startDate, endDate)} style={{ backgroundColor: '#175730' }}>
+                  <CsvDownload
+                    data={allTransactions}
+                    filename={getCsvFilename(prependFilenameWithAcctNames ? accountIDs : [], startDate, endDate)}
+                    style={{ backgroundColor: '#175730' }}
+                  >
                     Download CSV file
                   </CsvDownload>
+                  <label style={{ fontSize: '0.7rem' }}>
+                    <input type="checkbox" checked={prependFilenameWithAcctNames} onChange={(event) => setPrependFilenameWithAcctNames(event.target.checked)} /> Prepend filename w/
+                    acct names
+                  </label>
                 </>
               ) : (
                 <button onClick={getAllTransactions} style={{ backgroundColor: '#175730' }}>

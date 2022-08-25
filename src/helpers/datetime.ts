@@ -12,8 +12,11 @@ export const getFormattedUtcDatetimeForFilename = (date: Date): string => {
   return formattedUtcDatetime.replaceAll(' ', '_').replaceAll(':', '');
 };
 
-export const getCsvFilename = (startDate: Date, endDate: Date) => {
-  return `transactions_${getFormattedUtcDatetimeForFilename(startDate)}_to_${getFormattedUtcDatetimeForFilename(endDate)}.csv`;
+export const getCsvFilename = (accountIds: string[], startDate: Date, endDate: Date) => {
+  const prefix = accountIds.length ? `${accountIds.join('_')}_` : ``;
+  const filename = `${prefix}${getFormattedUtcDatetimeForFilename(startDate)}_to_${getFormattedUtcDatetimeForFilename(endDate)}.csv`;
+  console.log({ filename });
+  return filename;
 };
 
 export const getBeginningOfTodayUtc = (): Date => {
