@@ -1,5 +1,5 @@
 /* eslint-disable import/extensions */
-import { getFormattedDateFromBlockTimestamp, getRangeFilter } from '../helpers/datetime.js';
+import { getFormattedDatetimeUtcFromBlockTimestamp, getRangeFilter } from '../helpers/datetime.js';
 import { respondWithServerError } from '../helpers/errors.js';
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
@@ -25,7 +25,7 @@ export const getTransactions = async (request, response) => {
       cleanedTransactions.push({
         accountId: transaction.accountId,
         txType: transaction.txType,
-        block_timestamp: getFormattedDateFromBlockTimestamp(transaction.block_timestamp),
+        block_timestamp_utc: getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp),
         from_account: transaction.from_account,
         block_height: transaction.block_height,
         args_base64: transaction.args_base64,

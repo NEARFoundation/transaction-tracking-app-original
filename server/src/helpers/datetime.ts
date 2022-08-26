@@ -39,9 +39,9 @@ export const getEndOfTodayUtc = (): Date => {
  * @param block_timestamp in nanoseconds (billionths of a second), such as 1659547920000000000
  * @returns {string} like 2022-08-03 17:32:00 UTC
  */
-export const getFormattedDateFromBlockTimestamp = (block_timestamp: number): string => {
+export const getFormattedDatetimeUtcFromBlockTimestamp = (block_timestamp: number): string => {
   const timestampInMilliseconds = block_timestamp / 1_000_000;
-  return getFormattedUtcDatetime(new Date(timestampInMilliseconds));
+  return getFormattedUtcDatetime(new Date(timestampInMilliseconds)).replace(/ UTC$/u, '');
 };
 
 export const getRangeFilter = (startDate: number, endDate: number) => {
