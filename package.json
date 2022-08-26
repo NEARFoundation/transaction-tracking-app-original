@@ -2,6 +2,7 @@
   "name": "near-transactions-accounting-report",
   "version": "0.1.0",
   "license": "UNLICENSED",
+  "type": "module",
   "scripts": {
     "build": "npm run build:web",
     "build:web": "env-cmd -f ./.env.development.local parcel build src/index.html --public-url ./",

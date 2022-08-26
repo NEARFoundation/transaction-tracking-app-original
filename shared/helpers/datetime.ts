@@ -1,5 +1,3 @@
-// TODO: Move to shared location to eliminate duplication with `src/helpers/datetime.ts`.
-
 import dayjs from 'dayjs';
 // eslint-disable-next-line import/extensions
 import utc from 'dayjs/plugin/utc.js';
