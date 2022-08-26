@@ -1,4 +1,4 @@
-// TODO: Move to shared location to eliminate duplication with `server/src/helpers/datetime.ts`.
+// TODO: Move to shared location to eliminate duplication with `src/helpers/datetime.ts`.
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -41,4 +41,11 @@ export const getEndOfTodayUtc = (): Date => {
 export const getFormattedDateFromBlockTimestamp = (block_timestamp: number): string => {
   const timestampInMilliseconds = block_timestamp / 1_000_000;
   return getFormattedUtcDatetime(new Date(timestampInMilliseconds));
+};
+
+export const getRangeFilter = (startDate: number, endDate: number) => {
+  return {
+    $gte: Math.floor(new Date(startDate).getTime()) * 1_000_000,
+    $lte: Math.floor(new Date(endDate).getTime()) * 1_000_000,
+  };
 };
