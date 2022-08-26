@@ -1,8 +1,11 @@
 {
   "compilerOptions": {
+    "target": "ES2022",
     "esModuleInterop": true,
+    "module": "ES2022",
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
-    "lib": ["ES2021.String"]
+    "lib": ["ES2021.String"],
+    "moduleResolution": "node"
   }
 }
