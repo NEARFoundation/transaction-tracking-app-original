@@ -1,19 +1,28 @@
-import 'regenerator-runtime/runtime';
 import React, { useState, useEffect } from 'react';
 import './global.css';
-import CsvDownload from 'react-json-to-CSV';
 import DatePicker from 'react-datepicker';
+import CsvDownload from 'react-json-to-CSV';
 import 'react-datepicker/dist/react-datepicker.css';
 import MultiSelect from 'react-select';
-import { getFormattedUtcDatetime, getFilename } from './helpers/datetime';
-import getConfig from './config';
 
-const nearConfig = getConfig(process.env.NODE_ENV || 'development');
+import { MainTable } from './components/MainTable';
+import getConfig from './config';
+import { getFormattedUtcDatetime, getCsvFilename, getBeginningOfTodayUtc, getEndOfTodayUtc } from './helpers/datetime';
+import { logAndDisplayError } from './helpers/errors';
+
+const NODE_ENV = process.env.NODE_ENV;
+const REACT_APP_API = process.env.REACT_APP_API;
+const nearConfig = getConfig(NODE_ENV || 'development');
+
+const defaultRequestOptions = {
+  headers: { 'Content-Type': 'application/json' },
+  method: 'POST',
+};
 
 const { exampleAccount } = nearConfig;
 
 export default function App() {
-  const [msg, setMsg] = useState('');
+  const [message, setMessage] = useState('');
   const [newAccountId, setNewAccountId] = useState('');
   const [selectedAccountId, setSelectedAccountId] = useState('');
   const [transactions, setTransactions] = useState([]);
@@ -21,15 +30,14 @@ export default function App() {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [allTransactions, setAllTransactions] = useState([]);
   const [lastUpdate, setLastUpdate] = useState('');
+  const [prependFilenameWithAcctNames, setPrependFilenameWithAcctNames] = useState(true);
   const [startDate, setStartDate] = useState(() => {
     const saved = localStorage.getItem('rangeDate');
     const initialValue = JSON.parse(saved);
     if (initialValue) {
       return new Date(initialValue.startDate);
     } else {
-      const start = new Date();
-      start.setUTCHours(0, 0, 0, 0);
-      return new Date(start);
+      return getBeginningOfTodayUtc();
     }
   });
   const [endDate, setEndDate] = useState(() => {
@@ -38,11 +46,24 @@ export default function App() {
     if (initialValue) {
       return new Date(initialValue.endDate);
     } else {
-      const end = new Date();
-      end.setUTCHours(23, 59, 59, 999);
-      return new Date(end);
+      return getEndOfTodayUtc();
     }
   });
+
+  const getTypes = async () => {
+    const requestOptions = {
+      ...defaultRequestOptions,
+      method: 'GET',
+    };
+    await fetch(REACT_APP_API + '/types', requestOptions)
+      .then(async (response) => {
+        const json = await response.json();
+        setTypes(json.types);
+      })
+      .catch((error) => {
+        logAndDisplayError(error, setMessage);
+      });
+  };
 
   const [accountIDs, setAccountIDs] = useState(() => {
     const saved = localStorage.getItem('accountIDs');
@@ -51,24 +72,67 @@ export default function App() {
   });
   const [accountsStatus, setAccountsStatus] = useState([]);
 
+  const getTransactions = async (accountId) => {
+    setMessage('');
+    setSelectedAccountId(accountId);
+    console.log('getTransactions', accountId, startDate, endDate);
+    const requestOptions = {
+      ...defaultRequestOptions,
+      body: JSON.stringify({
+        accountId: [accountId],
+        endDate,
+        startDate,
+        types: Array.isArray(selectedTypes) ? selectedTypes.map((x) => x.value) : [],
+      }),
+    };
+    await fetch(REACT_APP_API + '/transactions', requestOptions)
+      .then(async (response) => {
+        const data = await response.json();
+        setTransactions(data.transactions);
+        if (data.lastUpdate > 0) setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
+        else setLastUpdate('');
+      })
+      .catch((error) => {
+        setTransactions([]);
+        logAndDisplayError(error, setMessage);
+      });
+  };
+
+  const getAccounts = async () => {
+    const requestOptions = {
+      ...defaultRequestOptions,
+      body: JSON.stringify({ accountId: JSON.parse(localStorage.getItem('accountIDs')) }),
+    };
+    await fetch(REACT_APP_API + '/accounts', requestOptions)
+      .then(async (response) => {
+        const data = await response.json();
+        // console.log(data['accounts']);
+        setAccountsStatus(data.accounts);
+      })
+      .catch((error) => {
+        setAccountsStatus([]);
+        logAndDisplayError(error, setMessage);
+      });
+  };
+
   useEffect(() => {
-    getTypes().then();
-    getAccounts().then();
+    getTypes();
+    getAccounts();
     setInterval(() => {
-      getAccounts().then();
-    }, 30000);
+      getAccounts();
+    }, 30_000);
   }, []);
 
   useEffect(() => {
     localStorage.setItem('accountIDs', JSON.stringify(accountIDs));
     setAllTransactions([]);
-    getAccounts().then();
+    getAccounts();
   }, [accountIDs]);
 
   useEffect(() => {
-    setMsg('');
-    if (selectedAccountId) getTransactions(selectedAccountId).then();
-    localStorage.setItem('rangeDate', JSON.stringify({ startDate, endDate }));
+    setMessage('');
+    if (selectedAccountId) getTransactions(selectedAccountId);
+    localStorage.setItem('rangeDate', JSON.stringify({ endDate, startDate }));
     setAllTransactions([]);
   }, [startDate, endDate, selectedTypes]);
 
@@ -80,147 +144,83 @@ export default function App() {
     }),
   };
 
-  function onChangeTypes(value, event) {
+  const onChangeTypes = (value, event) => {
     if (event.action === 'select-option' && event.option.value === '*') {
       if (selectedTypes.length === types.length) setSelectedTypes([]);
       else setSelectedTypes(types);
     } else {
       setSelectedTypes(value);
     }
-  }
-
-  const getAccounts = async () => {
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accountId: JSON.parse(localStorage.getItem('accountIDs')) }),
-    };
-    await fetch(process.env.REACT_APP_API + '/accounts', requestOptions)
-      .then(async (response) => {
-        const data = await response.json();
-        //console.log(data['accounts']);
-        setAccountsStatus(data['accounts']);
-      })
-      .catch((error) => {
-        setAccountsStatus([]);
-        console.error('There was an error!', error);
-        setMsg('Unknown error!');
-      });
   };
 
   const getAccountStatus = (accountId) => {
     if (accountsStatus.length > 0) {
-      const res = accountsStatus.filter(function (item) {
+      const result = accountsStatus.find((item) => {
         return item.accountId === accountId;
       });
-      return res[0] ? res[0] : [];
+      return result ? result : [];
     }
-  };
 
-  const getTransactions = async (accountId) => {
-    setMsg('');
-    setSelectedAccountId(accountId);
-    console.log('getTransactions', accountId, startDate, endDate);
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        types: Array.isArray(selectedTypes) ? selectedTypes.map((x) => x.value) : [],
-        accountId: [accountId],
-        startDate: startDate,
-        endDate: endDate,
-      }),
-    };
-    await fetch(process.env.REACT_APP_API + '/transactions', requestOptions)
-      .then(async (response) => {
-        const data = await response.json();
-        setTransactions(data.transactions);
-        if (data.lastUpdate > 0) setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
-        else setLastUpdate('');
-      })
-      .catch((error) => {
-        setTransactions([]);
-        console.error('There was an error!', error);
-        setMsg('Unknown error!');
-      });
+    return [];
   };
 
   const getAllTransactions = async () => {
-    setMsg('');
+    setMessage('');
     console.log('getAllTransactions', accountIDs);
     const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      ...defaultRequestOptions,
       body: JSON.stringify({
-        types: Array.isArray(selectedTypes) ? selectedTypes.map((x) => x.value) : [],
         accountId: accountIDs,
-        startDate: startDate,
-        endDate: endDate,
+        endDate,
+        startDate,
+        types: Array.isArray(selectedTypes) ? selectedTypes.map((item) => item.value) : [],
       }),
     };
-    await fetch(process.env.REACT_APP_API + '/transactions', requestOptions)
+    await fetch(REACT_APP_API + '/transactions', requestOptions)
       .then(async (response) => {
         const data = await response.json();
         setAllTransactions(data.transactions);
         console.log(data.transactions);
-        if (data.transactions.length === 0) setMsg(' Check back later. No data for the CSV file');
+        if (data.transactions.length === 0) setMessage('No transactions have been received yet. Please check back later.');
       })
       .catch((error) => {
-        console.error('There was an error!', error);
-        setMsg('Unknown error!');
+        logAndDisplayError(error, setMessage);
         setAllTransactions([]);
       });
   };
 
-  const handleChange = (e) => {
-    setNewAccountId(e.target.value);
+  const handleChange = (event) => {
+    setNewAccountId(event.target.value);
     console.log('handleChange');
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('handleSubmit', newAccountId);
-    if (newAccountId) addTasks().then();
   };
 
   const addTasks = async () => {
     setNewAccountId('');
-    setMsg('');
+    setMessage('');
     console.log('newTasks:', newAccountId);
     const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      ...defaultRequestOptions,
       body: JSON.stringify({ accountId: newAccountId }),
     };
-    await fetch(process.env.REACT_APP_API + '/add-tasks', requestOptions)
+    await fetch(REACT_APP_API + '/add-tasks', requestOptions)
       .then(async (response) => {
         if (response.status === 200) {
-          if (accountIDs.indexOf(newAccountId) === -1) setAccountIDs([...accountIDs, newAccountId]);
+          if (!accountIDs.includes(newAccountId)) setAccountIDs([...accountIDs, newAccountId]);
         } else if (response.status === 400) {
           const status = await response.json();
-          setMsg(status.error);
+          setMessage(status.error);
           console.error(status.error);
         }
       })
       .catch((error) => {
-        console.error('Unknown error!', error);
-        setMsg('Unknown error!');
+        logAndDisplayError(error, setMessage);
       });
   };
 
-  const getTypes = async () => {
-    const requestOptions = {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    };
-    await fetch(process.env.REACT_APP_API + '/types', requestOptions)
-      .then(async (response) => {
-        const types = await response.json();
-        setTypes(types['types']);
-      })
-      .catch((error) => {
-        console.error('There was an error!', error);
-      });
+  const addNewAccount = async (event) => {
+    event.preventDefault();
+    console.log('addNewAccount', newAccountId);
+    if (newAccountId) await addTasks();
   };
 
   const { explorerUrl } = nearConfig;
@@ -228,7 +228,7 @@ export default function App() {
   return (
     <main>
       <nav>
-        <h1>Welcome to NEAR!</h1>
+        <h1>NEAR Transactions Accounting Report</h1>
         <div style={{ textAlign: 'center' }}>
           {accountIDs.length > 0 ? (
             <>
@@ -260,7 +260,7 @@ export default function App() {
                   ))}
                   <tr key="addAccountId">
                     <td>
-                      <form onSubmit={handleSubmit}>
+                      <form onSubmit={addNewAccount}>
                         <input type="text" onChange={handleChange} value={newAccountId} placeholder="Add new account" />
                       </form>
                     </td>
@@ -274,19 +274,19 @@ export default function App() {
           ) : (
             <>
               <p>Enter the account ID:</p>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={addNewAccount}>
                 <input type="text" onChange={handleChange} value={newAccountId} placeholder={exampleAccount} />
                 <button type="submit">Add</button>
               </form>
             </>
           )}
         </div>
-        {msg ? <div className="msg">{msg}</div> : null}
+        {message ? <div className="msg">{message}</div> : null}
         <div>
           <hr />
           {accountIDs.length > 0 ? (
             <>
-              <div style={{ textAlign: 'center', paddingBottom: '6px' }}>
+              <div style={{ paddingBottom: '6px', textAlign: 'center' }}>
                 From: <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} showMonthDropdown showYearDropdown dateFormat="yyyy-MM-dd" />
                 To: <DatePicker selected={endDate} onChange={(date) => setEndDate(date)} showMonthDropdown showYearDropdown dateFormat="yyyy-MM-dd" />
               </div>
@@ -306,9 +306,17 @@ export default function App() {
                   <button onClick={getAllTransactions} style={{ backgroundColor: '#175730' }}>
                     Update data for the CSV file
                   </button>
-                  <CsvDownload data={allTransactions} filename={getFilename(startDate, endDate)} style={{ backgroundColor: '#175730' }}>
+                  <CsvDownload
+                    data={allTransactions}
+                    filename={getCsvFilename(prependFilenameWithAcctNames ? accountIDs : [], startDate, endDate)}
+                    style={{ backgroundColor: '#175730' }}
+                  >
                     Download CSV file
                   </CsvDownload>
+                  <label style={{ fontSize: '0.7rem' }}>
+                    <input type="checkbox" checked={prependFilenameWithAcctNames} onChange={(event) => setPrependFilenameWithAcctNames(event.target.checked)} /> Prepend filename w/
+                    acct names
+                  </label>
                 </>
               ) : (
                 <button onClick={getAllTransactions} style={{ backgroundColor: '#175730' }}>
@@ -335,54 +343,7 @@ export default function App() {
 
         {transactions.length > 0 ? (
           <>
-            <table>
-              <thead>
-                <tr>
-                  <th>accountId</th>
-                  <th>txType</th>
-                  <th>block_timestamp</th>
-                  <th>from_account</th>
-                  <th>block_height</th>
-                  <th>args_base64</th>
-                  <th>transaction_hash</th>
-                  <th>amount_transferred</th>
-                  <th>currency_transferred</th>
-                  <th>amount_transferred2</th>
-                  <th>currency_transferred2</th>
-                  <th>receiver_owner_account</th>
-                  <th>receiver_lockup_account</th>
-                  <th>lockup_start</th>
-                  <th>lockup_duration</th>
-                  <th>cliff_duration</th>
-                  <th>date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.accountId}</td>
-                    <td>{item.txType}</td>
-                    <td>{item.block_timestamp}</td>
-                    <td>{item.from_account}</td>
-                    <td>{item.block_height}</td>
-                    <td>{item.args_base64}</td>
-                    <td>
-                      <a href={`${explorerUrl}/transactions/${item.transaction_hash}`}>{item.transaction_hash}</a>
-                    </td>
-                    <td>{item.amount_transferred}</td>
-                    <td>{item.currency_transferred}</td>
-                    <td>{item.amount_transferred2}</td>
-                    <td>{item.currency_transferred2}</td>
-                    <td>{item.receiver_owner_account}</td>
-                    <td>{item.receiver_lockup_account}</td>
-                    <td>{item.lockup_start}</td>
-                    <td>{item.lockup_duration}</td>
-                    <td>{item.cliff_duration}</td>
-                    <td>{new Date(item.block_timestamp / 1000000).toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <MainTable transactions={transactions} explorerUrl={explorerUrl} />
           </>
         ) : null}
         {transactions.length === 0 && selectedAccountId ? <>No data</> : null}
