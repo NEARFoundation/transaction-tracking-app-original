@@ -218,6 +218,12 @@ aside footer *:last-child {
     input:focus {
         box-shadow: 0 0 10em rgba(255, 255, 255, 0.02) inset;
     }
+
+    .my-react-select-container {
+        /* https://github.com/JedWatson/react-select/issues/4067#issuecomment-721672676
+        https://stackoverflow.com/questions/63212723/using-dark-mode-in-react-select */
+        color: gray;
+    }
 }
 
 table {

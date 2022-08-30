@@ -296,6 +296,7 @@ export default function App() {
                 options={[{ label: '--- Select All ---', value: '*' }, ...types]}
                 placeholder="Select transaction types"
                 value={selectedTypes}
+                className="my-react-select-container"
                 onChange={onChangeTypes}
                 setState={setSelectedTypes}
                 isMulti
