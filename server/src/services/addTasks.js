@@ -1,6 +1,9 @@
-import { TxTasks } from '../models/TxTasks.js';
 import nearApi from 'near-api-js';
-import getConfig from '../config.js';
+
+/* eslint-disable import/extensions */
+import getConfig from '../../../shared/config.js';
+import { TxTasks } from '../models/TxTasks.js';
+/* eslint-enable import/extensions */
 
 const nearConfig = getConfig(process.env.NODE_ENV || 'development');
 
@@ -10,26 +13,30 @@ const connectionInfo = { url: nodeUrl };
 const provider = new nearApi.providers.JsonRpcProvider(connectionInfo);
 const connection = new nearApi.Connection(nodeUrl, provider, {});
 
-export const addTasks = async (req, res) => {
-  try {
-    if (!(await accountExists(req.body.accountId))) {
-      return res.status(400).send({ error: 'Account does not exist' });
-    }
-    TxTasks.findOneAndUpdate({ accountId: req.body.accountId }, { accountId: req.body.accountId }, { upsert: true })
-      .then()
-      .catch((e) => console.log(e));
-    res.send({ status: 'ok' });
-  } catch (e) {
-    console.log(e);
-    res.status(500).send({ error: e });
-  }
-};
-
-async function accountExists(accountId) {
+const accountExists = async (accountId) => {
   try {
     await new nearApi.Account(connection, accountId).state();
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
-}
+};
+
+// eslint-disable-next-line consistent-return
+export const addTasks = async (request, response) => {
+  const { accountId } = request.body;
+  console.log('addTasks', { accountId });
+  try {
+    if (!(await accountExists(accountId))) {
+      return response.status(400).send({ error: `Account does not exist in ${nodeUrl}.` });
+    }
+
+    TxTasks.findOneAndUpdate({ accountId }, { accountId }, { upsert: true })
+      .then()
+      .catch((error) => console.error({ error }));
+    response.send({ status: 'ok' });
+  } catch (error) {
+    console.log(error);
+    response.status(500).send({ error });
+  }
+};
