@@ -5,10 +5,11 @@ import CsvDownload from 'react-json-to-CSV';
 import 'react-datepicker/dist/react-datepicker.css';
 import MultiSelect from 'react-select';
 
+import getConfig from '../shared/config';
+import { getFormattedUtcDatetime, getCsvFilename, getBeginningOfTodayUtc, getEndOfTodayUtc } from '../shared/helpers/datetime';
+import { logAndDisplayError } from '../shared/helpers/errors';
+
 import { MainTable } from './components/MainTable';
-import getConfig from './config';
-import { getFormattedUtcDatetime, getCsvFilename, getBeginningOfTodayUtc, getEndOfTodayUtc } from './helpers/datetime';
-import { logAndDisplayError } from './helpers/errors';
 
 const NODE_ENV = process.env.NODE_ENV;
 const REACT_APP_API = process.env.REACT_APP_API;

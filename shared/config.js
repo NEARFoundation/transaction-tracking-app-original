@@ -1,5 +1,3 @@
-// This file is unfortunately mostly duplicated with `server/src/config.js` because of https://stackoverflow.com/questions/44114436/the-create-react-app-imports-restriction-outside-of-src-directory
-
 // eslint-disable-next-line canonical/filename-match-exported
 const contractName = process.env.CONTRACT_NAME || 'near-transactions-accounting-report';
 const localHome = process.env.HOME;
@@ -61,7 +59,7 @@ const getConfig = (environment) => {
         nodeUrl: 'https://rpc.ci-betanet.near.org',
       };
     default:
-      throw new Error(`Unconfigured environment '${environment}'. Can be configured in src/config.js.`);
+      throw new Error(`Unconfigured environment '${environment}'. Can be configured in shared/config.js.`);
   }
 };
 

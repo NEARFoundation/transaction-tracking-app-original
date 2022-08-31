@@ -1,7 +1,7 @@
 import nearApi from 'near-api-js';
 
 /* eslint-disable import/extensions */
-import getConfig from '../config.js';
+import getConfig from '../../../shared/config.js';
 import { TxTasks } from '../models/TxTasks.js';
 /* eslint-enable import/extensions */
 

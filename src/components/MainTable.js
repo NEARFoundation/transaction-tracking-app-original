@@ -1,4 +1,4 @@
-import { getFormattedDatetimeUtcFromBlockTimestamp } from '../helpers/datetime';
+import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../shared/helpers/datetime';
 
 export const MainTable = ({ transactions, explorerUrl }) => {
   return (
