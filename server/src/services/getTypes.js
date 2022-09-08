@@ -16,7 +16,7 @@ export const getTypes = async (request, response) => {
     // console.log(types);
     response.send({ types });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     response.status(500).send({ error: 'Server error. Please try again.' });
   }
 };

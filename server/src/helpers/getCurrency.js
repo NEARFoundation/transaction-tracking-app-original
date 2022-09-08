@@ -32,7 +32,7 @@ export const getCurrencyByPool = async (pool_id) => {
       { upsert: true },
     )
       .then()
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
     return res_symbol.symbol;
   }
 };
@@ -53,7 +53,7 @@ export const getCurrencyByContract = async (contract) => {
       { upsert: true },
     )
       .then()
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
     console.log('Get currency', res_symbol.symbol);
     return res_symbol.symbol;
   }

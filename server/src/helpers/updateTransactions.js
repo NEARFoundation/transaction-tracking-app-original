@@ -23,10 +23,10 @@ export const runTasks = async () => {
                 await TxTasks.findOneAndUpdate({accountId: task.accountId}, {
                     lastUpdate: Math.floor(Date.now()),
                     isRunning: false
-                }).then().catch(e => console.log(e));
+                }).then().catch(error => console.error(error));
             }
-        } catch (e) {
-            console.log(e);
+        } catch (error) {
+            console.error(error);
         }
         IsRun = 0;
     } else {
@@ -44,8 +44,8 @@ async function getTransactions(accountId, txType, block_timestamp, length) {
         } else {
             return [];
         }
-    } catch (e) {
-        console.log(e);
+    } catch (error) {
+        console.error(error);
         return [];
     }
 }
@@ -54,7 +54,7 @@ async function updateTransactions(accountId, txType) {
     console.log(`updateTransactions(${accountId}, ${txType})`);
     await TxTasks.findOneAndUpdate({accountId: accountId}, {
         isRunning: true
-    }).then().catch(e => console.log(e));
+    }).then().catch(error => console.error(error));
     let blockTimestamp = 0;
     const length = 100;
     const lastBlockTimestamp = await TxActions.findOne({
@@ -87,7 +87,7 @@ async function updateTransactions(accountId, txType) {
                     lockup_duration: item.lockup_duration,
                     cliff_duration: item.cliff_duration,
                 }, {upsert: true}
-            ).then().catch(e => console.log(e));
+            ).then().catch(error => console.error(error));
         })
 
         let nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;

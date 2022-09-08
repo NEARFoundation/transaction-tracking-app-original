@@ -36,7 +36,7 @@ export const addTasks = async (request, response) => {
       .catch((error) => console.error({ error }));
     response.send({ status: 'ok' });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     response.status(500).send({ error });
   }
 };

@@ -31,7 +31,7 @@ export const getAccounts = async (request, response) => {
 
     response.send({ accounts });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     response.status(500).send({ error: 'Server error. Please try again.' });
   }
 };
