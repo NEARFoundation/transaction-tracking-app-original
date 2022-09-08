@@ -11,7 +11,7 @@
   },
   "references": [
     {
-      "path": "../src"
+      "path": "../server"
     },
     {
       "path": "../shared"
