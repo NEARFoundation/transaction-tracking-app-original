@@ -76,7 +76,7 @@ export default function App() {
   const getTransactions = async (accountId) => {
     setMessage('');
     setSelectedAccountId(accountId);
-    console.log('getTransactions', accountId, startDate, endDate);
+    console.log('getTransactions', { accountId, start: getFormattedUtcDatetime(startDate), end: getFormattedUtcDatetime(endDate) });
     const requestOptions = {
       ...defaultRequestOptions,
       body: JSON.stringify({
