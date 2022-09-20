@@ -31,7 +31,63 @@ async function deleteFromDb(accountId) {
     });
 }
 
+function AccountRow({ accountId, deleteFromLocalStorage, accountStatus, getTransactions }) {
+  return (
+    <tr>
+      <td>
+        <div className="accountId" title="Show transactions for this account" onClick={() => getTransactions(accountId)}>
+          {accountId}
+        </div>
+      </td>
+      <td>{accountStatus ? accountStatus.status : null}</td>
+      <td className="fixed-width">{accountStatus ? getFormattedUtcDatetime(accountStatus.lastUpdate) : null}</td>
+      <td>
+        <button
+          style={{ backgroundColor: '#ccc', color: 'black' }}
+          onClick={() => {
+            deleteFromLocalStorage(accountId);
+          }}
+        >
+          Delete from localStorage
+        </button>
+      </td>
+      <td>
+        <button
+          style={{ backgroundColor: 'red', color: 'black' }}
+          onClick={() => {
+            deleteFromLocalStorage(accountId);
+            deleteFromDb(accountId);
+          }}
+        >
+          Delete from DB
+        </button>
+      </td>
+    </tr>
+  );
+}
+
+function AddNewAccountForm({ addNewAccount, handleChange, newAccountId, exampleAccount, buttonText = 'Add' }) {
+  return (
+    <form onSubmit={addNewAccount}>
+      <input type="text" onChange={handleChange} value={newAccountId} placeholder={exampleAccount} />
+      <button type="submit" title="Add new account">
+        {buttonText}
+      </button>
+    </form>
+  );
+}
+
 export function AccountsTable({ accountIDs, getTransactions, setAccountIDs, accountsStatus, handleChange, newAccountId, addNewAccount, exampleAccount }) {
+  // console.log({ accountIDs });
+
+  function deleteFromLocalStorage(accountId) {
+    const newAccountIDs = accountIDs.filter((item) => item !== accountId);
+    console.log('deleteFromLocalStorage', accountId, newAccountIDs);
+    setAccountIDs(newAccountIDs);
+  }
+
+  const props = { addNewAccount, handleChange, newAccountId, exampleAccount };
+  const inlineProps = { ...props, buttonText: '+' };
   return (
     <div style={{ textAlign: 'center' }}>
       {accountIDs.length > 0 ? (
@@ -48,33 +104,12 @@ export function AccountsTable({ accountIDs, getTransactions, setAccountIDs, acco
             <tbody>
               {accountIDs.map((accountId, index) => {
                 const accountStatus = getAccountStatus(accountsStatus, accountId);
-                return (
-                  <tr key={index}>
-                    <td>
-                      <div className="accountId" title="Show transactions for this account" onClick={() => getTransactions(accountId)}>
-                        {accountId}
-                      </div>
-                    </td>
-                    <td>{accountStatus ? accountStatus.status : null}</td>
-                    <td className="fixed-width">{accountStatus ? getFormattedUtcDatetime(accountStatus.lastUpdate) : null}</td>
-                    <td>
-                      <button style={{ backgroundColor: '#ccc', color: '#000000' }} onClick={() => setAccountIDs(accountIDs.filter((item) => item !== accountId))}>
-                        Delete from localStorage
-                      </button>
-                    </td>
-                    <td>
-                      <button style={{ backgroundColor: 'red', color: '#000000' }} onClick={() => deleteFromDb(accountId)}>
-                        Delete from DB
-                      </button>
-                    </td>
-                  </tr>
-                );
+                const rowProps = { accountId, deleteFromLocalStorage, accountStatus, getTransactions };
+                return <AccountRow {...rowProps} key={index} />;
               })}
               <tr key="addAccountId">
                 <td>
-                  <form onSubmit={addNewAccount}>
-                    <input type="text" onChange={handleChange} value={newAccountId} placeholder="Add new account" />
-                  </form>
+                  <AddNewAccountForm {...inlineProps} />
                 </td>
                 <td></td>
                 <td></td>
@@ -86,10 +121,7 @@ export function AccountsTable({ accountIDs, getTransactions, setAccountIDs, acco
       ) : (
         <>
           <p>Enter the account ID:</p>
-          <form onSubmit={addNewAccount}>
-            <input type="text" onChange={handleChange} value={newAccountId} placeholder={exampleAccount} />
-            <button type="submit">Add</button>
-          </form>
+          <AddNewAccountForm {...props} />
         </>
       )}
     </div>

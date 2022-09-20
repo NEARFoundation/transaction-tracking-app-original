@@ -99,7 +99,7 @@ export default function App() {
     await fetch(REACT_APP_API + '/transactions', requestOptions)
       .then(async (response) => {
         const data = await response.json();
-        // console.log(data.transactions[0]);
+        console.log(data, data.transactions[0]);
         setTransactions(data.transactions);
         if (data.lastUpdate > 0) setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
         else setLastUpdate('');
@@ -111,9 +111,11 @@ export default function App() {
   };
 
   const getAccounts = async () => {
+    const localStorageAccountIds = localStorage.getItem('accountIDs');
+    console.log({ localStorageAccountIds });
     const requestOptions = {
       ...defaultRequestOptions,
-      body: JSON.stringify({ accountId: JSON.parse(localStorage.getItem('accountIDs')) }),
+      body: JSON.stringify({ accountId: JSON.parse(localStorageAccountIds) }),
     };
     await fetch(REACT_APP_API + '/accounts', requestOptions)
       .then(async (response) => {
@@ -191,8 +193,9 @@ export default function App() {
   };
 
   const handleChange = (event) => {
-    setNewAccountId(event.target.value);
-    console.log('handleChange');
+    const accountId = event.target.value;
+    setNewAccountId(accountId);
+    console.log('handleChange. accountId=', accountId);
   };
 
   const addTasks = async (accountId) => {
@@ -222,6 +225,7 @@ export default function App() {
   };
 
   const accountsTableProps = { accountIDs, accountsStatus, exampleAccount, handleChange, newAccountId: accountId, getTransactions, addNewAccount, setAccountIDs };
+  // console.log({ accountsTableProps });
 
   return (
     <main>
