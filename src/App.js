@@ -10,6 +10,7 @@ import { getFormattedUtcDatetime, getCsvFilename, getBeginningOfTodayUtc, getEnd
 import { logAndDisplayError } from '../shared/helpers/errors';
 
 import { MainTable } from './components/MainTable';
+import { AccountsTable } from './components/AccountsTable';
 
 const REACT_APP_ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT;
 const REACT_APP_API = process.env.REACT_APP_API;
@@ -89,6 +90,7 @@ export default function App() {
     await fetch(REACT_APP_API + '/transactions', requestOptions)
       .then(async (response) => {
         const data = await response.json();
+        // console.log(data.transactions[0]);
         setTransactions(data.transactions);
         if (data.lastUpdate > 0) setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
         else setLastUpdate('');
@@ -154,17 +156,6 @@ export default function App() {
     }
   };
 
-  const getAccountStatus = (accountId) => {
-    if (accountsStatus.length > 0) {
-      const result = accountsStatus.find((item) => {
-        return item.accountId === accountId;
-      });
-      return result ? result : [];
-    }
-
-    return [];
-  };
-
   const getAllTransactions = async () => {
     setMessage('');
     console.log('getAllTransactions', accountIDs);
@@ -224,62 +215,13 @@ export default function App() {
     if (newAccountId) await addTasks();
   };
 
+  const accountsTableProps = { accountIDs, accountsStatus, exampleAccount, handleChange, newAccountId, getTransactions, addNewAccount, setAccountIDs };
+
   return (
     <main>
       <nav>
         <h1>NEAR Transactions Accounting Report</h1>
-        <div style={{ textAlign: 'center' }}>
-          {accountIDs.length > 0 ? (
-            <>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Account ID</th>
-                    <th>Status</th>
-                    <th>Last Update</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {accountIDs.map((accountId, index) => (
-                    <tr key={index}>
-                      <td>
-                        <div className="accountId" title="Show transactions for this account" onClick={() => getTransactions(accountId)}>
-                          {accountId}
-                        </div>
-                      </td>
-                      <td>{getAccountStatus(accountId) ? getAccountStatus(accountId).status : null}</td>
-                      <td>{getAccountStatus(accountId) ? getFormattedUtcDatetime(getAccountStatus(accountId).lastUpdate) : null}</td>
-                      <td>
-                        <button style={{ backgroundColor: '#ccc', color: '#000000' }} onClick={() => setAccountIDs(accountIDs.filter((item) => item !== accountId))}>
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  <tr key="addAccountId">
-                    <td>
-                      <form onSubmit={addNewAccount}>
-                        <input type="text" onChange={handleChange} value={newAccountId} placeholder="Add new account" />
-                      </form>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                </tbody>
-              </table>
-            </>
-          ) : (
-            <>
-              <p>Enter the account ID:</p>
-              <form onSubmit={addNewAccount}>
-                <input type="text" onChange={handleChange} value={newAccountId} placeholder={exampleAccount} />
-                <button type="submit">Add</button>
-              </form>
-            </>
-          )}
-        </div>
+        <AccountsTable {...accountsTableProps} />
         {message ? <div className="msg">{message}</div> : null}
         <div>
           <hr />
