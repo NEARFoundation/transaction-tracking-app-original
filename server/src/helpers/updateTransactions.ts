@@ -8,12 +8,12 @@ import { AccountId } from '../../../shared/types';
 const pgClient = new pg.Client({ connectionString: process.env.POSTGRESQL_CONNECTION_STRING });
 await pgClient.connect();
 
-let IsRun = 0;
+let isAlreadyRunning = 0;
 
 export const runTasks = async () => {
-  if (IsRun === 0) {
+  if (isAlreadyRunning === 0) {
     try {
-      IsRun = 1;
+      isAlreadyRunning = 1;
       let types = await TxTypes.find({});
       let tasks = await TxTasks.find({});
       for (const task of tasks) {
@@ -33,7 +33,7 @@ export const runTasks = async () => {
     } catch (error) {
       console.error(error);
     }
-    IsRun = 0;
+    isAlreadyRunning = 0;
   } else {
     console.log('SyncedCron: runTasks is already running');
   }
