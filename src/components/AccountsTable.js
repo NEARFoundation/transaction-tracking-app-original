@@ -1,4 +1,7 @@
 import { getFormattedUtcDatetime } from '../../shared/helpers/datetime';
+import { addTaskForAccountId, defaultRequestOptions } from '../App.js';
+
+const REACT_APP_API = process.env.REACT_APP_API;
 
 const getAccountStatus = (accountsStatus, accountId) => {
   if (accountsStatus.length > 0) {
@@ -10,6 +13,23 @@ const getAccountStatus = (accountsStatus, accountId) => {
 
   return [];
 };
+
+async function deleteFromDb(accountId) {
+  console.log('deleteFromDb', accountId);
+  const requestOptions = {
+    ...defaultRequestOptions,
+    body: JSON.stringify({ accountId }),
+  };
+  await fetch(REACT_APP_API + '/deleteAccountData', requestOptions)
+    .then(async (response) => {
+      const data = await response.json();
+      console.log(data);
+      addTaskForAccountId(accountId);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
 
 export function AccountsTable({ accountIDs, getTransactions, setAccountIDs, accountsStatus, handleChange, newAccountId, addNewAccount, exampleAccount }) {
   return (
@@ -39,7 +59,12 @@ export function AccountsTable({ accountIDs, getTransactions, setAccountIDs, acco
                     <td>{accountStatus ? getFormattedUtcDatetime(accountStatus.lastUpdate) : null}</td>
                     <td>
                       <button style={{ backgroundColor: '#ccc', color: '#000000' }} onClick={() => setAccountIDs(accountIDs.filter((item) => item !== accountId))}>
-                        Delete
+                        Delete from localStorage
+                      </button>
+                    </td>
+                    <td>
+                      <button style={{ backgroundColor: 'red', color: '#000000' }} onClick={() => deleteFromDb(accountId)}>
+                        Delete from DB
                       </button>
                     </td>
                   </tr>

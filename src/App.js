@@ -18,14 +18,23 @@ const nearConfig = getConfig(REACT_APP_ENVIRONMENT || 'development');
 console.log({ REACT_APP_ENVIRONMENT, REACT_APP_API, nearConfig });
 const { exampleAccount, explorerUrl } = nearConfig;
 
-const defaultRequestOptions = {
+export const defaultRequestOptions = {
   headers: { 'Content-Type': 'application/json' },
   method: 'POST',
 };
 
+export async function addTaskForAccountId(accountId) {
+  console.log('addTaskForAccountId:', accountId);
+  const requestOptions = {
+    ...defaultRequestOptions,
+    body: JSON.stringify({ accountId }),
+  };
+  return fetch(REACT_APP_API + '/add-tasks', requestOptions);
+}
+
 export default function App() {
   const [message, setMessage] = useState('');
-  const [newAccountId, setNewAccountId] = useState('');
+  const [accountId, setNewAccountId] = useState('');
   const [selectedAccountId, setSelectedAccountId] = useState('');
   const [transactions, setTransactions] = useState([]);
   const [types, setTypes] = useState([]);
@@ -186,18 +195,12 @@ export default function App() {
     console.log('handleChange');
   };
 
-  const addTasks = async () => {
-    setNewAccountId('');
+  const addTasks = async (accountId) => {
     setMessage('');
-    console.log('newTasks:', newAccountId);
-    const requestOptions = {
-      ...defaultRequestOptions,
-      body: JSON.stringify({ accountId: newAccountId }),
-    };
-    await fetch(REACT_APP_API + '/add-tasks', requestOptions)
+    await addTaskForAccountId(accountId)
       .then(async (response) => {
         if (response.status === 200) {
-          if (!accountIDs.includes(newAccountId)) setAccountIDs([...accountIDs, newAccountId]);
+          if (!accountIDs.includes(accountId)) setAccountIDs([...accountIDs, accountId]);
         } else if (response.status === 400) {
           const status = await response.json();
           setMessage(status.error);
@@ -211,11 +214,14 @@ export default function App() {
 
   const addNewAccount = async (event) => {
     event.preventDefault();
-    console.log('addNewAccount', newAccountId);
-    if (newAccountId) await addTasks();
+    console.log('addNewAccount', accountId);
+    if (accountId) {
+      await addTasks(accountId);
+      setNewAccountId('');
+    }
   };
 
-  const accountsTableProps = { accountIDs, accountsStatus, exampleAccount, handleChange, newAccountId, getTransactions, addNewAccount, setAccountIDs };
+  const accountsTableProps = { accountIDs, accountsStatus, exampleAccount, handleChange, newAccountId: accountId, getTransactions, addNewAccount, setAccountIDs };
 
   return (
     <main>
