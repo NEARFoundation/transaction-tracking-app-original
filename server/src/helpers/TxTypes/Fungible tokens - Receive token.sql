@@ -5,7 +5,7 @@ SELECT b.block_timestamp,
        convert_from(decode(ara.args ->> 'args_base64', 'base64'), 'UTF8') args_base64,
        r.originated_from_transaction_hash transaction_hash,
        ara.args ->'args_json'->>'amount' amount_transferred,
-       'token' currency_transferred, /* TODO: Show the actual token symbol? */
+       'token' currency_transferred, /* TODO: Show the actual token symbol (determined by the receiver at the top level instead of in the JSON args?)? */
        r.receiver_account_id receiver_owner_account
 FROM receipts r
     INNER JOIN execution_outcomes eo ON eo.receipt_id = r.receipt_id
