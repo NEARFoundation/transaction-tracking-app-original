@@ -56,7 +56,7 @@ export function AccountsTable({ accountIDs, getTransactions, setAccountIDs, acco
                       </div>
                     </td>
                     <td>{accountStatus ? accountStatus.status : null}</td>
-                    <td>{accountStatus ? getFormattedUtcDatetime(accountStatus.lastUpdate) : null}</td>
+                    <td className="fixed-width">{accountStatus ? getFormattedUtcDatetime(accountStatus.lastUpdate) : null}</td>
                     <td>
                       <button style={{ backgroundColor: '#ccc', color: '#000000' }} onClick={() => setAccountIDs(accountIDs.filter((item) => item !== accountId))}>
                         Delete from localStorage
