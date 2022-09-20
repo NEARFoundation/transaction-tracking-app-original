@@ -25,29 +25,32 @@ export const MainTable = ({ transactions, explorerUrl }) => {
         </tr>
       </thead>
       <tbody>
-        {transactions.map((item, index) => (
-          <tr key={index}>
-            <td>{item.accountId}</td>
-            <td>{item.txType}</td>
-            <td>{item.block_timestamp}</td>
-            <td>{getFormattedDatetimeUtcFromBlockTimestamp(item.block_timestamp)}</td>
-            <td>{item.from_account}</td>
-            <td>{item.block_height}</td>
-            <td>{item.args_base64}</td>
-            <td>
-              <a href={`${explorerUrl}/transactions/${item.transaction_hash}`}>{item.transaction_hash}</a>
-            </td>
-            <td>{item.amount_transferred}</td>
-            <td>{item.currency_transferred}</td>
-            <td>{item.amount_transferred2}</td>
-            <td>{item.currency_transferred2}</td>
-            <td>{item.receiver_owner_account}</td>
-            <td>{item.receiver_lockup_account}</td>
-            <td>{item.lockup_start}</td>
-            <td>{item.lockup_duration}</td>
-            <td>{item.cliff_duration}</td>
-          </tr>
-        ))}
+        {transactions.map((transaction, index) => {
+          // console.log({ transaction });
+          return (
+            <tr key={index}>
+              <td>{transaction.accountId}</td>
+              <td>{transaction.txType}</td>
+              <td>{transaction.block_timestamp}</td>
+              <td>{getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp)}</td>
+              <td>{transaction.from_account}</td>
+              <td>{transaction.block_height}</td>
+              <td>{transaction.args_base64}</td>
+              <td>
+                <a href={`${explorerUrl}/transactions/${transaction.transaction_hash}`}>{transaction.transaction_hash}</a>
+              </td>
+              <td>{transaction.amount_transferred}</td>
+              <td>{transaction.currency_transferred}</td>
+              <td>{transaction.amount_transferred2}</td>
+              <td>{transaction.currency_transferred2}</td>
+              <td>{transaction.receiver_owner_account}</td>
+              <td>{transaction.receiver_lockup_account}</td>
+              <td>{transaction.lockup_start}</td>
+              <td>{transaction.lockup_duration}</td>
+              <td>{transaction.cliff_duration}</td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );
