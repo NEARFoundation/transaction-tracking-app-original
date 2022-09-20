@@ -11,16 +11,16 @@ import { logAndDisplayError } from '../shared/helpers/errors';
 
 import { MainTable } from './components/MainTable';
 
-const NODE_ENV = process.env.NODE_ENV;
+const REACT_APP_ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT;
 const REACT_APP_API = process.env.REACT_APP_API;
-const nearConfig = getConfig(NODE_ENV || 'development');
+const nearConfig = getConfig(REACT_APP_ENVIRONMENT || 'development');
+console.log({ REACT_APP_ENVIRONMENT, REACT_APP_API, nearConfig });
+const { exampleAccount, explorerUrl } = nearConfig;
 
 const defaultRequestOptions = {
   headers: { 'Content-Type': 'application/json' },
   method: 'POST',
 };
-
-const { exampleAccount } = nearConfig;
 
 export default function App() {
   const [message, setMessage] = useState('');
@@ -223,8 +223,6 @@ export default function App() {
     console.log('addNewAccount', newAccountId);
     if (newAccountId) await addTasks();
   };
-
-  const { explorerUrl } = nearConfig;
 
   return (
     <main>

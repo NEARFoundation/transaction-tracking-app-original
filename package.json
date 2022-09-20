@@ -11,7 +11,7 @@
     "start": "echo The app is starting! It will automatically open in your browser when ready && env-cmd -f ./.env parcel src/index.html --open",
     "dev": "nodemon --ext js --exec \"env-cmd -f ./.env.local parcel src/index.html --open\" --ignore \"dist\"",
     "test": "jest test --runInBand",
-    "start:server": "(cd server && yarn dev)"
+    "serverdev": "(cd server && yarn dev)"
   },
   "devDependencies": {
     "@nearfoundation/near-prettier-config": "^1.0.1",
