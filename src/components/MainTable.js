@@ -32,7 +32,7 @@ export const MainTable = ({ transactions, explorerUrl }) => {
               <td>{transaction.accountId}</td>
               <td>{transaction.txType}</td>
               <td>{transaction.block_timestamp}</td>
-              <td>{getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp)}</td>
+              <td className="fixed-width">{getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp)}</td>
               <td>{transaction.from_account}</td>
               <td>{transaction.block_height}</td>
               <td>{transaction.args_base64}</td>

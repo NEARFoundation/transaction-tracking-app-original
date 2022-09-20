@@ -276,3 +276,7 @@ td {
 .react-datepicker__tab-loop {
   display: inline-block;
 }
+
+.fixed-width {
+  font-family: 'Courier New', Courier, monospace;
+}
