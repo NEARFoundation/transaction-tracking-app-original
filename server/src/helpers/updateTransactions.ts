@@ -8,6 +8,7 @@ import { AccountId } from '../../../shared/types';
 const pgClient = new pg.Client({ connectionString: process.env.POSTGRESQL_CONNECTION_STRING });
 await pgClient.connect();
 
+const DEFAULT_LENGTH = 100;
 let isAlreadyRunning = 0;
 
 export const runTasks = async () => {
@@ -18,7 +19,7 @@ export const runTasks = async () => {
       let tasks = await TxTasks.find({});
       for (const task of tasks) {
         for (const type of types) {
-          await updateTransactions(task.accountId, type.name);
+          await updateTransactions(task.accountId, type.name, DEFAULT_LENGTH);
         }
         await TxTasks.findOneAndUpdate(
           { accountId: task.accountId },
@@ -55,7 +56,7 @@ async function getTransactions(accountId: AccountId, txType, block_timestamp, le
   }
 }
 
-async function updateTransactions(accountId: AccountId, txType) {
+async function updateTransactions(accountId: AccountId, txType, length: number) {
   console.log(`updateTransactions(${accountId}, ${txType})`);
   await TxTasks.findOneAndUpdate(
     { accountId: accountId },
@@ -66,7 +67,6 @@ async function updateTransactions(accountId: AccountId, txType) {
     .then()
     .catch((error) => console.error(error));
   let blockTimestamp = 0;
-  const length = 100;
   const lastBlockTimestamp = await TxActions.findOne({
     accountId: accountId,
     txType: txType,
