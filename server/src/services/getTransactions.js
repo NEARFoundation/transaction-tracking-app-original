@@ -25,6 +25,7 @@ export const getTransactions = async (request, response) => {
       cleanedTransactions.push({
         accountId: transaction.accountId,
         txType: transaction.txType,
+        block_timestamp: transaction.block_timestamp.toString(),
         block_timestamp_utc: getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp),
         from_account: transaction.from_account,
         block_height: transaction.block_height,
