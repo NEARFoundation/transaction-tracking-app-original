@@ -1,3 +1,4 @@
+import { NEAR } from 'near-units';
 import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../shared/helpers/datetime';
 
 export const MainTable = ({ transactions, explorerUrl }) => {
@@ -7,14 +8,13 @@ export const MainTable = ({ transactions, explorerUrl }) => {
         <tr>
           <th>accountId</th>
           <th>txType</th>
-          <th>block_timestamp</th>
           <th>block_timestamp_utc</th>
-          <th>from_account</th>
-          <th>block_height</th>
-          <th>args_base64</th>
           <th>transaction_hash</th>
-          <th>amount_transferred</th>
+          <th>from_account</th>
+          <th>amount_transferred_readable</th>
           <th>currency_transferred</th>
+          <th>args_base64</th>
+          <th>amount_transferred</th>
           <th>amount_transferred2</th>
           <th>currency_transferred2</th>
           <th>receiver_owner_account</th>
@@ -22,25 +22,30 @@ export const MainTable = ({ transactions, explorerUrl }) => {
           <th>lockup_start</th>
           <th>lockup_duration</th>
           <th>cliff_duration</th>
+          <th>block_timestamp</th>
+          <th>block_height</th>
         </tr>
       </thead>
       <tbody>
-        {transactions.map((transaction, index) => {
+        {transactions.map((transaction, index: number) => {
           // console.log({ transaction });
           return (
             <tr key={index}>
               <td>{transaction.accountId}</td>
               <td>{transaction.txType}</td>
-              <td>{transaction.block_timestamp}</td>
               <td className="fixed-width">{getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp)}</td>
-              <td>{transaction.from_account}</td>
-              <td>{transaction.block_height}</td>
-              <td>{transaction.args_base64}</td>
-              <td>
-                <a href={`${explorerUrl}/transactions/${transaction.transaction_hash}`}>{transaction.transaction_hash}</a>
+              <td className="max-width-none">
+                <a href={`${explorerUrl}/transactions/${transaction.transaction_hash}`} className="fixed-width">
+                  {transaction.transaction_hash}
+                </a>
               </td>
-              <td>{transaction.amount_transferred}</td>
+              <td>{transaction.from_account}</td>
+              {/* https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/src/near.ts#L20 
+              and https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/__tests__/near.spec.ts#L4*/}
+              <td>{NEAR.from(transaction.amount_transferred).toHuman()}</td>
               <td>{transaction.currency_transferred}</td>
+              <td>{transaction.args_base64}</td>
+              <td>{transaction.amount_transferred}</td>
               <td>{transaction.amount_transferred2}</td>
               <td>{transaction.currency_transferred2}</td>
               <td>{transaction.receiver_owner_account}</td>
@@ -48,6 +53,8 @@ export const MainTable = ({ transactions, explorerUrl }) => {
               <td>{transaction.lockup_start}</td>
               <td>{transaction.lockup_duration}</td>
               <td>{transaction.cliff_duration}</td>
+              <td>{transaction.block_timestamp}</td>
+              <td>{transaction.block_height}</td>
             </tr>
           );
         })}

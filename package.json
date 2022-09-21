@@ -33,6 +33,7 @@
   "dependencies": {
     "dayjs": "^1.11.5",
     "near-api-js": "~0.43.1",
+    "near-units": "^0.1.9",
     "react": "~17.0.1",
     "react-datepicker": "^4.7.0",
     "react-dom": "~17.0.1",

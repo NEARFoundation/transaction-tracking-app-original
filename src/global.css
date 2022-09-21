@@ -280,3 +280,7 @@ td {
 .fixed-width {
   font-family: 'Courier New', Courier, monospace;
 }
+
+.max-width-none {
+  max-width: none;
+}
