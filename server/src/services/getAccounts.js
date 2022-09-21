@@ -1,3 +1,4 @@
+import { getFormattedUtcDatetime } from '../../../shared/helpers/datetime.js';
 /* eslint-disable import/extensions */
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
@@ -20,7 +21,9 @@ export const getAccounts = async (request, response) => {
         else if (transactions) status = 'Done';
         else if (!transactions && account.lastUpdate > 0) status = 'No data';
 
-        if (account.lastUpdate > 0) lastUpdate = new Date(account.lastUpdate).toLocaleString(); // TODO: Improve date formatting
+        if (account.lastUpdate > 0) {
+          lastUpdate = getFormattedUtcDatetime(account.lastUpdate);
+        }
       } else {
         status = 'The account is not monitored.';
       }
