@@ -1,9 +1,10 @@
 import { getFormattedUtcDatetime } from '../../shared/helpers/datetime';
 import { addTaskForAccountId, defaultRequestOptions } from '../App.js';
+import { AccountId } from '../../shared/types';
 
 const REACT_APP_API = process.env.REACT_APP_API;
 
-const getAccountStatus = (accountsStatus, accountId) => {
+const getAccountStatus = (accountsStatus, accountId: AccountId) => {
   if (accountsStatus.length > 0) {
     const result = accountsStatus.find((item) => {
       return item.accountId === accountId;
@@ -14,7 +15,7 @@ const getAccountStatus = (accountsStatus, accountId) => {
   return [];
 };
 
-async function deleteFromDb(accountId) {
+async function deleteFromDb(accountId: AccountId) {
   console.log('deleteFromDb', accountId);
   const requestOptions = {
     ...defaultRequestOptions,
@@ -80,7 +81,7 @@ function AddNewAccountForm({ addNewAccount, handleChange, newAccountId, exampleA
 export function AccountsTable({ accountIDs, getTransactions, setAccountIDs, accountsStatus, handleChange, newAccountId, addNewAccount, exampleAccount }) {
   // console.log({ accountIDs });
 
-  function deleteFromLocalStorage(accountId) {
+  function deleteFromLocalStorage(accountId: AccountId) {
     const newAccountIDs = accountIDs.filter((item) => item !== accountId);
     console.log('deleteFromLocalStorage', accountId, newAccountIDs);
     setAccountIDs(newAccountIDs);
@@ -102,7 +103,7 @@ export function AccountsTable({ accountIDs, getTransactions, setAccountIDs, acco
               </tr>
             </thead>
             <tbody>
-              {accountIDs.map((accountId, index) => {
+              {accountIDs.map((accountId: AccountId, index: number) => {
                 const accountStatus = getAccountStatus(accountsStatus, accountId);
                 const rowProps = { accountId, deleteFromLocalStorage, accountStatus, getTransactions };
                 return <AccountRow {...rowProps} key={index} />;
