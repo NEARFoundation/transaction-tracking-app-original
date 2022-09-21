@@ -12,10 +12,10 @@ import { logAndDisplayError } from '../shared/helpers/errors';
 import { MainTable } from './components/MainTable';
 import { AccountsTable } from './components/AccountsTable';
 
-const REACT_APP_ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT;
-const REACT_APP_API = process.env.REACT_APP_API;
-const nearConfig = getConfig(REACT_APP_ENVIRONMENT || 'development');
-console.log({ REACT_APP_ENVIRONMENT, REACT_APP_API, nearConfig });
+const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT ?? 'development';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const nearConfig = getConfig(ENVIRONMENT);
+console.log({ ENVIRONMENT, API_BASE_URL, nearConfig });
 const { exampleAccount, explorerUrl } = nearConfig;
 
 export const defaultRequestOptions = {
@@ -29,7 +29,7 @@ export async function addTaskForAccountId(accountId) {
     ...defaultRequestOptions,
     body: JSON.stringify({ accountId }),
   };
-  return fetch(REACT_APP_API + '/add-tasks', requestOptions);
+  return fetch(API_BASE_URL + '/add-tasks', requestOptions);
 }
 
 export default function App() {
@@ -66,7 +66,7 @@ export default function App() {
       ...defaultRequestOptions,
       method: 'GET',
     };
-    await fetch(REACT_APP_API + '/types', requestOptions)
+    await fetch(API_BASE_URL + '/types', requestOptions)
       .then(async (response) => {
         const json = await response.json();
         setTypes(json.types);
@@ -96,7 +96,7 @@ export default function App() {
         types: Array.isArray(selectedTypes) ? selectedTypes.map((x) => x.value) : [],
       }),
     };
-    await fetch(REACT_APP_API + '/transactions', requestOptions)
+    await fetch(API_BASE_URL + '/transactions', requestOptions)
       .then(async (response) => {
         const data = await response.json();
         console.log(data, data.transactions[0]);
@@ -117,7 +117,7 @@ export default function App() {
       ...defaultRequestOptions,
       body: JSON.stringify({ accountId: JSON.parse(localStorageAccountIds) }),
     };
-    await fetch(REACT_APP_API + '/accounts', requestOptions)
+    await fetch(API_BASE_URL + '/accounts', requestOptions)
       .then(async (response) => {
         const data = await response.json();
         // console.log(data['accounts']);
@@ -179,7 +179,7 @@ export default function App() {
         types: Array.isArray(selectedTypes) ? selectedTypes.map((item) => item.value) : [],
       }),
     };
-    await fetch(REACT_APP_API + '/transactions', requestOptions)
+    await fetch(API_BASE_URL + '/transactions', requestOptions)
       .then(async (response) => {
         const data = await response.json();
         setAllTransactions(data.transactions);

@@ -266,7 +266,10 @@ td {
 }
 
 .react-datepicker__input-container input {
-  width: 180px;
+  width: auto;
+  font-family: 'Courier New', Courier, monospace;
+  padding: 0.2rem;
+  margin-right: 1rem;
 }
 
 .react-datepicker-wrapper {

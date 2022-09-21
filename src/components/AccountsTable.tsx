@@ -1,8 +1,11 @@
 import { getFormattedUtcDatetime } from '../../shared/helpers/datetime';
 import { addTaskForAccountId, defaultRequestOptions } from '../App.js';
 import { AccountId } from '../../shared/types';
+import { stringToBoolean } from '../../shared/helpers/strings';
 
-const REACT_APP_API = process.env.REACT_APP_API;
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const ALLOW_DELETING_FROM_DATABASE = stringToBoolean(process.env.REACT_APP_ALLOW_DELETING_FROM_DATABASE ?? 'false');
+console.log(process.env.REACT_APP_ALLOW_DELETING_FROM_DATABASE, { ALLOW_DELETING_FROM_DATABASE });
 
 const getAccountStatus = (accountsStatus, accountId: AccountId) => {
   if (accountsStatus.length > 0) {
@@ -21,7 +24,7 @@ async function deleteFromDb(accountId: AccountId) {
     ...defaultRequestOptions,
     body: JSON.stringify({ accountId }),
   };
-  await fetch(REACT_APP_API + '/deleteAccountData', requestOptions)
+  await fetch(API_BASE_URL + '/deleteAccountData', requestOptions)
     .then(async (response) => {
       const data = await response.json();
       console.log(data);
@@ -33,6 +36,21 @@ async function deleteFromDb(accountId: AccountId) {
 }
 
 function AccountRow({ accountId, deleteFromLocalStorage, accountStatus, getTransactions }) {
+  const deleteFromDbCell = ALLOW_DELETING_FROM_DATABASE ? (
+    <td>
+      <button
+        style={{ backgroundColor: 'red', color: 'black' }}
+        onClick={() => {
+          deleteFromLocalStorage(accountId);
+          deleteFromDb(accountId);
+        }}
+      >
+        Delete from DB
+      </button>
+    </td>
+  ) : (
+    <></>
+  );
   return (
     <tr>
       <td>
@@ -48,21 +66,12 @@ function AccountRow({ accountId, deleteFromLocalStorage, accountStatus, getTrans
           onClick={() => {
             deleteFromLocalStorage(accountId);
           }}
+          title="Delete from localStorage"
         >
-          Delete from localStorage
+          Delete
         </button>
       </td>
-      <td>
-        <button
-          style={{ backgroundColor: 'red', color: 'black' }}
-          onClick={() => {
-            deleteFromLocalStorage(accountId);
-            deleteFromDb(accountId);
-          }}
-        >
-          Delete from DB
-        </button>
-      </td>
+      {deleteFromDbCell}
     </tr>
   );
 }
@@ -109,7 +118,7 @@ export function AccountsTable({ accountIDs, getTransactions, setAccountIDs, acco
                 return <AccountRow {...rowProps} key={index} />;
               })}
               <tr key="addAccountId">
-                <td>
+                <td className="max-width-none">
                   <AddNewAccountForm {...inlineProps} />
                 </td>
                 <td></td>
