@@ -58,11 +58,13 @@ async function getTransactions(accountId: AccountId, txType: string, block_times
 }
 
 async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string) {
-  const mostRecentBlockTimestamp = await TxActions.findOne({
+  const mostRecentTxAction = await TxActions.findOne({
     accountId,
     txType,
   }).sort([['block_timestamp', -1]]);
-  return mostRecentBlockTimestamp ?? 0;
+  const mostRecentBlockTimestamp = mostRecentTxAction ? mostRecentTxAction.block_timestamp : 0;
+  // console.log(`getMostRecentBlockTimestamp(${accountId}, ${txType})`, mostRecentBlockTimestamp);
+  return mostRecentBlockTimestamp;
 }
 
 async function updateTransactions(accountId: AccountId, txType: string, length: number) {
