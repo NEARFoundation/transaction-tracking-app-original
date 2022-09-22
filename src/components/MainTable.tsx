@@ -1,4 +1,4 @@
-import { NEAR } from 'near-units';
+import { roundAsLocaleStringWithUnitLabel } from '../../shared/helpers/nearUnits';
 import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../shared/helpers/datetime';
 
 export const MainTable = ({ transactions, explorerUrl }) => {
@@ -42,7 +42,7 @@ export const MainTable = ({ transactions, explorerUrl }) => {
               <td>{transaction.from_account}</td>
               {/* https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/src/near.ts#L20 
               and https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/__tests__/near.spec.ts#L4*/}
-              <td>{NEAR.from(transaction.amount_transferred).toHuman()}</td>
+              <td style={{ textAlign: 'right' }}>{roundAsLocaleStringWithUnitLabel(transaction.amount_transferred)}</td>
               <td>{transaction.currency_transferred}</td>
               <td>{transaction.args_base64}</td>
               <td>{transaction.amount_transferred}</td>
