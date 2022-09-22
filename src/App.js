@@ -29,7 +29,7 @@ export async function addTaskForAccountId(accountId) {
     ...defaultRequestOptions,
     body: JSON.stringify({ accountId }),
   };
-  return fetch(API_BASE_URL + '/add-tasks', requestOptions);
+  return fetch(API_BASE_URL + '/addTasks', requestOptions);
 }
 
 export default function App() {
