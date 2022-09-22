@@ -25,15 +25,6 @@ export function round(yoctonear: string, unitLabel = 'N', decimals = 6): number 
   return value.toFixed(decimals);
 }
 
-// export function getUnitLabel(power: number): string {
-//   const near = NEAR.parse('1 N');
-//   const denominator = getDenominator(power);
-//   const divided = near.div(denominator);
-//   const dividedStr = divided.toString();
-//   console.log(near.toString(), denominator.toString(), { dividedStr });
-//   return dividedStr.replace('1 ', '');
-// }
-
 /**
  *
  * @param yoctonear {string}

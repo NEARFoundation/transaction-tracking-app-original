@@ -9,11 +9,7 @@ describe('nearUnits', () => {
     expect(getDenominator(3).toString()).toBe('TODO');
   });
 
-  test('getUnitLabel', () => {
-    expect(getUnitLabel(-24).toString()).toBe('TODO');
-    expect(getUnitLabel(1).toString()).toBe('TODO');
-    expect(getUnitLabel(3).toString()).toBe('TODO');
-  });*/
+*/
 
   test('round', () => {
     const cases = {
