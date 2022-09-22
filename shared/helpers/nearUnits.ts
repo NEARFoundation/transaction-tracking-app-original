@@ -6,9 +6,9 @@ import exactMath from 'exact-math'; // https://www.npmjs.com/package/exact-math
 /**
  *
  * @param yoctonear {string}
- * @param unitLabel {string} e.g. Use -24 for yoctonear, 1 for near, 3 for kN, etc https://docs.near.org/tools/near-api-js/utils https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/__tests__/near.spec.ts#L13
+ * @param unitLabel {string} e.g. 'yN' for yoctonear, 'N' for near, 'kN' for kilonear, etc https://docs.near.org/tools/near-api-js/utils https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/__tests__/near.spec.ts#L13
  * @param decimals {number} e.g. 6 would return 6 decimal places like 0.000000
- * @returns {string} e.g. 1000.000001
+ * @returns {string} e.g. 1000.000000
  */
 export function round(yoctonear: string, unitLabel = 'N', decimals = 6): string {
   const original = yoctonear.replaceAll('_', '');
@@ -23,7 +23,7 @@ export function round(yoctonear: string, unitLabel = 'N', decimals = 6): string 
 /**
  *
  * @param yoctonear {string}
- * @param unitLabel {string} e.g. Use -24 for yoctonear, 1 for near, 3 for kN, etc https://docs.near.org/tools/near-api-js/utils https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/__tests__/near.spec.ts#L13
+ * @param unitLabel {string} e.g. 'yN' for yoctonear, 'N' for near, 'kN' for kilonear, etc https://docs.near.org/tools/near-api-js/utils https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/__tests__/near.spec.ts#L13
  * @param decimals {number} e.g. 6 would return 6 decimal places like 0.000000
  * @returns {string} e.g. 1,000.000000 N
  */
