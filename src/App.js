@@ -10,21 +10,31 @@ import { getFormattedUtcDatetime, getCsvFilename, getBeginningOfTodayUtc, getEnd
 import { logAndDisplayError } from '../shared/helpers/errors';
 
 import { MainTable } from './components/MainTable';
+import { AccountsTable } from './components/AccountsTable';
 
-const NODE_ENV = process.env.NODE_ENV;
-const REACT_APP_API = process.env.REACT_APP_API;
-const nearConfig = getConfig(NODE_ENV || 'development');
+const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT ?? 'development';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const nearConfig = getConfig(ENVIRONMENT);
+console.log({ ENVIRONMENT, API_BASE_URL, nearConfig });
+const { exampleAccount, explorerUrl } = nearConfig;
 
-const defaultRequestOptions = {
+export const defaultRequestOptions = {
   headers: { 'Content-Type': 'application/json' },
   method: 'POST',
 };
 
-const { exampleAccount } = nearConfig;
+export async function addTaskForAccountId(accountId) {
+  console.log('addTaskForAccountId:', accountId);
+  const requestOptions = {
+    ...defaultRequestOptions,
+    body: JSON.stringify({ accountId }),
+  };
+  return fetch(API_BASE_URL + '/addTasks', requestOptions);
+}
 
 export default function App() {
   const [message, setMessage] = useState('');
-  const [newAccountId, setNewAccountId] = useState('');
+  const [accountId, setNewAccountId] = useState('');
   const [selectedAccountId, setSelectedAccountId] = useState('');
   const [transactions, setTransactions] = useState([]);
   const [types, setTypes] = useState([]);
@@ -56,7 +66,7 @@ export default function App() {
       ...defaultRequestOptions,
       method: 'GET',
     };
-    await fetch(REACT_APP_API + '/types', requestOptions)
+    await fetch(API_BASE_URL + '/types', requestOptions)
       .then(async (response) => {
         const json = await response.json();
         setTypes(json.types);
@@ -76,7 +86,7 @@ export default function App() {
   const getTransactions = async (accountId) => {
     setMessage('');
     setSelectedAccountId(accountId);
-    console.log('getTransactions', accountId, startDate, endDate);
+    console.log('getTransactions', { accountId, start: getFormattedUtcDatetime(startDate), end: getFormattedUtcDatetime(endDate) });
     const requestOptions = {
       ...defaultRequestOptions,
       body: JSON.stringify({
@@ -86,9 +96,10 @@ export default function App() {
         types: Array.isArray(selectedTypes) ? selectedTypes.map((x) => x.value) : [],
       }),
     };
-    await fetch(REACT_APP_API + '/transactions', requestOptions)
+    await fetch(API_BASE_URL + '/transactions', requestOptions)
       .then(async (response) => {
         const data = await response.json();
+        console.log(data, data.transactions[0]);
         setTransactions(data.transactions);
         if (data.lastUpdate > 0) setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
         else setLastUpdate('');
@@ -100,11 +111,13 @@ export default function App() {
   };
 
   const getAccounts = async () => {
+    const localStorageAccountIds = localStorage.getItem('accountIDs');
+    console.log({ localStorageAccountIds });
     const requestOptions = {
       ...defaultRequestOptions,
-      body: JSON.stringify({ accountId: JSON.parse(localStorage.getItem('accountIDs')) }),
+      body: JSON.stringify({ accountId: JSON.parse(localStorageAccountIds) }),
     };
-    await fetch(REACT_APP_API + '/accounts', requestOptions)
+    await fetch(API_BASE_URL + '/accounts', requestOptions)
       .then(async (response) => {
         const data = await response.json();
         // console.log(data['accounts']);
@@ -154,17 +167,6 @@ export default function App() {
     }
   };
 
-  const getAccountStatus = (accountId) => {
-    if (accountsStatus.length > 0) {
-      const result = accountsStatus.find((item) => {
-        return item.accountId === accountId;
-      });
-      return result ? result : [];
-    }
-
-    return [];
-  };
-
   const getAllTransactions = async () => {
     setMessage('');
     console.log('getAllTransactions', accountIDs);
@@ -177,7 +179,7 @@ export default function App() {
         types: Array.isArray(selectedTypes) ? selectedTypes.map((item) => item.value) : [],
       }),
     };
-    await fetch(REACT_APP_API + '/transactions', requestOptions)
+    await fetch(API_BASE_URL + '/transactions', requestOptions)
       .then(async (response) => {
         const data = await response.json();
         setAllTransactions(data.transactions);
@@ -191,22 +193,17 @@ export default function App() {
   };
 
   const handleChange = (event) => {
-    setNewAccountId(event.target.value);
-    console.log('handleChange');
+    const accountId = event.target.value;
+    setNewAccountId(accountId);
+    console.log('handleChange. accountId=', accountId);
   };
 
-  const addTasks = async () => {
-    setNewAccountId('');
+  const addTasks = async (accountId) => {
     setMessage('');
-    console.log('newTasks:', newAccountId);
-    const requestOptions = {
-      ...defaultRequestOptions,
-      body: JSON.stringify({ accountId: newAccountId }),
-    };
-    await fetch(REACT_APP_API + '/add-tasks', requestOptions)
+    await addTaskForAccountId(accountId)
       .then(async (response) => {
         if (response.status === 200) {
-          if (!accountIDs.includes(newAccountId)) setAccountIDs([...accountIDs, newAccountId]);
+          if (!accountIDs.includes(accountId)) setAccountIDs([...accountIDs, accountId]);
         } else if (response.status === 400) {
           const status = await response.json();
           setMessage(status.error);
@@ -220,68 +217,21 @@ export default function App() {
 
   const addNewAccount = async (event) => {
     event.preventDefault();
-    console.log('addNewAccount', newAccountId);
-    if (newAccountId) await addTasks();
+    console.log('addNewAccount', accountId);
+    if (accountId) {
+      await addTasks(accountId);
+      setNewAccountId('');
+    }
   };
 
-  const { explorerUrl } = nearConfig;
+  const accountsTableProps = { accountIDs, accountsStatus, exampleAccount, handleChange, newAccountId: accountId, getTransactions, addNewAccount, setAccountIDs };
+  // console.log({ accountsTableProps });
 
   return (
     <main>
       <nav>
         <h1>NEAR Transactions Accounting Report</h1>
-        <div style={{ textAlign: 'center' }}>
-          {accountIDs.length > 0 ? (
-            <>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Account ID</th>
-                    <th>Status</th>
-                    <th>Last Update</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {accountIDs.map((accountId, index) => (
-                    <tr key={index}>
-                      <td>
-                        <div className="accountId" title="Show transactions for this account" onClick={() => getTransactions(accountId)}>
-                          {accountId}
-                        </div>
-                      </td>
-                      <td>{getAccountStatus(accountId) ? getAccountStatus(accountId).status : null}</td>
-                      <td>{getAccountStatus(accountId) ? getFormattedUtcDatetime(getAccountStatus(accountId).lastUpdate) : null}</td>
-                      <td>
-                        <button style={{ backgroundColor: '#ccc', color: '#000000' }} onClick={() => setAccountIDs(accountIDs.filter((item) => item !== accountId))}>
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  <tr key="addAccountId">
-                    <td>
-                      <form onSubmit={addNewAccount}>
-                        <input type="text" onChange={handleChange} value={newAccountId} placeholder="Add new account" />
-                      </form>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                </tbody>
-              </table>
-            </>
-          ) : (
-            <>
-              <p>Enter the account ID:</p>
-              <form onSubmit={addNewAccount}>
-                <input type="text" onChange={handleChange} value={newAccountId} placeholder={exampleAccount} />
-                <button type="submit">Add</button>
-              </form>
-            </>
-          )}
-        </div>
+        <AccountsTable {...accountsTableProps} />
         {message ? <div className="msg">{message}</div> : null}
         <div>
           <hr />

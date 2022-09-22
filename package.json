@@ -9,9 +9,9 @@
     "deploy:pages": "gh-pages -d dist/",
     "deploy": "npm run build && npm run deploy:pages",
     "start": "echo The app is starting! It will automatically open in your browser when ready && env-cmd -f ./.env parcel src/index.html --open",
-    "dev": "nodemon --ext js --exec \"env-cmd -f ./.env.local parcel src/index.html --open\" --ignore \"dist\"",
+    "dev": "nodemon --ext js --exec \"env-cmd -f ./.env.development.local parcel src/index.html\" --ignore \"dist\"",
     "test": "jest test --runInBand",
-    "start:server": "(cd server && yarn dev)"
+    "serverdev": "(cd server && yarn dev)"
   },
   "devDependencies": {
     "@nearfoundation/near-prettier-config": "^1.0.1",
@@ -33,6 +33,7 @@
   "dependencies": {
     "dayjs": "^1.11.5",
     "near-api-js": "~0.43.1",
+    "near-units": "^0.1.9",
     "react": "~17.0.1",
     "react-datepicker": "^4.7.0",
     "react-dom": "~17.0.1",

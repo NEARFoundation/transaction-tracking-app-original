@@ -4,6 +4,11 @@ import utc from 'dayjs/plugin/utc.js';
 // https://day.js.org/docs/en/plugin/utc
 dayjs.extend(utc);
 
+/**
+ *
+ * @param {Date} date
+ * @returns {string} like 2022-08-03 17:32:00 UTC
+ */
 export const getFormattedUtcDatetime = (date: Date): string => {
   return dayjs(date).utc().format('YYYY-MM-DD HH:mm:ss [UTC]'); // https://day.js.org/docs/en/manipulate/utc
 };
@@ -35,7 +40,7 @@ export const getEndOfTodayUtc = (): Date => {
 /**
  *
  * @param block_timestamp in nanoseconds (billionths of a second), such as 1659547920000000000
- * @returns {string} like 2022-08-03 17:32:00 UTC
+ * @returns {string} like 2022-08-03 17:32:00
  */
 export const getFormattedDatetimeUtcFromBlockTimestamp = (block_timestamp: number): string => {
   const timestampInMilliseconds = block_timestamp / 1_000_000;

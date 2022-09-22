@@ -8,17 +8,19 @@ import { AccountId } from '../../../shared/types';
 const pgClient = new pg.Client({ connectionString: process.env.POSTGRESQL_CONNECTION_STRING });
 await pgClient.connect();
 
-let IsRun = 0;
+const DEFAULT_LENGTH = 100;
+let isAlreadyRunning = 0;
 
 export const runTasks = async () => {
-  if (IsRun === 0) {
+  if (isAlreadyRunning === 0) {
     try {
-      IsRun = 1;
+      isAlreadyRunning = 1;
+      console.log('runTasks() isAlreadyRunning', new Date());
       let types = await TxTypes.find({});
       let tasks = await TxTasks.find({});
       for (const task of tasks) {
         for (const type of types) {
-          await updateTransactions(task.accountId, type.name);
+          await updateTransactions(task.accountId, type.name, DEFAULT_LENGTH);
         }
         await TxTasks.findOneAndUpdate(
           { accountId: task.accountId },
@@ -33,13 +35,13 @@ export const runTasks = async () => {
     } catch (error) {
       console.error(error);
     }
-    IsRun = 0;
+    isAlreadyRunning = 0;
   } else {
     console.log('SyncedCron: runTasks is already running');
   }
 };
 
-async function getTransactions(accountId: AccountId, txType, block_timestamp, length) {
+async function getTransactions(accountId: AccountId, txType: string, block_timestamp, length) {
   try {
     let TxType = await TxTypes.findOne({ name: txType });
     if (TxType) {
@@ -55,7 +57,17 @@ async function getTransactions(accountId: AccountId, txType, block_timestamp, le
   }
 }
 
-async function updateTransactions(accountId: AccountId, txType) {
+async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string) {
+  const mostRecentTxAction = await TxActions.findOne({
+    accountId,
+    txType,
+  }).sort([['block_timestamp', -1]]);
+  const mostRecentBlockTimestamp = mostRecentTxAction ? mostRecentTxAction.block_timestamp : 0;
+  // console.log(`getMostRecentBlockTimestamp(${accountId}, ${txType})`, mostRecentBlockTimestamp);
+  return mostRecentBlockTimestamp;
+}
+
+async function updateTransactions(accountId: AccountId, txType: string, length: number) {
   console.log(`updateTransactions(${accountId}, ${txType})`);
   await TxTasks.findOneAndUpdate(
     { accountId: accountId },
@@ -65,14 +77,8 @@ async function updateTransactions(accountId: AccountId, txType) {
   )
     .then()
     .catch((error) => console.error(error));
-  let blockTimestamp = 0;
-  const length = 100;
-  const lastBlockTimestamp = await TxActions.findOne({
-    accountId: accountId,
-    txType: txType,
-  }).sort([['block_timestamp', -1]]);
-  if (lastBlockTimestamp) blockTimestamp = lastBlockTimestamp.block_timestamp;
-  let transactions: any = await getTransactions(accountId, txType, blockTimestamp, length);
+  let minBlockTimestamp = await getMostRecentBlockTimestamp(accountId, txType);
+  let transactions: any = await getTransactions(accountId, txType, minBlockTimestamp, length);
 
   while (transactions.length > 0) {
     transactions.map(async (item: any) => {
@@ -107,18 +113,18 @@ async function updateTransactions(accountId: AccountId, txType) {
 
     let nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
     let i = 1;
-    while (nextBlockTimestamp === blockTimestamp && transactions.length === length * i) {
+    while (nextBlockTimestamp === minBlockTimestamp && transactions.length === length * i) {
       i++;
       let increasedLength = length * i;
-      transactions = await getTransactions(accountId, txType, blockTimestamp, increasedLength);
+      transactions = await getTransactions(accountId, txType, minBlockTimestamp, increasedLength);
       nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
     }
-    if (nextBlockTimestamp === blockTimestamp) {
+    if (nextBlockTimestamp === minBlockTimestamp) {
       break;
     }
     if (i === 1) {
-      blockTimestamp = nextBlockTimestamp;
-      transactions = await getTransactions(accountId, txType, blockTimestamp, length);
+      minBlockTimestamp = nextBlockTimestamp;
+      transactions = await getTransactions(accountId, txType, minBlockTimestamp, length);
     }
   }
 }
