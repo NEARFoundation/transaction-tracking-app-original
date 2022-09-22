@@ -10,7 +10,7 @@ import exactMath from 'exact-math'; // https://www.npmjs.com/package/exact-math
  * @param decimals {number} e.g. 6 would return 6 decimal places like 0.000000
  * @returns {string} e.g. 1000.000000
  */
-export function round(yoctonear: string, unitLabel = 'N', decimals = 6): string {
+export function round(yoctonear: string, unitLabel = 'mN', decimals = 6): string {
   const original = yoctonear.replaceAll('_', '');
   const denominator = NEAR.parse(`1 ${unitLabel}`).toString();
   // console.log(original, denominator);
@@ -27,7 +27,7 @@ export function round(yoctonear: string, unitLabel = 'N', decimals = 6): string 
  * @param decimals {number} e.g. 6 would return 6 decimal places like 0.000000
  * @returns {string} e.g. 1,000.000000 N
  */
-export function roundAsLocaleStringWithUnitLabel(yoctonear: string, unitLabel = 'N', decimals = 6): string {
+export function roundAsLocaleStringWithUnitLabel(yoctonear: string, unitLabel = 'mN', decimals = 6): string {
   const value = round(yoctonear, unitLabel, decimals);
   // console.log({ value, unitLabel });
   const localeString = Number(value).toLocaleString(undefined, {
