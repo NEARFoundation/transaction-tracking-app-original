@@ -7,8 +7,8 @@ This [React] app was initialized with [create-near-app]
 To run this project locally:
 
 1. Prerequisites: Make sure you've installed [Node.js] ≥ 12 and [Mongo](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/) or [Docker](https://docs.docker.com/get-docker/). See below about Mongo.
-1. `cp .env .env.local`
-1. `cp server/.env.development server/.env.development.local` and then edit the values.
+1. `cp .env.development .env.development.local && cp server/.env.development server/.env.development.local`
+1. Edit the values for each of those local env files. If you set REACT_APP_ALLOW_DELETING_FROM_DATABASE to "true" in .env.development.local and ALLOW_DELETING_FROM_DATABASE to "true" in server/.env.development.local, you will see a button in the frontend that allows you to delete records from the database, which is useful when you are manually testing whether transaction processing is working after editing the SQL queries.
 1. Start Mongo (unless you'll be starting Docker) with something like `brew services start mongodb-community@5.0`.
 1. Install dependencies for UI and server: `yarn install && cd server && yarn install && cd ..`
 1. Start the server: `yarn serverdev`
