@@ -4,8 +4,8 @@ import { NEAR } from 'near-units'; // https://github.com/near/units-js
 import exactMath from 'exact-math'; // https://www.npmjs.com/package/exact-math
 
 export function getDenominator(unitLabel: string): string {
-  const denominator = NEAR.parse(`1 ${unitLabel}`); // TODO
-  console.log('denominator', denominator.toString());
+  const denominator = NEAR.parse(`1 ${unitLabel}`);
+  // console.log('denominator', denominator.toString());
   return denominator.toString();
 }
 

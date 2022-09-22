@@ -1,15 +1,16 @@
 // https://jestjs.io/docs/getting-started#using-typescript
 
+import exactMath from 'exact-math'; // https://www.npmjs.com/package/exact-math
+import { NEAR } from 'near-units'; // https://github.com/near/units-js
 import { roundAsLocaleStringWithUnitLabel, round, getDenominator, getUnitLabel } from './nearUnits';
 
 describe('nearUnits', () => {
-  /*   test('getDenominator', () => {
-    expect(getDenominator(-24).toString()).toBe('TODO');
-    expect(getDenominator(1).toString()).toBe('TODO');
-    expect(getDenominator(3).toString()).toBe('TODO');
+  console.log('temp', exactMath.pow(10, 24, true));
+  test('getDenominator', () => {
+    expect(getDenominator('yN').toString()).toBe('1');
+    expect(getDenominator('N').toString()).toBe(NEAR.parse('1 N').toString());
+    expect(getDenominator('kN').toString()).toBe(NEAR.parse('1 kN').toString());
   });
-
-*/
 
   test('round', () => {
     const cases = {
@@ -22,6 +23,7 @@ describe('nearUnits', () => {
       expect(round(key)).toBe(cases[key]);
     });
   });
+
   /*
   test('roundAsLocaleStringWithUnitLabel', () => {
     const cases = {
