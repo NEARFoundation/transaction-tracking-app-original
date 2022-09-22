@@ -1,7 +1,10 @@
+import { NEAR } from 'near-units'; // https://github.com/near/units-js
 import { roundAsLocaleString } from '../../shared/helpers/nearUnits';
 import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../shared/helpers/datetime';
 
 export const MainTable = ({ transactions, explorerUrl }) => {
+  const unitLabel = 'mN';
+  const denominator = NEAR.parse(`1 ${unitLabel}`).toString();
   return (
     <table>
       <thead>
@@ -11,8 +14,8 @@ export const MainTable = ({ transactions, explorerUrl }) => {
           <th>block_timestamp_utc</th>
           <th>transaction_hash</th>
           <th>from_account</th>
-          {/* TODO: Some currencies won't be NEAR so this label should specify the divisor instead. */}
-          <th>amount_transferred_mN</th>
+          {/* Some currencies won't be NEAR so this label should specify the divisor instead. */}
+          <th>amount_transferred_div_by_{denominator}</th>
           <th>currency_transferred</th>
           <th>args_base64</th>
           <th>amount_transferred</th>
@@ -44,7 +47,7 @@ export const MainTable = ({ transactions, explorerUrl }) => {
               {/* https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/src/near.ts#L20 
               and https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/__tests__/near.spec.ts#L4*/}
               <td className="fixed-width" style={{ textAlign: 'right' }}>
-                {roundAsLocaleString(transaction.amount_transferred)}
+                {roundAsLocaleString(transaction.amount_transferred, unitLabel)}
               </td>
               <td>{transaction.currency_transferred}</td>
               <td>{transaction.args_base64}</td>
