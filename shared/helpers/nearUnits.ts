@@ -1,4 +1,4 @@
-// TODO: Move this into https://github.com/near/units-js/ ?
+// TODO: Move this and its tests into https://github.com/near/units-js/ ?
 
 import { NEAR } from 'near-units'; // https://github.com/near/units-js
 import exactMath from 'exact-math'; // https://www.npmjs.com/package/exact-math
@@ -16,7 +16,7 @@ export function getDenominator(unitLabel: string): string {
  * @param decimals {number} e.g. 6 would return 6 decimal places like 0.000000
  * @returns {string} e.g. 1000.000001
  */
-export function round(yoctonear: string, unitLabel = 'N', decimals = 6): number {
+export function round(yoctonear: string, unitLabel = 'N', decimals = 6): string {
   const original = yoctonear.replaceAll('_', '');
   const denominator = getDenominator(unitLabel);
   const value = exactMath.div(original, denominator);
@@ -34,7 +34,10 @@ export function round(yoctonear: string, unitLabel = 'N', decimals = 6): number 
  */
 export function roundAsLocaleStringWithUnitLabel(yoctonear: string, unitLabel = 'N', decimals = 6): string {
   const value = round(yoctonear, unitLabel, decimals);
-  console.log({ value, unitLabel });
-  // TODO: Honor decimals precision by padding with extra zeroes if necessary
-  return `${value.toLocaleString()} ${unitLabel}`;
+  // console.log({ value, unitLabel });
+  return `${Number(value).toLocaleString(undefined, {
+    //useGrouping: 'auto',
+    signDisplay: 'auto',
+    maximumFractionDigits: decimals,
+  })} ${unitLabel}`; // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat#options https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString
 }
