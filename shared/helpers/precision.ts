@@ -52,7 +52,7 @@ export function round(amount: string, decimals = 0, divisorPower = 0, locale?: s
   }
   const amountCleaned = amount.replaceAll('_', '');
   const divisor = Math.pow(10, divisorPower);
-  const value: string = exactMath.div(amountCleaned, divisor, { returnString: true }); // TODO: Figure out safe way to divide huge numbers without losing precision.
+  const value: string = exactMath.div(amountCleaned, divisor, { returnString: true, maxDecimal: amount.length + decimals }); // https://www.npmjs.com/package/exact-math#the-config-maxdecimal-property-usage
   // console.log(`round(${amount}, decimals = ${decimals}, divisorPower = ${divisorPower}) = ${value}`, divisor);
   const localeString = getLocaleStringToDecimals(value, decimals, locale);
   return localeString;
