@@ -22,19 +22,19 @@ export function getLocaleStringToDecimals(amount: string, decimals: any, locale?
   const mainFinal = mainFormat.format(mainBigInt); // '321.321.321.321.321.321' | '321.321.321.321.321.322'
   const decimalFinal = typeof decimalString !== 'undefined' ? `${decimalChar}${decimalString}` : ''; // '.357' | '.998'
   const amountFinal = `${mainFinal}${decimalFinal}`; // '321.321.321.321.321.321,36' | '321.321.321.321.321.322,00'
-  console.log({
-    amount,
-    fixed,
-    mainString,
-    decimalString,
-    'decimalString.length': decimalString ? decimalString.length : undefined,
-    decimalFormat,
-    decimalFinal,
-    mainFormat,
-    mainBigInt,
-    mainFinal,
-    amountFinal,
-  });
+  // console.log({
+  //   amount,
+  //   fixed,
+  //   mainString,
+  //   decimalString,
+  //   'decimalString.length': decimalString ? decimalString.length : undefined,
+  //   decimalFormat,
+  //   decimalFinal,
+  //   mainFormat,
+  //   mainBigInt,
+  //   mainFinal,
+  //   amountFinal,
+  // });
   return amountFinal;
 }
 
@@ -52,7 +52,7 @@ export function round(amount: string, decimals = 0, divisorPower = 0, locale?: s
   }
   const amountCleaned = amount.replaceAll('_', '');
   const divisor = Math.pow(10, divisorPower);
-  const value: string = exactMath.div(amountCleaned, divisor, { returnString: true });
+  const value: string = exactMath.div(amountCleaned, divisor, { returnString: true }); // TODO: Figure out safe way to divide huge numbers without losing precision.
   // console.log(`round(${amount}, decimals = ${decimals}, divisorPower = ${divisorPower}) = ${value}`, divisor);
   const localeString = getLocaleStringToDecimals(value, decimals, locale);
   return localeString;

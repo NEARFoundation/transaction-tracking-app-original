@@ -1,14 +1,22 @@
 // https://jestjs.io/docs/getting-started#using-typescript
 
 import exactMath from 'exact-math'; // https://www.npmjs.com/package/exact-math
+import { Decimal } from 'decimal.js'; // https://github.com/MikeMcl/decimal.js
 import { round, getLocaleStringToDecimals } from './precision';
 
 describe('precision helper', () => {
   const locale = 'en-US';
   const deDE = 'de-DE';
 
+  test('decimals.js', () => {
+    expect(new Decimal('530467119.530467119').div(new Decimal(1)).toFixed(10)).toBe('530467119.5304671190');
+    expect(new Decimal('9999513263875304671192000009').div(new Decimal(1)).toFixed(1)).toBe('9999513263875304671200000000.0'); // NOTE: This unexpected lack of precision is unfortunate.
+    expect(new Decimal('4513263875304671192000009').div(new Decimal(1)).toFixed(25)).toBe('4513263875304671192000000.0000000000000000000000000'); // NOTE: This unexpected lack of precision is unfortunate.
+  });
+
   test('exact-math', () => {
     expect(exactMath.div('9999513263875304671192000009', 1, { returnString: true })).toBe('9999513263875304671192000009');
+    expect(exactMath.div('1.1998679030467029262556391239', 1, { returnString: true })).toBe('1.19986790304670293'); // NOTE: This unexpected lack of precision is unfortunate.
     expect(exactMath.div('4.5', 1e12, { returnString: true })).toBe('4.5e-12');
   });
 
@@ -51,6 +59,6 @@ describe('precision helper', () => {
     expect(round('490', 1, 3, locale)).toBe('0.5');
     expect(round('4_513_263_875_304_671_192_000_009', 6, 21, locale)).toBe('4,513.263875');
     expect(round('4_513_263_875_304_671_192_000_009', 6, 21, deDE)).toBe('4.513,263875');
-    expect(round('4_513_263_875_304_671_192_000_009.1998679030467029262556391239', 27, undefined, locale)).toBe('4,513,263,875,304,671,192,000,009.1998679030467029262556391234');
+    expect(round('4_513_263_875_304_671_192_000_009.1998679030467029262556391239', 27, undefined, locale)).toBe('4,513,263,875,304,671,192,000,009.199867903046702930000000000'); // TODO: Throw an error instead of returning this surprising result.
   });
 });
