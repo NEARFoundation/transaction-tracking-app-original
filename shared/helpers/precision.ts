@@ -1,6 +1,14 @@
 import exactMath from 'exact-math'; // https://www.npmjs.com/package/exact-math
 import { Decimal } from 'decimal.js'; // https://github.com/MikeMcl/decimal.js
 
+function getDecimalChar(locale: string | undefined): string {
+  const decimalFormat = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const decimalFullString = '1.1';
+  const decimalFullNumber = Number.parseFloat(decimalFullString);
+  const decimalChar = decimalFormat.format(decimalFullNumber).charAt(1); // e.g. '.' or ','
+  return decimalChar;
+}
+
 /**
  *
  * @param amount {string}
@@ -11,16 +19,12 @@ import { Decimal } from 'decimal.js'; // https://github.com/MikeMcl/decimal.js
 export function getLocaleStringToDecimals(amount: string, decimals: any, locale?: string): string {
   // Thanks to https://stackoverflow.com/a/68906367/ because https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString and https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt/toLocaleString would not work for huge numbers or numbers with many decimal places.
 
-  const decimalFormat = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  const decimalFullString = '1.1';
-  const decimalFullNumber = Number.parseFloat(decimalFullString);
-  const decimalChar = decimalFormat.format(decimalFullNumber).charAt(1); // e.g. '.' or ','
   const fixed = new Decimal(amount).toFixed(decimals);
   const [mainString, decimalString] = fixed.split('.'); // ['321321321321321321', '357' | '998']
   const mainFormat = new Intl.NumberFormat(locale, { minimumFractionDigits: 0 });
   let mainBigInt = BigInt(mainString); // 321321321321321321n
   const mainFinal = mainFormat.format(mainBigInt); // '321.321.321.321.321.321' | '321.321.321.321.321.322'
-  const decimalFinal = typeof decimalString !== 'undefined' ? `${decimalChar}${decimalString}` : ''; // '.357' | '.998'
+  const decimalFinal = typeof decimalString !== 'undefined' ? `${getDecimalChar(locale)}${decimalString}` : ''; // '.357' | '.998'
   const amountFinal = `${mainFinal}${decimalFinal}`; // '321.321.321.321.321.321,36' | '321.321.321.321.321.322,00'
   // console.log({
   //   amount,
@@ -28,7 +32,6 @@ export function getLocaleStringToDecimals(amount: string, decimals: any, locale?
   //   mainString,
   //   decimalString,
   //   'decimalString.length': decimalString ? decimalString.length : undefined,
-  //   decimalFormat,
   //   decimalFinal,
   //   mainFormat,
   //   mainBigInt,
