@@ -1,4 +1,5 @@
 import exactMath from 'exact-math'; // https://www.npmjs.com/package/exact-math
+import { Decimal } from 'decimal.js'; // https://github.com/MikeMcl/decimal.js
 
 /**
  *
@@ -10,22 +11,30 @@ import exactMath from 'exact-math'; // https://www.npmjs.com/package/exact-math
 export function getLocaleStringToDecimals(amount: string, decimals: any, locale?: string): string {
   // Thanks to https://stackoverflow.com/a/68906367/ because https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString and https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt/toLocaleString would not work for huge numbers or numbers with many decimal places.
 
-  if (decimals > 20) {
-    throw new Error(
-      'decimals must be <= 20. See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat#minimumfractiondigits',
-    );
-  }
-  const [mainString, decimalString] = amount.split('.'); // ['321321321321321321', '357' | '998']
-  const decimalFormat = new Intl.NumberFormat(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-  const decimalFullString = `0.${decimalString}`; // '0.357' | '0.998'
-  const decimalFullNumber = Number.parseFloat(decimalFullString); // 0.357 | 0.998
-  const decimalFullFinal = decimalFormat.format(decimalFullNumber); // '0,36' | '1,00'
-  const decimalFinal = decimalFullFinal.slice(1); // ',36' | ',00'
+  const decimalFormat = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const decimalFullString = '1.1';
+  const decimalFullNumber = Number.parseFloat(decimalFullString);
+  const decimalChar = decimalFormat.format(decimalFullNumber).charAt(1); // e.g. '.' or ','
+  const fixed = new Decimal(amount).toFixed(decimals);
+  const [mainString, decimalString] = fixed.split('.'); // ['321321321321321321', '357' | '998']
   const mainFormat = new Intl.NumberFormat(locale, { minimumFractionDigits: 0 });
   let mainBigInt = BigInt(mainString); // 321321321321321321n
-  if (decimalFullFinal[0] === '1') mainBigInt += BigInt(1); // 321321321321321321n | 321321321321321322n
   const mainFinal = mainFormat.format(mainBigInt); // '321.321.321.321.321.321' | '321.321.321.321.321.322'
+  const decimalFinal = typeof decimalString !== 'undefined' ? `${decimalChar}${decimalString}` : ''; // '.357' | '.998'
   const amountFinal = `${mainFinal}${decimalFinal}`; // '321.321.321.321.321.321,36' | '321.321.321.321.321.322,00'
+  console.log({
+    amount,
+    fixed,
+    mainString,
+    decimalString,
+    'decimalString.length': decimalString ? decimalString.length : undefined,
+    decimalFormat,
+    decimalFinal,
+    mainFormat,
+    mainBigInt,
+    mainFinal,
+    amountFinal,
+  });
   return amountFinal;
 }
 
