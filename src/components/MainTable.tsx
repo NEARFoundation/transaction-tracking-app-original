@@ -1,10 +1,8 @@
 import { round } from '../../shared/helpers/precision';
 import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../shared/helpers/datetime';
 
-export const MainTable = ({ transactions, explorerUrl }) => {
-  const readableAmountDivisorPower = 9; // TODO: Make this dynamic based on a frontend field.
-  const decimalPlaces = 6;
-  const readableAmountHeader = `amount_transferred_div_by_1e${readableAmountDivisorPower.toString()}`;
+export const MainTable = ({ transactions, explorerUrl, divisorPower, decimalPlaces }) => {
+  const readableAmountHeader = divisorPower ? `amount_transferred_div_by_1e${divisorPower.toString()}` : `amount_transferred_readable`;
   return (
     <table>
       <thead>
@@ -46,8 +44,8 @@ export const MainTable = ({ transactions, explorerUrl }) => {
               <td>{transaction.from_account}</td>
               {/* https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/src/near.ts#L20 
               and https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/__tests__/near.spec.ts#L4*/}
-              <td className="fixed-width" style={{ textAlign: 'right' }}>
-                {round(transaction.amount_transferred, decimalPlaces, readableAmountDivisorPower)}
+              <td className="fixed-width max-width-none" style={{ textAlign: 'right' }}>
+                {round(transaction.amount_transferred, decimalPlaces, divisorPower)}
               </td>
               <td>{transaction.currency_transferred}</td>
               <td>{transaction.args_base64}</td>
