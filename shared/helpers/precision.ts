@@ -9,11 +9,12 @@ function getLocaleStringToDecimals(value: number, decimals: number): string {
     maximumFractionDigits: decimals,
   });
 }
+
 /**
  *
  * @param original {string}
  * @param decimals {number} e.g. 6 would return 6 decimal places like 0.000000
- * @param divisorPower {number} e.g. in terms of NEAR, this would be 0 for yoctonear, 24 for near, 27 for kilonear, etc https://docs.near.org/tools/near-api-js/utils https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/__tests__/near.spec.ts#L13
+ * @param divisorPower {number} e.g. 0 for yocto, 24 for [base], 27 for kilo, etc https://docs.near.org/tools/near-api-js/utils https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/__tests__/near.spec.ts#L13
  * @returns {string} e.g. 1000.000000
  */
 export function round(original: string, decimals = 6, divisorPower = 0): string {
