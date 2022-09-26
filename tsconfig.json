@@ -1,12 +1,23 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "esModuleInterop": true,
     "module": "ES2022",
     "strictNullChecks": true,
-    "allowSyntheticDefaultImports": true,
     "lib": ["ES2021.String"],
-    "moduleResolution": "node"
+    /* Specify JSX code generation */
+    "jsx": "react",
+    /* Generate corresponding .map files */
+    "sourceMap": true,
+    /* Enable all strict type-checking options */
+    "strict": true,
+    /* Specify module resolution strategy */
+    "moduleResolution": "node",
+    /* Base directory to resolve non-absolute module names */
+    //"baseUrl": "./src"
+    /* allow import React instead of import * as React */
+    "allowSyntheticDefaultImports": true,
+    /*  Emit interop between CommonJS and ES modules */
+    "esModuleInterop": true
   },
   "references": [
     {

@@ -14,3 +14,13 @@ export type TxActionsFilter = {
   };
   txType?: string[];
 };
+
+declare global {
+  interface Window {
+    // https://bobbyhadz.com/blog/typescript-property-does-not-exist-on-type-window
+    accountId: AccountId;
+    contract: any;
+    nearInitPromise: any;
+    walletConnection: any;
+  }
+}

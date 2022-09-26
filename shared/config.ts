@@ -2,7 +2,7 @@
 const contractName = process.env.CONTRACT_NAME || 'near-transactions-accounting-report';
 const localHome = process.env.HOME;
 
-const getConfig = (environment) => {
+const getConfig = (environment: string) => {
   console.log('shared/config.js getConfig', { environment });
   switch (environment) {
     case 'production':

@@ -21,7 +21,7 @@ Go ahead and play with the app and the code. As you make code changes, the app w
 1. The "backend" code lives in the `/server` folder. See the README there for
    more info.
 2. The frontend code lives in the `/src` folder. `/src/index.html` is a great
-   place to start exploring. Note that it loads in `/src/index.js`, where you
+   place to start exploring. Note that it loads in `/src/index.tsx`, where you
    can learn how the frontend connects to the NEAR blockchain.
 3. Tests use [jest](https://jestjs.io/docs/getting-started#using-typescript). You can run via `yarn test`.
 
