@@ -1,7 +1,8 @@
-import { NEAR } from 'near-units';
+import { round } from '../../shared/helpers/precision';
 import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../shared/helpers/datetime';
 
-export const MainTable = ({ transactions, explorerUrl }) => {
+export const MainTable = ({ transactions, explorerUrl, divisorPower, decimalPlaces }) => {
+  const readableAmountHeader = divisorPower ? `amount_transferred_div_by_1e${divisorPower.toString()}` : `amount_transferred_readable`;
   return (
     <table>
       <thead>
@@ -11,7 +12,8 @@ export const MainTable = ({ transactions, explorerUrl }) => {
           <th>block_timestamp_utc</th>
           <th>transaction_hash</th>
           <th>from_account</th>
-          <th>amount_transferred_readable</th>
+          {/* Some currencies won't be NEAR so this label should specify the divisor instead. */}
+          <th>{readableAmountHeader}</th>
           <th>currency_transferred</th>
           <th>args_base64</th>
           <th>amount_transferred</th>
@@ -42,7 +44,9 @@ export const MainTable = ({ transactions, explorerUrl }) => {
               <td>{transaction.from_account}</td>
               {/* https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/src/near.ts#L20 
               and https://github.com/near/units-js/blob/d0e76d5729b0f3b58b98263a1f92fb057eb84d96/__tests__/near.spec.ts#L4*/}
-              <td>{NEAR.from(transaction.amount_transferred).toHuman()}</td>
+              <td className="fixed-width max-width-none" style={{ textAlign: 'right' }}>
+                {round(transaction.amount_transferred, decimalPlaces, divisorPower)}
+              </td>
               <td>{transaction.currency_transferred}</td>
               <td>{transaction.args_base64}</td>
               <td>{transaction.amount_transferred}</td>

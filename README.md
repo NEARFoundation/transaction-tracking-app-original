@@ -23,9 +23,7 @@ Go ahead and play with the app and the code. As you make code changes, the app w
 2. The frontend code lives in the `/src` folder. `/src/index.html` is a great
    place to start exploring. Note that it loads in `/src/index.js`, where you
    can learn how the frontend connects to the NEAR blockchain.
-3. Tests: there are different kinds of tests for the frontend and the backend
-   See `server/README` for info about how it's tested. The frontend code gets
-   tested with [jest]. You can run both of these at once with `yarn run test`.
+3. Tests use [jest](https://jestjs.io/docs/getting-started#using-typescript). You can run via `yarn test`.
 
 # Troubleshooting
 
@@ -44,7 +42,6 @@ On Windows, if you're seeing an error containing `EPERM` it may be related to sp
 - [react](https://reactjs.org/)
 - [create-near-app](https://github.com/near/create-near-app)
 - [node.js](https://nodejs.org/en/download/package-manager/)
-- [jest](https://jestjs.io/)
 - [near accounts](https://docs.near.org/docs/concepts/account)
 - [near wallet](https://wallet.testnet.near.org/)
 - [near-cli](https://github.com/near/near-cli)

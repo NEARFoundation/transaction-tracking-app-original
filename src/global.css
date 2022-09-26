@@ -288,3 +288,8 @@ td {
 .max-width-none {
   max-width: none;
 }
+
+.my-react-select-container.divisorPower,
+.my-react-select-container.decimalPlaces {
+  display: inline-block;
+}

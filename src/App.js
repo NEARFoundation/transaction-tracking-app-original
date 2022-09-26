@@ -3,11 +3,12 @@ import './global.css';
 import DatePicker from 'react-datepicker';
 import CsvDownload from 'react-json-to-CSV';
 import 'react-datepicker/dist/react-datepicker.css';
-import MultiSelect from 'react-select';
+import MultiSelect from 'react-select'; // https://react-select.com/home
 
 import getConfig from '../shared/config';
 import { getFormattedUtcDatetime, getCsvFilename, getBeginningOfTodayUtc, getEndOfTodayUtc } from '../shared/helpers/datetime';
 import { logAndDisplayError } from '../shared/helpers/errors';
+import { useLocalStorage } from './helpers/localStorage';
 
 import { MainTable } from './components/MainTable';
 import { AccountsTable } from './components/AccountsTable';
@@ -42,6 +43,11 @@ export default function App() {
   const [allTransactions, setAllTransactions] = useState([]);
   const [lastUpdate, setLastUpdate] = useState('');
   const [prependFilenameWithAcctNames, setPrependFilenameWithAcctNames] = useState(true);
+  const [divisorPower, setDivisorPower] = useLocalStorage('divisorPower', 9);
+  const divisorPowerOptions = [0, 9].map((x) => ({ value: x, label: x ? `1e${x}` : 1 }));
+  const [decimalPlaces, setDecimalPlaces] = useLocalStorage('decimalPlaces', 6);
+  const decimalPlacesOptions = [1, 2, 3, 4, 5, 6, 7, 8].map((x) => ({ value: x, label: x }));
+  console.log({ divisorPowerOptions, decimalPlacesOptions });
   const [startDate, setStartDate] = useState(() => {
     const saved = localStorage.getItem('rangeDate');
     const initialValue = JSON.parse(saved);
@@ -167,6 +173,20 @@ export default function App() {
     }
   };
 
+  function onChangeDivisorPower(chosenOption, event) {
+    const { value } = chosenOption;
+    console.log('onChangeDivisorPower', { value, event });
+    setDivisorPower(value);
+    // ONEDAY: save to localStorage
+  }
+
+  function onChangeDecimalPlaces(chosenOption, event) {
+    const { value } = chosenOption;
+    console.log('onChangeDecimalPlaces', { value, event });
+    setDecimalPlaces(value);
+    // ONEDAY: save to localStorage
+  }
+
   const getAllTransactions = async () => {
     setMessage('');
     console.log('getAllTransactions', accountIDs);
@@ -235,6 +255,29 @@ export default function App() {
         {message ? <div className="msg">{message}</div> : null}
         <div>
           <hr />
+          <span style={{ paddingRight: '1rem' }}>
+            Divide by:{' '}
+            <MultiSelect
+              options={divisorPowerOptions}
+              placeholder="Divide by"
+              defaultValue={divisorPowerOptions.find((option) => option.value === divisorPower)}
+              className="my-react-select-container divisorPower"
+              onChange={onChangeDivisorPower}
+              setState={setDivisorPower}
+            />
+          </span>
+          <span>
+            Decimal places:{' '}
+            <MultiSelect
+              options={decimalPlacesOptions}
+              placeholder="Decimal places"
+              defaultValue={decimalPlacesOptions.find((option) => option.value === decimalPlaces)}
+              className="my-react-select-container decimalPlaces"
+              onChange={onChangeDecimalPlaces}
+              setState={setDecimalPlaces}
+            />
+          </span>
+          <hr />
           {accountIDs.length > 0 ? (
             <>
               <div style={{ paddingBottom: '6px', textAlign: 'center' }}>
@@ -295,7 +338,7 @@ export default function App() {
 
         {transactions.length > 0 ? (
           <>
-            <MainTable transactions={transactions} explorerUrl={explorerUrl} />
+            <MainTable transactions={transactions} explorerUrl={explorerUrl} divisorPower={divisorPower} decimalPlaces={decimalPlaces} />
           </>
         ) : null}
         {transactions.length === 0 && selectedAccountId ? <>No data</> : null}
