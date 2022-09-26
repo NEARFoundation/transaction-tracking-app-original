@@ -1,6 +1,6 @@
 import { connect, Contract, keyStores, WalletConnection } from 'near-api-js';
 
-import getConfig from '../shared/config.js';
+import getConfig from '../../shared/config.js';
 
 const REACT_APP_ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT || 'development';
 console.log('src/utils.js', { REACT_APP_ENVIRONMENT });

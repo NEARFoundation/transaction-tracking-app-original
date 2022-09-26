@@ -8,6 +8,7 @@ import MultiSelect from 'react-select'; // https://react-select.com/home
 import getConfig from '../shared/config';
 import { getFormattedUtcDatetime, getCsvFilename, getBeginningOfTodayUtc, getEndOfTodayUtc } from '../shared/helpers/datetime';
 import { logAndDisplayError } from '../shared/helpers/errors';
+import { useLocalStorage } from './helpers/localStorage';
 
 import { MainTable } from './components/MainTable';
 import { AccountsTable } from './components/AccountsTable';
@@ -42,10 +43,10 @@ export default function App() {
   const [allTransactions, setAllTransactions] = useState([]);
   const [lastUpdate, setLastUpdate] = useState('');
   const [prependFilenameWithAcctNames, setPrependFilenameWithAcctNames] = useState(true);
-  const [divisorPower, setDivisorPower] = useState(9); // ONEDAY: read from localStorage
-  const divisorPowerOptions = [[0, 9].map((x) => ({ value: x, label: x ? `1e${x}` : 1 }))].flat();
-  const [decimalPlaces, setDecimalPlaces] = useState(6); // ONEDAY: read from localStorage
-  const decimalPlacesOptions = [[1, 2, 3, 4, 5, 6, 7, 8].map((x) => ({ value: x, label: x }))].flat();
+  const [divisorPower, setDivisorPower] = useLocalStorage('divisorPower', 9);
+  const divisorPowerOptions = [0, 9].map((x) => ({ value: x, label: x ? `1e${x}` : 1 }));
+  const [decimalPlaces, setDecimalPlaces] = useLocalStorage('decimalPlaces', 6);
+  const decimalPlacesOptions = [1, 2, 3, 4, 5, 6, 7, 8].map((x) => ({ value: x, label: x }));
   console.log({ divisorPowerOptions, decimalPlacesOptions });
   const [startDate, setStartDate] = useState(() => {
     const saved = localStorage.getItem('rangeDate');
