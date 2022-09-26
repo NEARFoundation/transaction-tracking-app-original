@@ -1,4 +1,3 @@
-import exactMath from 'exact-math'; // https://www.npmjs.com/package/exact-math
 import { Decimal } from 'decimal.js'; // https://github.com/MikeMcl/decimal.js
 
 function getDecimalChar(locale: string | undefined): string {
@@ -55,7 +54,9 @@ export function round(amount: string, decimals = 0, divisorPower = 0, locale?: s
   }
   const amountCleaned = amount.replaceAll('_', '');
   const divisor = Math.pow(10, divisorPower);
-  const value: string = exactMath.div(amountCleaned, divisor, { returnString: true, maxDecimal: amount.length + decimals }); // https://www.npmjs.com/package/exact-math#the-config-maxdecimal-property-usage
+  const precision = amount.length + decimals;
+  Decimal.set({ precision }); // https://mikemcl.github.io/decimal.js/#precision
+  const value: string = new Decimal(amountCleaned).div(divisor).toFixed(precision);
   // console.log(`round(${amount}, decimals = ${decimals}, divisorPower = ${divisorPower}) = ${value}`, divisor);
   const localeString = getLocaleStringToDecimals(value, decimals, locale);
   return localeString;

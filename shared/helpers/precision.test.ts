@@ -1,6 +1,6 @@
 // https://jestjs.io/docs/getting-started#using-typescript
 
-import exactMath from 'exact-math'; // https://www.npmjs.com/package/exact-math
+import { Decimal } from 'decimal.js'; // https://github.com/MikeMcl/decimal.js
 import { round, getLocaleStringToDecimals } from './precision';
 
 describe('precision helper', () => {
@@ -11,7 +11,7 @@ describe('precision helper', () => {
     expect(getLocaleStringToDecimals('4500000000', 1, locale)).toBe('4,500,000,000.0');
     expect(getLocaleStringToDecimals('9000.0000000000004500000000', 15, locale)).toBe('9,000.000000000000450');
     expect(getLocaleStringToDecimals('9000.630', 3, deDE)).toBe('9.000,630');
-    expect(getLocaleStringToDecimals(exactMath.formula('4.5e-12', { returnString: true }), 2, locale)).toBe('0.00');
+    expect(getLocaleStringToDecimals(new Decimal('4.5e-12').toFixed(10), 2, locale)).toBe('0.00');
     expect(getLocaleStringToDecimals('4513263875304671192000009.1998679030467029262556391239', 28, locale)).toBe('4,513,263,875,304,671,192,000,009.1998679030467029262556391239');
   });
 
