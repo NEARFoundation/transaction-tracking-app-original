@@ -3,7 +3,8 @@ import { TxActions } from '../models/TxActions.js';
 import { TxTypes } from '../models/TxTypes.js';
 import { TxTasks } from '../models/TxTasks.js';
 import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
-import { AccountId } from '../../../shared/types';
+import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../../shared/helpers/datetime.js';
+import { AccountId, TxActionRow } from '../../../shared/types';
 
 const pgClient = new pg.Client({ connectionString: process.env.POSTGRESQL_CONNECTION_STRING });
 await pgClient.connect();
@@ -41,13 +42,15 @@ export const runTasks = async () => {
   }
 };
 
-async function getTransactions(accountId: AccountId, txType: string, block_timestamp, length) {
+async function getTransactions(accountId: AccountId, txType: string, block_timestamp: number, length: number): Promise<TxActionRow[]> {
   try {
     let TxType = await TxTypes.findOne({ name: txType });
     if (TxType) {
-      console.log(`getTransactions(${accountId}, ${txType}, ${block_timestamp.toString()}, ${length})`);
+      console.log(`getTransactions(${accountId}, ${txType}, ${getFormattedDatetimeUtcFromBlockTimestamp(block_timestamp)}, ${length})`);
       const res = await pgClient.query(TxType.sql, [accountId, block_timestamp.toString(), length]);
-      return res.rows;
+      const rows = res.rows as unknown as TxActionRow[];
+      // console.log(JSON.stringify(rows));
+      return rows;
     } else {
       return [];
     }
@@ -57,7 +60,7 @@ async function getTransactions(accountId: AccountId, txType: string, block_times
   }
 }
 
-async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string) {
+async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string): Promise<number> {
   const mostRecentTxAction = await TxActions.findOne({
     accountId,
     txType,
@@ -78,10 +81,10 @@ async function updateTransactions(accountId: AccountId, txType: string, length: 
     .then()
     .catch((error) => console.error(error));
   let minBlockTimestamp = await getMostRecentBlockTimestamp(accountId, txType);
-  let transactions: any = await getTransactions(accountId, txType, minBlockTimestamp, length);
+  let transactions = await getTransactions(accountId, txType, minBlockTimestamp, length);
 
   while (transactions.length > 0) {
-    transactions.map(async (item: any) => {
+    transactions.map(async (item) => {
       console.log('Received: ', item.block_timestamp);
       if (item.pool_id) item.currency_transferred2 = await getCurrencyByPool(parseInt(item.pool_id));
       if (item.get_currency_by_contract) item.currency_transferred = await getCurrencyByContract(item.get_currency_by_contract);

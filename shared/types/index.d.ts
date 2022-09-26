@@ -6,6 +6,29 @@ export type AccountStatus = {
   status: string;
 };
 
+export type TxActionRow = {
+  // See server/src/models/TxActions.js and https://mongoosejs.com/docs/typescript.html
+  accountId: string;
+  txType: string;
+  block_timestamp: number;
+  block_timestamp_utc: string;
+  from_account?: string;
+  block_height?: number;
+  args_base64?: string;
+  transaction_hash?: string;
+  amount_transferred?: string;
+  currency_transferred?: string;
+  amount_transferred2?: string;
+  currency_transferred2?: string;
+  receiver_owner_account?: string;
+  receiver_lockup_account?: string;
+  lockup_start?: string;
+  lockup_duration?: string;
+  cliff_duration?: string;
+  get_currency_by_contract?: string;
+  pool_id?: string;
+};
+
 export type TxActionsFilter = {
   accountId: AccountId;
   block_timestamp: {

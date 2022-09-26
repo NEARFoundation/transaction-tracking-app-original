@@ -1,7 +1,7 @@
 /* eslint-disable import/extensions */
 import { getFormattedDatetimeUtcFromBlockTimestamp, getRangeFilter } from '../../../shared/helpers/datetime.js';
 import { respondWithServerError } from '../../../shared/helpers/errors.js';
-import { TxActionsFilter } from '../../../shared/types';
+import { TxActionRow, TxActionsFilter } from '../../../shared/types';
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
 /* eslint-enable import/extensions */
@@ -16,17 +16,17 @@ export const getTransactions = async (request, response) => {
       block_timestamp: datetimeRangeFilter,
     };
     if (body.types.length > 0) filter = { ...filter, txType: body.types };
-    const transactions = await TxActions.find(filter).sort({ block_timestamp: -1 });
+    const transactions: TxActionRow[] = await TxActions.find(filter).sort({ block_timestamp: -1 });
     const task = await TxTasks.findOne({ accountId: body.accountId }).select({ _id: 0 });
 
-    const cleanedTransactions: any[] = [];
+    const cleanedTransactions: TxActionRow[] = [];
     // eslint-disable-next-line array-callback-return
     transactions.map((transaction) => {
       /* eslint-disable canonical/sort-keys */
       cleanedTransactions.push({
         accountId: transaction.accountId,
         txType: transaction.txType,
-        block_timestamp: transaction.block_timestamp.toString(),
+        block_timestamp: transaction.block_timestamp,
         block_timestamp_utc: getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp),
         from_account: transaction.from_account,
         block_height: transaction.block_height,
