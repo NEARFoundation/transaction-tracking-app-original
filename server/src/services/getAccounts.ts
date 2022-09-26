@@ -1,4 +1,7 @@
 import { getFormattedUtcDatetime } from '../../../shared/helpers/datetime.js';
+import { respondWithServerError } from '../../../shared/helpers/errors.js';
+import { AccountStatus } from '../../../shared/types';
+
 /* eslint-disable import/extensions */
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
@@ -8,7 +11,7 @@ export const getAccounts = async (request, response) => {
   const accountIds = request.body.accountId;
   console.log('getAccounts accountIds', accountIds);
   try {
-    const accounts = [];
+    const accounts: AccountStatus[] = [];
     for (const accountId of accountIds) {
       console.log('getAccounts', accountId);
       const account = await TxTasks.findOne({ accountId }).select({ __v: 0, _id: 0 });
@@ -34,7 +37,6 @@ export const getAccounts = async (request, response) => {
 
     response.send({ accounts });
   } catch (error) {
-    console.error(error);
-    response.status(500).send({ error: 'Server error. Please try again.' });
+    respondWithServerError(response, error);
   }
 };
