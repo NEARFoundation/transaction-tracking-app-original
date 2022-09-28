@@ -1,24 +1,24 @@
+// https://kulshekhar.github.io/ts-jest/docs/guides/esm-support/
+
 /* eslint-disable canonical/filename-match-exported */
-import { type Config } from 'jest';
+import { type JestConfigWithTsJest } from 'ts-jest';
 
-const config: Config = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  // modulePaths: ['<rootDir>', '/Users/rcwalsh/code/near/tx-tracking-app/shared/'],
+const jestConfig: JestConfigWithTsJest = {
+  // [...]
+  preset: 'ts-jest/presets/default-esm', // or other ESM presets
   moduleNameMapper: {
-    '^shared/(.*)$': ['<rootDir>/../shared/$1'],
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-  // roots: ['<rootDir>'],
-
-  // modulePaths: ['<rootDir>', '../shared'],
-  // moduleDirectories: ['node_modules', 'src', '../../../shared/'],
-  // modulePaths: ['node_modules', 'src', '../shared'], // https://jestjs.io/docs/next/configuration#modulepaths-arraystring
-  // moduleNameMapper: {
-  //   // '^@App/(.*)$': '<rootDir>/src/$1',
-  //   // '^../shared/(.*)$': '<rootDir>/shared/$1',
-  //   '@Shared/(.*)': '<rootDir>/../shared/$1',
-  // },
-  // roots: ['<rootDir>/src', '<rootDir>/../shared'], // https://jestjs.io/docs/next/configuration#roots-arraystring
+  transform: {
+    // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
+    // '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+      },
+    ],
+  },
 };
 
-export default config;
+export default jestConfig;
