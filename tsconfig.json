@@ -17,7 +17,8 @@
     /* allow import React instead of import * as React */
     "allowSyntheticDefaultImports": true,
     /*  Emit interop between CommonJS and ES modules */
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["node", "jest"]
   },
   "references": [
     {
