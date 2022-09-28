@@ -3,6 +3,7 @@ import { InMemoryKeyStore } from 'near-api-js/lib/key_stores/in_memory_key_store
 import { type KeyStore } from 'near-api-js/lib/key_stores/keystore.js';
 
 export function getNearApiConnection(nodeUrl: string, keyStore?: KeyStore) {
+  console.log('getNearApiConnection', { nodeUrl, keyStore, nearApi });
   const connectionInfo = { url: nodeUrl };
   const provider = new nearApi.providers.JsonRpcProvider(connectionInfo);
   const signer = new nearApi.InMemorySigner(keyStore ?? new InMemoryKeyStore());

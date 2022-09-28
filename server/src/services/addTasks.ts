@@ -1,12 +1,11 @@
 import nearApi from 'near-api-js';
 
-import { AccountId } from '../../../shared/types';
-import { getNearApiConnection } from '../helpers/nearConnection.js';
-
 import getConfig from '../../../shared/config.js';
+import { type AccountId } from '../../../shared/types';
+import { getNearApiConnection } from '../helpers/nearConnection.js';
 import { TxTasks } from '../models/TxTasks.js';
 
-const nearConfig = getConfig(process.env.NODE_ENV || 'development');
+const nearConfig = getConfig(process.env.NODE_ENV);
 
 const { nodeUrl } = nearConfig;
 

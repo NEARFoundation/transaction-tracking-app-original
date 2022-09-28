@@ -1,12 +1,14 @@
 // https://jestjs.io/docs/getting-started#using-typescript
 
 import { Decimal } from 'decimal.js'; // https://github.com/MikeMcl/decimal.js
+
 import { round, getLocaleStringToDecimals } from './precision';
 
 type Cases = {
   [key: string]: string;
 };
 
+// eslint-disable-next-line max-lines-per-function
 describe('precision helper', () => {
   const locale = 'en-US';
   const deDE = 'de-DE';
@@ -28,9 +30,10 @@ describe('precision helper', () => {
       '9_993_575_646_028_206_228_514': '9,993,575,646,028,206,228,514',
       '4_500_000_000': '4,500,000,000',
     };
-    Object.keys(cases).forEach((key) => {
+    for (const key of Object.keys(cases)) {
       expect(round(key, undefined, undefined, locale)).toBe(cases[key]);
-    });
+    }
+
     expect(round('1', undefined, undefined, locale)).toBe('1');
   });
 
@@ -40,11 +43,11 @@ describe('precision helper', () => {
       '9_993_575_646_028_206_228_514': '9.99',
       '4_500_000_000': '0.00',
     };
-    Object.keys(cases).forEach((key) => {
+    for (const key of Object.keys(cases)) {
       const decimals = 2;
       const divisorPower = 21;
       expect(round(key, decimals, divisorPower, locale)).toBe(cases[key]);
-    });
+    }
 
     expect(round('500_000_000_000_000', 4, 15, locale)).toBe('0.5000');
     expect(round('490', 1, 3, locale)).toBe('0.5');

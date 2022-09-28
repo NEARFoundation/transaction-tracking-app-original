@@ -1,9 +1,10 @@
 import { getFormattedDatetimeUtcFromBlockTimestamp, getRangeFilter } from '../../../shared/helpers/datetime.js';
 import { respondWithServerError } from '../../../shared/helpers/errors.js';
-import { TxActionRow, TxActionsFilter } from '../../../shared/types';
+import { type TxActionRow, type TxActionsFilter } from '../../../shared/types';
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
 
+// eslint-disable-next-line max-lines-per-function
 export const getTransactions = async (request, response) => {
   try {
     const { body } = request;

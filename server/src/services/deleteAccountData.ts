@@ -1,5 +1,4 @@
 import { stringToBoolean } from '../../../shared/helpers/strings.js';
-
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
 
@@ -13,6 +12,7 @@ export const deleteAccountData = async (request, response) => {
     if (!ALLOW_DELETING_FROM_DATABASE) {
       throw new Error('ALLOW_DELETING_FROM_DATABASE is not enabled.');
     }
+
     TxTasks.deleteMany({ accountId })
       .then()
       .catch((error) => console.error({ error }));

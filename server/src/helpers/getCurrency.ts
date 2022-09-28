@@ -10,24 +10,25 @@ const { nodeUrl } = nearConfig;
 
 const connection = getNearApiConnection(nodeUrl);
 
-export const getCurrencyByPool = async (pool_id) => {
-  const currency = await PoolsCurrencies.findOne({ pool: pool_id });
+export const getCurrencyByPool = async (poolId: number) => {
+  const currency = await PoolsCurrencies.findOne({ pool: poolId });
   if (currency) {
     return currency.currency;
   } else {
     const poolsResult = await new nearApi.Account(connection, '').viewFunction('v2.ref-finance.near', 'get_pools', {
-      from_index: pool_id,
+      // TODO: Document what this is doing and why it is hard-coded.
+      from_index: poolId,
       limit: 1,
     });
     console.log(poolsResult);
     const ftMetadataResult = await new nearApi.Account(connection, '').viewFunction(poolsResult[0].token_account_ids[0], 'ft_metadata', {});
     // eslint-disable-next-line promise/valid-params
     await PoolsCurrencies.findOneAndUpdate(
-      { pool: pool_id },
+      { pool: poolId },
       {
         contract: poolsResult[0].token_account_ids[0],
         currency: ftMetadataResult.symbol,
-        pool: pool_id,
+        pool: poolId,
       },
       { upsert: true },
     )
@@ -37,7 +38,7 @@ export const getCurrencyByPool = async (pool_id) => {
   }
 };
 
-export const getCurrencyByContract = async (contract) => {
+export const getCurrencyByContract = async (contract: string) => {
   const currency = await PoolsCurrencies.findOne({ contract });
   if (currency) {
     console.log('Found currency', currency.currency);

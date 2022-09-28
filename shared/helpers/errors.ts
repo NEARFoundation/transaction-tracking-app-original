@@ -1,3 +1,5 @@
+import type React from 'react';
+
 export const ERROR_CODE_SERVER_ERROR = 500;
 
 export const respondWithServerError = (response: any, error: any) => {

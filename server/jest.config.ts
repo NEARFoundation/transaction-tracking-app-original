@@ -4,13 +4,20 @@ import { type Config } from 'jest';
 const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  // moduleDirectories: ['node_modules', 'src', '../shared/helpers'],
-  // modulePaths: ['node_modules', 'src', '../shared'], // https://jestjs.io/docs/next/configuration#modulepaths-arraystring
+  // modulePaths: ['<rootDir>', '/Users/rcwalsh/code/near/tx-tracking-app/shared/'],
   moduleNameMapper: {
-    // '^@App/(.*)$': '<rootDir>/src/$1',
-    // '^../shared/(.*)$': '<rootDir>/shared/$1',
-    '@Shared/(.*)': '<rootDir>/../shared/$1',
+    '^shared/(.*)$': ['<rootDir>/../shared/$1'],
   },
+  // roots: ['<rootDir>'],
+
+  // modulePaths: ['<rootDir>', '../shared'],
+  // moduleDirectories: ['node_modules', 'src', '../../../shared/'],
+  // modulePaths: ['node_modules', 'src', '../shared'], // https://jestjs.io/docs/next/configuration#modulepaths-arraystring
+  // moduleNameMapper: {
+  //   // '^@App/(.*)$': '<rootDir>/src/$1',
+  //   // '^../shared/(.*)$': '<rootDir>/shared/$1',
+  //   '@Shared/(.*)': '<rootDir>/../shared/$1',
+  // },
   // roots: ['<rootDir>/src', '<rootDir>/../shared'], // https://jestjs.io/docs/next/configuration#roots-arraystring
 };
 
