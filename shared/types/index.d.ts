@@ -47,3 +47,5 @@ declare global {
     walletConnection: any;
   }
 }
+
+export type OptionType = { label: string; value: string }; // https://github.com/JedWatson/react-select/issues/2902#issuecomment-624806537

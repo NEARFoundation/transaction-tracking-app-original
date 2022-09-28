@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import './global.css';
+import { useState, useEffect } from 'react';
+
 import DatePicker from 'react-datepicker';
 import CsvDownload from 'react-json-to-CSV';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -12,6 +12,8 @@ import { useLocalStorage } from './helpers/localStorage';
 
 import { MainTable } from './components/MainTable';
 import { AccountsTable } from './components/AccountsTable';
+import { AccountId, OptionType } from '../shared/types';
+import './global.css';
 
 const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT ?? 'development';
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -24,7 +26,7 @@ export const defaultRequestOptions = {
   method: 'POST',
 };
 
-export async function addTaskForAccountId(accountId) {
+export async function addTaskForAccountId(accountId: AccountId) {
   console.log('addTaskForAccountId:', accountId);
   const requestOptions = {
     ...defaultRequestOptions,
@@ -49,7 +51,7 @@ export default function App() {
   const decimalPlacesOptions = [1, 2, 3, 4, 5, 6, 7, 8].map((x) => ({ value: x, label: x }));
   console.log({ divisorPowerOptions, decimalPlacesOptions });
   const [startDate, setStartDate] = useState(() => {
-    const saved = localStorage.getItem('rangeDate');
+    const saved = localStorage.getItem('rangeDate') ?? '';
     const initialValue = JSON.parse(saved);
     if (initialValue) {
       return new Date(initialValue.startDate);
@@ -58,7 +60,7 @@ export default function App() {
     }
   });
   const [endDate, setEndDate] = useState(() => {
-    const saved = localStorage.getItem('rangeDate');
+    const saved = localStorage.getItem('rangeDate') ?? '';
     const initialValue = JSON.parse(saved);
     if (initialValue) {
       return new Date(initialValue.endDate);
@@ -83,13 +85,13 @@ export default function App() {
   };
 
   const [accountIDs, setAccountIDs] = useState(() => {
-    const saved = localStorage.getItem('accountIDs');
+    const saved = localStorage.getItem('accountIDs') ?? '';
     const initialValue = JSON.parse(saved);
     return initialValue || [];
   });
   const [accountsStatus, setAccountsStatus] = useState([]);
 
-  const getTransactions = async (accountId) => {
+  const getTransactions = async (accountId: AccountId) => {
     setMessage('');
     setSelectedAccountId(accountId);
     console.log('getTransactions', { accountId, start: getFormattedUtcDatetime(startDate), end: getFormattedUtcDatetime(endDate) });
@@ -99,7 +101,7 @@ export default function App() {
         accountId: [accountId],
         endDate,
         startDate,
-        types: Array.isArray(selectedTypes) ? selectedTypes.map((x) => x.value) : [],
+        types: Array.isArray(selectedTypes) ? selectedTypes.map((option: OptionType) => option.value) : [],
       }),
     };
     await fetch(API_BASE_URL + '/transactions', requestOptions)
@@ -117,7 +119,7 @@ export default function App() {
   };
 
   const getAccounts = async () => {
-    const localStorageAccountIds = localStorage.getItem('accountIDs');
+    const localStorageAccountIds = localStorage.getItem('accountIDs') ?? '';
     console.log({ localStorageAccountIds });
     const requestOptions = {
       ...defaultRequestOptions,
@@ -177,14 +179,12 @@ export default function App() {
     const { value } = chosenOption;
     console.log('onChangeDivisorPower', { value, event });
     setDivisorPower(value);
-    // ONEDAY: save to localStorage
   }
 
   function onChangeDecimalPlaces(chosenOption, event) {
     const { value } = chosenOption;
     console.log('onChangeDecimalPlaces', { value, event });
     setDecimalPlaces(value);
-    // ONEDAY: save to localStorage
   }
 
   const getAllTransactions = async () => {
@@ -196,7 +196,7 @@ export default function App() {
         accountId: accountIDs,
         endDate,
         startDate,
-        types: Array.isArray(selectedTypes) ? selectedTypes.map((item) => item.value) : [],
+        types: Array.isArray(selectedTypes) ? selectedTypes.map((option: OptionType) => option.value) : [],
       }),
     };
     await fetch(API_BASE_URL + '/transactions', requestOptions)
@@ -263,7 +263,6 @@ export default function App() {
               defaultValue={divisorPowerOptions.find((option) => option.value === divisorPower)}
               className="my-react-select-container divisorPower"
               onChange={onChangeDivisorPower}
-              setState={setDivisorPower}
             />
           </span>
           <span>
@@ -274,7 +273,6 @@ export default function App() {
               defaultValue={decimalPlacesOptions.find((option) => option.value === decimalPlaces)}
               className="my-react-select-container decimalPlaces"
               onChange={onChangeDecimalPlaces}
-              setState={setDecimalPlaces}
             />
           </span>
           <hr />
@@ -291,7 +289,6 @@ export default function App() {
                 value={selectedTypes}
                 className="my-react-select-container"
                 onChange={onChangeTypes}
-                setState={setSelectedTypes}
                 isMulti
                 styles={MultiSelectStyles}
               />

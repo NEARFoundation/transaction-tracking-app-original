@@ -1,5 +1,5 @@
 import { getFormattedUtcDatetime } from '../../shared/helpers/datetime';
-import { addTaskForAccountId, defaultRequestOptions } from '../App.js';
+import { addTaskForAccountId, defaultRequestOptions } from '../App';
 import { AccountId } from '../../shared/types';
 import { stringToBoolean } from '../../shared/helpers/strings';
 
