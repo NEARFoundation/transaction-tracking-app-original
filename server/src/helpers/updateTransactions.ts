@@ -46,12 +46,12 @@ export const runTasks = async () => {
   }
 };
 
-async function getTransactions(pgClient: Client, accountId: AccountId, txTypeName: string, block_timestamp: number, length: number): Promise<TxActionRow[]> {
+async function getTransactions(pgClient: Client, accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
   try {
     const txType: TxTypeRow | null = await TxTypes.findOne({ name: txTypeName });
     if (txType) {
-      console.log(`getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(block_timestamp)}, ${length})`);
-      const result = await pgClient.query(txType.sql, [accountId, block_timestamp.toString(), length]);
+      console.log(`getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
+      const result = await pgClient.query(txType.sql, [accountId, blockTimestamp.toString(), length]);
       const rows = result.rows as unknown as TxActionRow[];
       // console.log(JSON.stringify(rows));
       return rows;
@@ -79,6 +79,7 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
   console.log(`updateTransactions(${accountId}, ${txType})`);
   const pgClient = new pg.Client({ connectionString });
   await pgClient.connect();
+  // eslint-disable-next-line promise/valid-params
   await TxTasks.findOneAndUpdate(
     { accountId },
     {

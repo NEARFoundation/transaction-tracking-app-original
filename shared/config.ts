@@ -1,4 +1,3 @@
-// eslint-disable-next-line canonical/filename-match-exported
 const contractName = process.env.CONTRACT_NAME || 'near-transactions-accounting-report';
 const localHome = process.env.HOME;
 

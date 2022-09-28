@@ -4,7 +4,7 @@ import getConfig from '../../../shared/config.js';
 import { getNearApiConnection } from '../helpers/nearConnection.js';
 import { PoolsCurrencies } from '../models/PoolsCurrencies.js';
 
-const nearConfig = getConfig(process.env.NODE_ENV || 'development');
+const nearConfig = getConfig(process.env.NODE_ENV ?? 'development');
 
 const { nodeUrl } = nearConfig;
 
@@ -15,24 +15,25 @@ export const getCurrencyByPool = async (pool_id) => {
   if (currency) {
     return currency.currency;
   } else {
-    const res_pools = await new nearApi.Account(connection, '').viewFunction('v2.ref-finance.near', 'get_pools', {
+    const poolsResult = await new nearApi.Account(connection, '').viewFunction('v2.ref-finance.near', 'get_pools', {
       from_index: pool_id,
       limit: 1,
     });
-    console.log(res_pools);
-    const res_symbol = await new nearApi.Account(connection, '').viewFunction(res_pools[0].token_account_ids[0], 'ft_metadata', {});
+    console.log(poolsResult);
+    const ftMetadataResult = await new nearApi.Account(connection, '').viewFunction(poolsResult[0].token_account_ids[0], 'ft_metadata', {});
+    // eslint-disable-next-line promise/valid-params
     await PoolsCurrencies.findOneAndUpdate(
       { pool: pool_id },
       {
-        contract: res_pools[0].token_account_ids[0],
-        currency: res_symbol.symbol,
+        contract: poolsResult[0].token_account_ids[0],
+        currency: ftMetadataResult.symbol,
         pool: pool_id,
       },
       { upsert: true },
     )
       .then()
       .catch((error) => console.error(error));
-    return res_symbol.symbol;
+    return ftMetadataResult.symbol;
   }
 };
 
@@ -42,18 +43,19 @@ export const getCurrencyByContract = async (contract) => {
     console.log('Found currency', currency.currency);
     return currency.currency;
   } else {
-    const res_symbol = await new nearApi.Account(connection, '').viewFunction(contract, 'ft_metadata', {});
+    const ftMetadataResult = await new nearApi.Account(connection, '').viewFunction(contract, 'ft_metadata', {});
+    // eslint-disable-next-line promise/valid-params
     await PoolsCurrencies.findOneAndUpdate(
       { contract },
       {
         contract,
-        currency: res_symbol.symbol,
+        currency: ftMetadataResult.symbol,
       },
       { upsert: true },
     )
       .then()
       .catch((error) => console.error(error));
-    console.log('Get currency', res_symbol.symbol);
-    return res_symbol.symbol;
+    console.log('Get currency', ftMetadataResult.symbol);
+    return ftMetadataResult.symbol;
   }
 };

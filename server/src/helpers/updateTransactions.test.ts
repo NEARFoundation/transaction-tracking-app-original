@@ -1,11 +1,12 @@
 // https://jestjs.io/docs/setup-teardown#scoping
 
-//import { TxActions } from '../models/TxActions';
-import { seedTheMockIndexerDb } from '../../test_helpers/updateTestData';
+// import { TxActions } from '../models/TxActions';
+import { seedTheMockIndexerDatabase as seedTheMockIndexerDatabase } from '../../test_helpers/updateTestData';
+
 import { DEFAULT_LENGTH, updateTransactions } from './updateTransactions';
 
 beforeAll(async () => {
-  await seedTheMockIndexerDb();
+  await seedTheMockIndexerDatabase();
 });
 
 test('TODO', async () => {

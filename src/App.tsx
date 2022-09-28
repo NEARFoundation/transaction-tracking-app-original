@@ -1,5 +1,5 @@
+/* eslint-disable max-lines */
 import { useState, useEffect } from 'react';
-
 import DatePicker from 'react-datepicker';
 import CsvDownload from 'react-json-to-CSV';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -8,11 +8,12 @@ import MultiSelect from 'react-select'; // https://react-select.com/home
 import getConfig from '../shared/config';
 import { getFormattedUtcDatetime, getCsvFilename, getBeginningOfTodayUtc, getEndOfTodayUtc } from '../shared/helpers/datetime';
 import { logAndDisplayError } from '../shared/helpers/errors';
+import { AccountId, OptionType } from '../shared/types';
+
+import { AccountsTable } from './components/AccountsTable';
+import { MainTable } from './components/MainTable';
 import { useLocalStorage } from './helpers/localStorage';
 
-import { MainTable } from './components/MainTable';
-import { AccountsTable } from './components/AccountsTable';
-import { AccountId, OptionType } from '../shared/types';
 import './global.css';
 
 const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT ?? 'development';
@@ -35,9 +36,10 @@ export async function addTaskForAccountId(accountId: AccountId) {
   return fetch(API_BASE_URL + '/addTasks', requestOptions);
 }
 
+// eslint-disable-next-line max-lines-per-function
 export default function App() {
   const [message, setMessage] = useState('');
-  const [accountId, setNewAccountId] = useState('');
+  // const [accountId, setNewAccountId] = useState('');
   const [selectedAccountId, setSelectedAccountId] = useState('');
   const [transactions, setTransactions] = useState([]);
   const [types, setTypes] = useState([]);
@@ -214,7 +216,7 @@ export default function App() {
 
   const handleChange = (event) => {
     const accountId = event.target.value;
-    setNewAccountId(accountId);
+    setSelectedAccountId(accountId);
     console.log('handleChange. accountId=', accountId);
   };
 
@@ -237,14 +239,14 @@ export default function App() {
 
   const addNewAccount = async (event) => {
     event.preventDefault();
-    console.log('addNewAccount', accountId);
-    if (accountId) {
-      await addTasks(accountId);
-      setNewAccountId('');
+    console.log('addNewAccount', selectedAccountId);
+    if (selectedAccountId) {
+      await addTasks(selectedAccountId);
+      setSelectedAccountId('');
     }
   };
 
-  const accountsTableProps = { accountIDs, accountsStatus, exampleAccount, handleChange, newAccountId: accountId, getTransactions, addNewAccount, setAccountIDs };
+  const accountsTableProps = { accountIDs, accountsStatus, exampleAccount, handleChange, newAccountId: selectedAccountId, getTransactions, addNewAccount, setAccountIDs };
   // console.log({ accountsTableProps });
 
   return (
