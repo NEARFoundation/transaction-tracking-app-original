@@ -2973,7 +2973,7 @@ eslint-config-canonical@^37.0.3:
     ramda "^0.28.0"
     yaml-eslint-parser "^1.1.0"
 
-eslint-config-near@^1.0.1:
+eslint-config-near@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/eslint-config-near/-/eslint-config-near-1.0.3.tgz#65f5d07846fb884a055333f18b6d2af7ec10f35a"
   integrity sha512-3PfMtrb/zOTCHAvTPYh1gEZ9VrrUUg6+0s4IPBdxCU8JkfGA4mTKU4U1QYAKTpiYEbhfGrST16gkVJPq+98lCQ==

@@ -1,6 +1,6 @@
 import nearApi from 'near-api-js';
 import { InMemoryKeyStore } from 'near-api-js/lib/key_stores/in_memory_key_store.js';
-import { KeyStore } from 'near-api-js/lib/key_stores/keystore.js';
+import { type KeyStore } from 'near-api-js/lib/key_stores/keystore.js';
 
 export function getNearApiConnection(nodeUrl: string, keyStore?: KeyStore) {
   const connectionInfo = { url: nodeUrl };
