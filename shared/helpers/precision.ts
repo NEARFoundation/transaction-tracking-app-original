@@ -21,9 +21,9 @@ export function getLocaleStringToDecimals(amount: string, decimals: any, locale?
   const fixed = new Decimal(amount).toFixed(decimals);
   const [mainString, decimalString] = fixed.split('.'); // ['321321321321321321', '357' | '998']
   const mainFormat = new Intl.NumberFormat(locale, { minimumFractionDigits: 0 });
-  let mainBigInt = BigInt(mainString); // 321321321321321321n
+  const mainBigInt = BigInt(mainString); // 321321321321321321n
   const mainFinal = mainFormat.format(mainBigInt); // '321.321.321.321.321.321' | '321.321.321.321.321.322'
-  const decimalFinal = typeof decimalString !== 'undefined' ? `${getDecimalChar(locale)}${decimalString}` : ''; // '.357' | '.998'
+  const decimalFinal = typeof decimalString === 'undefined' ? '' : `${getDecimalChar(locale)}${decimalString}`; // '.357' | '.998'
   const amountFinal = `${mainFinal}${decimalFinal}`; // '321.321.321.321.321.321,36' | '321.321.321.321.321.322,00'
   // console.log({
   //   amount,
@@ -52,8 +52,9 @@ export function round(amount: string, decimals = 0, divisorPower = 0, locale?: s
   if (divisorPower < 0) {
     throw new Error('divisorPower must be >= 0');
   }
+
   const amountCleaned = amount.replaceAll('_', '');
-  const divisor = Math.pow(10, divisorPower);
+  const divisor = 10 ** divisorPower;
   const precision = amount.length + decimals;
   Decimal.set({ precision }); // https://mikemcl.github.io/decimal.js/#precision
   const value: string = new Decimal(amountCleaned).div(divisor).toFixed(precision);

@@ -1,6 +1,8 @@
-const contractName = process.env.CONTRACT_NAME || 'near-transactions-accounting-report';
+/* eslint-disable canonical/filename-match-exported */
+const contractName = process.env.CONTRACT_NAME ?? 'near-transactions-accounting-report';
 const localHome = process.env.HOME;
 
+// eslint-disable-next-line max-lines-per-function
 const getConfig = (environment: string) => {
   console.log('shared/config.js getConfig', { environment });
   switch (environment) {

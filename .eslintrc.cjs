@@ -30,4 +30,7 @@ module.exports = {
     // https://eslint.org/docs/rules/max-lines-per-function
     'max-lines-per-function': ['error', { max: 30, skipBlankLines: true, skipComments: true }],
   },
+  parserOptions: {
+    project: './tsconfig.eslint.json',
+  },
 };
