@@ -1,7 +1,7 @@
 // https://jestjs.io/docs/setup-teardown#scoping
 
 // import { TxActions } from '../models/TxActions';
-import { seedTheMockIndexerDatabase as seedTheMockIndexerDatabase } from '../../test_helpers/updateTestData';
+import { seedTheMockIndexerDatabase } from '../../test_helpers/updateTestData';
 
 import { DEFAULT_LENGTH, updateTransactions } from './updateTransactions';
 
