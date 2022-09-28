@@ -4,7 +4,7 @@ import getConfig from '../../../shared/config.js';
 import { getNearApiConnection } from '../helpers/nearConnection.js';
 import { PoolsCurrencies } from '../models/PoolsCurrencies.js';
 
-const nearConfig = getConfig(process.env.NODE_ENV ?? 'development');
+const nearConfig = getConfig(process.env.NODE_ENV);
 
 const { nodeUrl } = nearConfig;
 

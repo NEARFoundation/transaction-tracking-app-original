@@ -16,7 +16,7 @@ import { useLocalStorage } from './helpers/localStorage';
 
 import './global.css';
 
-const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT ?? 'development';
+const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT;
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const nearConfig = getConfig(ENVIRONMENT);
 console.log({ ENVIRONMENT, API_BASE_URL, nearConfig });

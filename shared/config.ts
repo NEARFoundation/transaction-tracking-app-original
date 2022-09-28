@@ -3,7 +3,7 @@ const contractName = process.env.CONTRACT_NAME ?? 'near-transactions-accounting-
 const localHome = process.env.HOME;
 
 // eslint-disable-next-line max-lines-per-function
-const getConfig = (environment: string) => {
+const getConfig = (environment: string = 'development') => {
   console.log('shared/config.js getConfig', { environment });
   switch (environment) {
     case 'production':
