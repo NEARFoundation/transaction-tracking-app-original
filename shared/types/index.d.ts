@@ -6,12 +6,15 @@ export type AccountStatus = {
   status: string;
 };
 
+// --------------------------------------------------------
+// Does this section contain duplicate code? I.e. Are these types already defined elsewhere, such as in Mongoose models? https://stackoverflow.com/a/61154023/
+
 export type TxActionRow = {
   // See server/src/models/TxActions.js and https://mongoosejs.com/docs/typescript.html
   accountId: string;
   txType: string;
-  block_timestamp: number;
-  block_timestamp_utc: string;
+  block_timestamp?: any; // Decimal128
+  block_timestamp_utc?: string;
   from_account?: string;
   block_height?: number;
   args_base64?: string;
@@ -29,6 +32,11 @@ export type TxActionRow = {
   pool_id?: string;
 };
 
+export type TxTypeRow = {
+  sql: string;
+  name: string;
+};
+
 export type TxActionsFilter = {
   accountId: AccountId;
   block_timestamp: {
@@ -37,6 +45,7 @@ export type TxActionsFilter = {
   };
   txType?: string[];
 };
+// --------------------------------------------------------
 
 declare global {
   interface Window {

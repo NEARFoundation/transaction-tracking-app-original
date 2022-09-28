@@ -25,8 +25,8 @@ done
 
 ./server/test_helpers/cleanTheSql.sh
 
-
-echo "Calling updateTestData.ts..."
-rm server/test_helpers/testData.db && ./server/node_modules/.bin/ts-node --esm server/test_helpers/updateTestData.ts
+# This section is disabled since probably the Jest beforeAll function will seed the DB instead.
+# echo "Calling updateTestDataSqlite.ts..."
+# rm server/test_helpers/testData.db && ./server/node_modules/.bin/ts-node --esm server/test_helpers/updateTestDataSqlite.ts
 
 echo "Finished!"

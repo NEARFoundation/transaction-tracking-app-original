@@ -3,10 +3,8 @@ import nearApi from 'near-api-js';
 import { AccountId } from '../../../shared/types';
 import { getNearApiConnection } from '../helpers/nearConnection.js';
 
-/* eslint-disable import/extensions */
 import getConfig from '../../../shared/config.js';
 import { TxTasks } from '../models/TxTasks.js';
-/* eslint-enable import/extensions */
 
 const nearConfig = getConfig(process.env.NODE_ENV || 'development');
 

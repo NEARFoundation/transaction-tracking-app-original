@@ -1,9 +1,7 @@
 import { stringToBoolean } from '../../../shared/helpers/strings.js';
 
-/* eslint-disable import/extensions */
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
-/* eslint-enable import/extensions */
 
 const ALLOW_DELETING_FROM_DATABASE = stringToBoolean(process.env.ALLOW_DELETING_FROM_DATABASE ?? 'false');
 

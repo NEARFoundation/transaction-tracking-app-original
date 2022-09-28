@@ -1,8 +1,5 @@
 import { respondWithServerError } from '../../../shared/helpers/errors.js';
-
-/* eslint-disable import/extensions */
 import { TxTypes } from '../models/TxTypes.js';
-/* eslint-enable import/extensions */
 
 export const getTypes = async (request, response) => {
   try {

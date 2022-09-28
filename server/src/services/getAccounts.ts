@@ -1,31 +1,28 @@
 import { getFormattedUtcDatetime } from '../../../shared/helpers/datetime.js';
 import { respondWithServerError } from '../../../shared/helpers/errors.js';
 import { AccountStatus } from '../../../shared/types';
-
-/* eslint-disable import/extensions */
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
-/* eslint-enable import/extensions */
 
-export const getAccounts = async (request, response) => {
+export const getAccounts = async (request: any, response: any) => {
   const accountIds = request.body.accountId;
   console.log('getAccounts accountIds', accountIds);
   try {
     const accounts: AccountStatus[] = [];
     for (const accountId of accountIds) {
       console.log('getAccounts', accountId);
-      const account = await TxTasks.findOne({ accountId }).select({ __v: 0, _id: 0 });
+      const txTaskForAccount = await TxTasks.findOne({ accountId }).select({ __v: 0, _id: 0 });
       const transactions = await TxActions.findOne({ accountId });
-      let lastUpdate;
-      let status;
-      if (account) {
-        if (account.lastUpdate === 0) status = 'Pending';
-        if (account.isRunning) status = 'In progress';
+      let lastUpdate: any;
+      let status: string = 'Pending';
+      if (txTaskForAccount) {
+        // if (txTaskForAccount.lastUpdate === 0) status = 'Pending';
+        if (txTaskForAccount.isRunning) status = 'In progress';
         else if (transactions) status = 'Done';
-        else if (!transactions && account.lastUpdate > 0) status = 'No data';
+        else if (!transactions && txTaskForAccount.lastUpdate > 0) status = 'No data';
 
-        if (account.lastUpdate > 0) {
-          lastUpdate = getFormattedUtcDatetime(account.lastUpdate);
+        if (txTaskForAccount.lastUpdate > 0) {
+          lastUpdate = getFormattedUtcDatetime(new Date(txTaskForAccount.lastUpdate));
         }
       } else {
         status = 'The account is not monitored.';

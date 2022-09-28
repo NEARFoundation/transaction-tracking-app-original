@@ -1,10 +1,8 @@
-/* eslint-disable import/extensions */
 import { getFormattedDatetimeUtcFromBlockTimestamp, getRangeFilter } from '../../../shared/helpers/datetime.js';
 import { respondWithServerError } from '../../../shared/helpers/errors.js';
 import { TxActionRow, TxActionsFilter } from '../../../shared/types';
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
-/* eslint-enable import/extensions */
 
 export const getTransactions = async (request, response) => {
   try {
