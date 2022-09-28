@@ -105,7 +105,7 @@ export default function App() {
     await fetch(API_BASE_URL + '/transactions', requestOptions)
       .then(async (response) => {
         const data = await response.json();
-        console.log(data, data.transactions[0]);
+        // console.log('first transaction', data.transactions[0]);
         setTransactions(data.transactions);
         if (data.lastUpdate > 0) setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
         else setLastUpdate('');

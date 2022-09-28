@@ -26,7 +26,7 @@ export const getTransactions = async (request, response) => {
       cleanedTransactions.push({
         accountId: transaction.accountId,
         txType: transaction.txType,
-        block_timestamp: transaction.block_timestamp,
+        block_timestamp: Number(transaction.block_timestamp), // server/src/models/TxActions.js uses Decimal128 for this field, which React can't display. https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-decimal.html
         block_timestamp_utc: getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp),
         from_account: transaction.from_account,
         block_height: transaction.block_height,
