@@ -1,4 +1,4 @@
-import nearApi from 'near-api-js';
+import * as nearApi from 'near-api-js';
 import { InMemoryKeyStore } from 'near-api-js/lib/key_stores/in_memory_key_store.js';
 import { type KeyStore } from 'near-api-js/lib/key_stores/keystore.js';
 
