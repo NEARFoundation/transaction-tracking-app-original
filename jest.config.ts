@@ -19,6 +19,7 @@ const jestConfig: JestConfigWithTsJest = {
       },
     ],
   },
+  setupFiles: ['dotenv/config'], // https://stackoverflow.com/a/66765765/ and https://stackoverflow.com/a/70665834/
 };
 
 export default jestConfig;

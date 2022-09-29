@@ -10,7 +10,26 @@ To run this project locally:
 1. `cp .env.development .env.development.local && cp server/.env.development server/.env.development.local`
 1. Edit the values for each of those local env files. If you set REACT_APP_ALLOW_DELETING_FROM_DATABASE to "true" in .env.development.local and ALLOW_DELETING_FROM_DATABASE to "true" in server/.env.development.local, you will see a button in the frontend that allows you to delete records from the database, which is useful when you are manually testing whether transaction processing is working after editing the SQL queries.
 1. Start Mongo (unless you'll be starting Docker) with something like `brew services start mongodb-community@5.0`.
+1. Install PostreSQL:
+
+   ```bash
+   brew install postgresql
+   brew services start postgresql
+   psql postgres
+   \du
+   CREATE ROLE testuser WITH LOGIN PASSWORD 'secret';
+   ALTER ROLE testuser CREATEDB;
+   \q
+   psql postgres -U testuser
+   CREATE DATABASE ttatestdb;
+   GRANT ALL PRIVILEGES ON DATABASE tta_test_db TO testuser;
+   \list
+   \q
+   ```
+
 1. Install dependencies for UI and server: `yarn install && cd server && yarn install && cd ..`
+1. `pgCreds=___ ./server/test_helpers/updateTestData.sh` (where \_\_\_ is the mainnet Postgres credentials string)
+1. `yarn test`
 1. Start the server: `yarn serverdev`
 1. In a second terminal, start the UI: `yarn dev` (see `package.json` for a full list of `scripts` you can run with `yarn`)
 

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index",
     "dev": "node -r dotenv/config --loader ts-node/esm src/index.ts dotenv_config_path=.env.development.local",
-    "test": "jest"
+    "test": "DOTENV_CONFIG_PATH=.env.test jest"
   },
   "dependencies": {
     "@types/sqlite3": "^3.1.8",

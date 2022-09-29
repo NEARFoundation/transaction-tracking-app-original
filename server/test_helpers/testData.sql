@@ -1,15 +1,15 @@
 
-CREATE TABLE action_receipt_actions (
+DROP TABLE IF EXISTS action_receipt_actions; CREATE TABLE action_receipt_actions (
     receipt_id text,
     index_in_action_receipt integer,
-    action_kind action_kind,
+    action_kind text,
     args jsonb,
     receipt_predecessor_account_id text,
     receipt_receiver_account_id text,
     receipt_included_in_block_timestamp numeric(20,0)
 );
 
-CREATE TABLE blocks (
+DROP TABLE IF EXISTS blocks; CREATE TABLE blocks (
     block_height numeric(20,0),
     block_hash text,
     prev_block_hash text,
@@ -19,7 +19,7 @@ CREATE TABLE blocks (
     author_account_id text
 );
 
-CREATE TABLE execution_outcomes (
+DROP TABLE IF EXISTS execution_outcomes; CREATE TABLE execution_outcomes (
     receipt_id text,
     executed_in_block_hash text,
     executed_in_block_timestamp numeric(20,0),
@@ -27,11 +27,11 @@ CREATE TABLE execution_outcomes (
     gas_burnt numeric(20,0),
     tokens_burnt numeric(45,0),
     executor_account_id text,
-    status execution_outcome_status,
+    status text,
     shard_id numeric(20,0)
 );
 
-CREATE TABLE receipts (
+DROP TABLE IF EXISTS receipts; CREATE TABLE receipts (
     receipt_id text,
     included_in_block_hash text,
     included_in_chunk_hash text,
@@ -39,11 +39,11 @@ CREATE TABLE receipts (
     included_in_block_timestamp numeric(20,0),
     predecessor_account_id text,
     receiver_account_id text,
-    receipt_kind receipt_kind,
+    receipt_kind text,
     originated_from_transaction_hash text
 );
 
-CREATE TABLE transactions (
+DROP TABLE IF EXISTS transactions; CREATE TABLE transactions (
     transaction_hash text,
     included_in_block_hash text,
     included_in_chunk_hash text,
@@ -54,7 +54,7 @@ CREATE TABLE transactions (
     nonce numeric(20,0),
     receiver_account_id text,
     signature text,
-    status execution_outcome_status,
+    status text,
     converted_into_receipt_id text,
     receipt_conversion_gas_burnt numeric(20,0),
     receipt_conversion_tokens_burnt numeric(45,0)
