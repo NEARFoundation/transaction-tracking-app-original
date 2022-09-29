@@ -16,6 +16,7 @@
   "devDependencies": {
     "@nearfoundation/near-prettier-config": "^1.0.1",
     "@types/jest": "^29.0.3",
+    "@types/pg": "^8.6.5",
     "buffer": "^6.0.3",
     "env-cmd": "~10.1.0",
     "eslint": "^8.22.0",
