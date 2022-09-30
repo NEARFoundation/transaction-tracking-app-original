@@ -1,8 +1,9 @@
-// eslint-disable-next-line canonical/filename-match-exported
-const contractName = process.env.CONTRACT_NAME || 'near-transactions-accounting-report';
+/* eslint-disable canonical/filename-match-exported */
+const contractName = process.env.CONTRACT_NAME ?? 'near-transactions-accounting-report';
 const localHome = process.env.HOME;
 
-const getConfig = (environment) => {
+// eslint-disable-next-line max-lines-per-function
+const getConfig = (environment: string = 'development') => {
   console.log('shared/config.js getConfig', { environment });
   switch (environment) {
     case 'production':

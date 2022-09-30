@@ -1,14 +1,16 @@
-import pg from 'pg';
+import pg, { type Client } from 'pg';
+
+import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../../shared/helpers/datetime.js';
+import { type AccountId, type TxActionRow, type TxTypeRow } from '../../../shared/types';
 import { TxActions } from '../models/TxActions.js';
-import { TxTypes } from '../models/TxTypes.js';
 import { TxTasks } from '../models/TxTasks.js';
+import { TxTypes } from '../models/TxTypes.js';
+
 import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
-import { AccountId } from '../../../shared/types';
 
-const pgClient = new pg.Client({ connectionString: process.env.POSTGRESQL_CONNECTION_STRING });
-await pgClient.connect();
+const connectionString = process.env.POSTGRESQL_CONNECTION_STRING;
 
-const DEFAULT_LENGTH = 100;
+export const DEFAULT_LENGTH = 100;
 let isAlreadyRunning = 0;
 
 export const runTasks = async () => {
@@ -16,12 +18,14 @@ export const runTasks = async () => {
     try {
       isAlreadyRunning = 1;
       console.log('runTasks() isAlreadyRunning', new Date());
-      let types = await TxTypes.find({});
-      let tasks = await TxTasks.find({});
+      const types: TxTypeRow[] = await TxTypes.find({});
+      const tasks = await TxTasks.find({});
       for (const task of tasks) {
         for (const type of types) {
           await updateTransactions(task.accountId, type.name, DEFAULT_LENGTH);
         }
+
+        // eslint-disable-next-line promise/valid-params
         await TxTasks.findOneAndUpdate(
           { accountId: task.accountId },
           {
@@ -30,24 +34,27 @@ export const runTasks = async () => {
           },
         )
           .then()
-          .catch((error) => console.error(error));
+          .catch((error: any) => console.error(error));
       }
     } catch (error) {
       console.error(error);
     }
+
     isAlreadyRunning = 0;
   } else {
     console.log('SyncedCron: runTasks is already running');
   }
 };
 
-async function getTransactions(accountId: AccountId, txType: string, block_timestamp, length) {
+async function getTransactions(pgClient: Client, accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
   try {
-    let TxType = await TxTypes.findOne({ name: txType });
-    if (TxType) {
-      console.log(`getTransactions(${accountId}, ${txType}, ${block_timestamp.toString()}, ${length})`);
-      const res = await pgClient.query(TxType.sql, [accountId, block_timestamp.toString(), length]);
-      return res.rows;
+    const txType: TxTypeRow | null = await TxTypes.findOne({ name: txTypeName });
+    if (txType) {
+      console.log(`getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
+      const result = await pgClient.query(txType.sql, [accountId, blockTimestamp.toString(), length]);
+      const rows = result.rows as unknown as TxActionRow[];
+      // console.log(JSON.stringify(rows));
+      return rows;
     } else {
       return [];
     }
@@ -57,39 +64,45 @@ async function getTransactions(accountId: AccountId, txType: string, block_times
   }
 }
 
-async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string) {
+async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string): Promise<number> {
   const mostRecentTxAction = await TxActions.findOne({
     accountId,
     txType,
-  }).sort([['block_timestamp', -1]]);
+  }).sort({ block_timestamp: 'desc' });
   const mostRecentBlockTimestamp = mostRecentTxAction ? mostRecentTxAction.block_timestamp : 0;
   // console.log(`getMostRecentBlockTimestamp(${accountId}, ${txType})`, mostRecentBlockTimestamp);
-  return mostRecentBlockTimestamp;
+  return Number(mostRecentBlockTimestamp); // server/src/models/TxActions.js uses Decimal128 for this field, which React can't display. https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-decimal.html
 }
 
-async function updateTransactions(accountId: AccountId, txType: string, length: number) {
+// eslint-disable-next-line max-lines-per-function
+export async function updateTransactions(accountId: AccountId, txType: string, length: number) {
   console.log(`updateTransactions(${accountId}, ${txType})`);
+  const pgClient = new pg.Client({ connectionString });
+  await pgClient.connect();
+  // eslint-disable-next-line promise/valid-params
   await TxTasks.findOneAndUpdate(
-    { accountId: accountId },
+    { accountId },
     {
       isRunning: true,
     },
   )
     .then()
-    .catch((error) => console.error(error));
+    .catch((error: any) => console.error(error));
   let minBlockTimestamp = await getMostRecentBlockTimestamp(accountId, txType);
-  let transactions: any = await getTransactions(accountId, txType, minBlockTimestamp, length);
+
+  let transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, length);
 
   while (transactions.length > 0) {
-    transactions.map(async (item: any) => {
+    transactions.map(async (item) => {
       console.log('Received: ', item.block_timestamp);
-      if (item.pool_id) item.currency_transferred2 = await getCurrencyByPool(parseInt(item.pool_id));
+      if (item.pool_id) item.currency_transferred2 = await getCurrencyByPool(Number.parseInt(item.pool_id));
       if (item.get_currency_by_contract) item.currency_transferred = await getCurrencyByContract(item.get_currency_by_contract);
+      // eslint-disable-next-line promise/valid-params
       await TxActions.findOneAndUpdate(
-        { transaction_hash: item.transaction_hash, txType: txType },
+        { transaction_hash: item.transaction_hash, txType },
         {
-          accountId: accountId,
-          txType: txType,
+          accountId,
+          txType,
           block_timestamp: item.block_timestamp,
           from_account: item.from_account,
           block_height: item.block_height,
@@ -108,23 +121,27 @@ async function updateTransactions(accountId: AccountId, txType: string, length: 
         { upsert: true },
       )
         .then()
-        .catch((error) => console.error(error));
+        .catch((error: any) => console.error(error));
     });
 
     let nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
-    let i = 1;
-    while (nextBlockTimestamp === minBlockTimestamp && transactions.length === length * i) {
-      i++;
-      let increasedLength = length * i;
-      transactions = await getTransactions(accountId, txType, minBlockTimestamp, increasedLength);
+    let index = 1;
+    while (nextBlockTimestamp === minBlockTimestamp && transactions.length === length * index) {
+      index++;
+      const increasedLength = length * index;
+      transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, increasedLength);
       nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
     }
+
     if (nextBlockTimestamp === minBlockTimestamp) {
       break;
     }
-    if (i === 1) {
+
+    if (index === 1) {
       minBlockTimestamp = nextBlockTimestamp;
-      transactions = await getTransactions(accountId, txType, minBlockTimestamp, length);
+      transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, length);
     }
   }
+
+  await pgClient.end();
 }

@@ -1,19 +1,17 @@
 import nearApi from 'near-api-js';
 
-/* eslint-disable import/extensions */
 import getConfig from '../../../shared/config.js';
+import { type AccountId } from '../../../shared/types';
+import { getNearApiConnection } from '../helpers/nearConnection.js';
 import { TxTasks } from '../models/TxTasks.js';
-/* eslint-enable import/extensions */
 
-const nearConfig = getConfig(process.env.NODE_ENV || 'development');
+const nearConfig = getConfig(process.env.NODE_ENV);
 
 const { nodeUrl } = nearConfig;
 
-const connectionInfo = { url: nodeUrl };
-const provider = new nearApi.providers.JsonRpcProvider(connectionInfo);
-const connection = new nearApi.Connection(nodeUrl, provider, {});
+const connection = getNearApiConnection(nodeUrl);
 
-const accountExists = async (accountId) => {
+const accountExists = async (accountId: AccountId) => {
   try {
     await new nearApi.Account(connection, accountId).state();
     return true;
