@@ -1,5 +1,6 @@
 import { performance } from 'perf_hooks';
 
+import { type Request, type Response } from 'express';
 import pg, { type Client } from 'pg';
 
 import { getFormattedDatetimeUtcFromBlockTimestamp, getFormattedUtcDatetime, millisToMinutesAndSeconds } from '../../../shared/helpers/datetime.js';
@@ -16,7 +17,7 @@ const TIMEOUT = 900_000; // 15 minutes
 
 let isAlreadyRunning = 0;
 
-export const runTask = async (request: any, response: any) => {
+export const runTask = async (request: Request, response: Response) => {
   // TODO: See whether we can reduce duplication with `runTasks`.
   try {
     const account = await TxTasks.findOne({ accountId: request.body.accountId });

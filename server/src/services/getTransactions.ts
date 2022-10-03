@@ -1,4 +1,5 @@
 import { Decimal } from 'decimal.js';
+import { type Request, type Response } from 'express';
 
 import { getFormattedDatetimeUtcFromBlockTimestamp, getRangeFilter } from '../../../shared/helpers/datetime.js';
 import { type TxActionRow, type TxActionsFilter } from '../../../shared/types';
@@ -34,7 +35,7 @@ async function convertAmount(amount: number | string, currency: string): Promise
 }
 
 // eslint-disable-next-line max-lines-per-function, complexity
-export const getTransactions = async (request: any, response: any) => {
+export const getTransactions = async (request: Request, response: Response) => {
   try {
     const { body } = request;
     const datetimeRangeFilter = getRangeFilter(body.startDate, body.endDate);

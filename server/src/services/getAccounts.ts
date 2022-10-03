@@ -1,10 +1,12 @@
+import { type Response, type Request } from 'express';
+
 import { getFormattedUtcDatetime } from '../../../shared/helpers/datetime.js';
 import { type AccountStatus } from '../../../shared/types';
 import { respondWithServerError } from '../helpers/errors.js';
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
 
-export const getAccounts = async (request: any, response: any) => {
+export const getAccounts = async (request: Request, response: Response) => {
   const { body } = request;
   const accountIds = body.accountIds;
   console.log(`getAccounts. body=${JSON.stringify(body)}`);

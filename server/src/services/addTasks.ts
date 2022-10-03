@@ -1,3 +1,4 @@
+import { type Request, type Response } from 'express';
 import nearApi from 'near-api-js';
 
 import getConfig from '../../../shared/config.js';
@@ -24,7 +25,7 @@ const accountExists = async (accountId: AccountId) => {
 };
 
 // eslint-disable-next-line consistent-return
-export const addTasks = async (request, response) => {
+export const addTasks = async (request: Request, response: Response) => {
   const { accountId } = request.body;
   console.log('addTasks', { accountId });
   try {
