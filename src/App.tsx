@@ -200,7 +200,6 @@ export default function App() {
   };
 
   const addNewAccount = async (event: React.FormEvent<HTMLFormElement>) => {
-    // Temp note to self: this function was formerly called `handleSubmit`.
     event.preventDefault();
     console.log('addNewAccount', newAccountId);
     if (newAccountId) {
@@ -209,31 +208,30 @@ export default function App() {
     }
   };
 
-  const accountsTableProps = {
-    accountIds,
-    accountStatuses,
-    exampleAccount,
-    handleNewAccountIdInputChange,
-    selectedAccountId,
-    getTransactions,
-    addNewAccount,
-    setAccountIds,
-    selectedAccountIdsForCsv,
-    setSelectedAccountIdsForCsv,
-    runTask,
-    messageCsv,
-    csvTransactions,
-    endDate,
-    newAccountId,
-    startDate,
-  };
-  // console.log({ accountsTableProps });
-
   return (
     <main>
       <nav>
         <h1>NEAR Transactions Accounting Report</h1>
-        <AccountsTable {...accountsTableProps} />
+        <AccountsTable
+          {...{
+            accountIds,
+            accountStatuses,
+            exampleAccount,
+            handleNewAccountIdInputChange,
+            selectedAccountId,
+            getTransactions,
+            addNewAccount,
+            setAccountIds,
+            selectedAccountIdsForCsv,
+            setSelectedAccountIdsForCsv,
+            runTask,
+            messageCsv,
+            csvTransactions,
+            endDate,
+            newAccountId,
+            startDate,
+          }}
+        />
         {message ? <div className="msg">{message}</div> : null}
         <div>
           <FormattingControls {...{ divisorPowerOptions, divisorPower, onChangeDivisorPower, decimalPlacesOptions, decimalPlaces, onChangeDecimalPlaces }} />

@@ -52,14 +52,6 @@ export type TxActionsFilter = {
 };
 // --------------------------------------------------------
 
-// export type CustomWindow = Window & {
-//   // See https://stackoverflow.com/a/45352250/ and https://bobbyhadz.com/blog/typescript-property-does-not-exist-on-type-window
-//   accountId: AccountId;
-//   contract: any;
-//   nearInitPromise: any;
-//   walletConnection: any;
-// };
-
 export type OptionType = { label: string; value: string }; // https://github.com/JedWatson/react-select/issues/2902#issuecomment-624806537
 
 // TODO: Throughout this repo, clean up the use of `any`.

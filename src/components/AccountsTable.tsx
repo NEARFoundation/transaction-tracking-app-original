@@ -135,8 +135,7 @@ export function AccountsTable({
     else setSelectedAccountIdsForCsv([]);
   };
 
-  const props = { addNewAccount, handleNewAccountIdInputChange, exampleAccount, newAccountId };
-  const inlineProps = { ...props, buttonText: '+' };
+  const basePropsForAddNewAccountForm = { addNewAccount, handleNewAccountIdInputChange, exampleAccount, newAccountId };
   return (
     <div style={{ textAlign: 'center' }}>
       {accountIds.length > 0 ? (
@@ -157,21 +156,25 @@ export function AccountsTable({
             <tbody>
               {accountIds.map((accountIdForRow: AccountId, index: number) => {
                 const accountStatus = getAccountStatus(accountStatuses, accountIdForRow);
-                const rowProps = {
-                  accountId: accountIdForRow,
-                  deleteFromLocalStorage,
-                  accountStatus,
-                  getTransactions,
-                  runTask,
-                  selectedAccountId,
-                  selectedAccountIdsForCsv,
-                  addAccountCsv,
-                };
-                return <AccountRow {...rowProps} key={index} />;
+                return (
+                  <AccountRow
+                    {...{
+                      accountId: accountIdForRow,
+                      deleteFromLocalStorage,
+                      accountStatus,
+                      getTransactions,
+                      runTask,
+                      selectedAccountId,
+                      selectedAccountIdsForCsv,
+                      addAccountCsv,
+                    }}
+                    key={index}
+                  />
+                );
               })}
               <tr key="addAccountId">
                 <td colSpan={2} className="max-width-none">
-                  <AddNewAccountForm {...inlineProps} />
+                  <AddNewAccountForm {...{ ...basePropsForAddNewAccountForm, buttonText: '+' }} />
                 </td>
                 <td colSpan={csvDownloadButtonColSpan} style={{ textAlign: 'right' }}>
                   {csvTransactions.length > 0 ? (
@@ -194,7 +197,7 @@ export function AccountsTable({
       ) : (
         <>
           <p>Enter the account ID:</p>
-          <AddNewAccountForm {...props} />
+          <AddNewAccountForm {...basePropsForAddNewAccountForm} />
         </>
       )}
     </div>
