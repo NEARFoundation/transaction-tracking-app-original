@@ -188,10 +188,10 @@ export default function App() {
     setDecimalPlaces(value);
   }
 
-  const handleChange = (event: any) => {
-    const accountId = event.target.value;
+  const handleNewAccountIdInputChange = (event: React.FormEvent<HTMLInputElement>) => {
+    const accountId = event.currentTarget.value;
     setNewAccountId(accountId);
-    console.log('handleChange. accountId=', accountId);
+    console.log('handleNewAccountIdInputChange. accountId=', accountId);
   };
 
   const addTasks = async (accountId: AccountId) => {
@@ -211,7 +211,7 @@ export default function App() {
       });
   };
 
-  const addNewAccount = async (event: any) => {
+  const addNewAccount = async (event: React.FormEvent<HTMLFormElement>) => {
     // Temp note to self: this function was formerly called `handleSubmit`.
     event.preventDefault();
     console.log('addNewAccount', newAccountId);
@@ -225,7 +225,7 @@ export default function App() {
     accountIds,
     accountStatuses,
     exampleAccount,
-    handleChange,
+    handleNewAccountIdInputChange,
     selectedAccountId,
     getTransactions,
     addNewAccount,

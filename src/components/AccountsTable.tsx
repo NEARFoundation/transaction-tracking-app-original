@@ -83,10 +83,10 @@ function AccountRow({ accountId, deleteFromLocalStorage, accountStatus, getTrans
   );
 }
 
-function AddNewAccountForm({ addNewAccount, handleChange, newAccountId, exampleAccount, buttonText = 'Add' }) {
+function AddNewAccountForm({ addNewAccount, handleNewAccountIdInputChange, newAccountId, exampleAccount, buttonText = 'Add' }) {
   return (
     <form onSubmit={addNewAccount}>
-      <input type="text" onChange={handleChange} value={newAccountId} placeholder={exampleAccount} />
+      <input type="text" onChange={handleNewAccountIdInputChange} value={newAccountId} placeholder={exampleAccount} />
       <button type="submit" title="Add new account" className="silverBtn">
         {buttonText}
       </button>
@@ -99,7 +99,7 @@ export function AccountsTable({
   accountIds,
   setAccountIds,
   accountStatuses,
-  handleChange,
+  handleNewAccountIdInputChange,
   addNewAccount,
   exampleAccount,
   selectedAccountIdsForCsv,
@@ -135,7 +135,7 @@ export function AccountsTable({
     else setSelectedAccountIdsForCsv([]);
   };
 
-  const props = { addNewAccount, handleChange, exampleAccount, newAccountId };
+  const props = { addNewAccount, handleNewAccountIdInputChange, exampleAccount, newAccountId };
   const inlineProps = { ...props, buttonText: '+' };
   return (
     <div style={{ textAlign: 'center' }}>

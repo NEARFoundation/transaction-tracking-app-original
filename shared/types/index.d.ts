@@ -1,3 +1,5 @@
+import type React from 'react';
+
 export type AccountId = string;
 
 export type AccountStatus = {
@@ -76,12 +78,12 @@ export type AccountRowProps = {
 export type AccountsTableProps = {
   accountIds: any;
   accountStatuses: any;
-  addNewAccount: any;
+  addNewAccount: (event: React.FormEvent<HTMLFormElement>) => void;
   csvTransactions: any;
   endDate: any;
   exampleAccount: any;
   getTransactions: any;
-  handleChange: any;
+  handleNewAccountIdInputChange: (event: React.FormEvent<HTMLInputElement>) => void;
   messageCsv: any;
   newAccountId: any;
   runTask: any;
