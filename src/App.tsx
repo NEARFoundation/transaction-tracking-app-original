@@ -6,6 +6,7 @@ import { getFormattedUtcDatetime, getDefaultStartUtc, getEndOfTodayUtc } from '.
 import { BAD_REQUEST, SUCCESS } from '../shared/helpers/statusCodes';
 import { AccountId, OptionType } from '../shared/types';
 
+import { AccountUpdatedLabel } from './components/AccountUpdatedLabel';
 import { AccountsTable } from './components/AccountsTable';
 import { FormattingControls } from './components/FormattingControls';
 import { MainTable } from './components/MainTable';
@@ -242,18 +243,7 @@ export default function App() {
         </div>
       </nav>
       <div style={{ paddingTop: '10px', textAlign: 'center' }}>
-        {selectedAccountId ? (
-          <>
-            {lastUpdate ? (
-              <div>
-                {selectedAccountId}. Last update: {lastUpdate}
-              </div>
-            ) : (
-              <div>{selectedAccountId}. Check back later</div>
-            )}
-          </>
-        ) : null}
-
+        <AccountUpdatedLabel {...{ selectedAccountId, lastUpdate }} />
         {transactions.length > 0 ? (
           <>
             <MainTable transactions={transactions} explorerUrl={explorerUrl} divisorPower={divisorPower} decimalPlaces={decimalPlaces} />
