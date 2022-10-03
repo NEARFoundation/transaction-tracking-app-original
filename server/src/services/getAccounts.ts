@@ -14,7 +14,7 @@ export const getAccounts = async (request: any, response: any) => {
       console.log('getAccounts', accountId);
       const txTaskForAccount = await TxTasks.findOne({ accountId }).select({ __v: 0, _id: 0 });
       const transactions = await TxActions.findOne({ accountId });
-      let lastUpdate: any;
+      let lastUpdate = '';
       let status = 'Pending';
       if (txTaskForAccount) {
         // if (txTaskForAccount.lastUpdate === 0) status = 'Pending';
