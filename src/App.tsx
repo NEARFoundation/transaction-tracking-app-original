@@ -99,7 +99,6 @@ export default function App() {
   };
 
   const getAccounts = async () => {
-    return; // TODO
     const requestOptions = {
       ...defaultRequestOptions,
       body: JSON.stringify({ accountIds }),
