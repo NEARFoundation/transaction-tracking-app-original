@@ -15,6 +15,7 @@ const schema = new Schema({
     },
     isRunning: {
         type: Boolean,
+        index: true,
         default: false,
     }
 });

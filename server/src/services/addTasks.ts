@@ -1,6 +1,7 @@
 import nearApi from 'near-api-js';
 
 import getConfig from '../../../shared/config.js';
+import { BAD_REQUEST, OK, SERVER_ERROR } from '../../../shared/helpers/statusCodes.js';
 import { type AccountId } from '../../../shared/types';
 import { getNearApiConnection } from '../helpers/nearConnection.js';
 import { TxTasks } from '../models/TxTasks.js';
@@ -8,6 +9,8 @@ import { TxTasks } from '../models/TxTasks.js';
 const nearConfig = getConfig(process.env.NODE_ENV);
 
 const { nodeUrl } = nearConfig;
+
+const TOP_LEVEL_ACCOUNT_SUFFIX = '.near'; // Should this come from shared/config.ts?
 
 const connection = getNearApiConnection(nodeUrl);
 
@@ -25,16 +28,20 @@ export const addTasks = async (request, response) => {
   const { accountId } = request.body;
   console.log('addTasks', { accountId });
   try {
+    if (!accountId.endsWith(TOP_LEVEL_ACCOUNT_SUFFIX)) {
+      return response.status(BAD_REQUEST).send({ error: `Not allowed. Account ID must end with '${TOP_LEVEL_ACCOUNT_SUFFIX}'.` });
+    }
+
     if (!(await accountExists(accountId))) {
-      return response.status(400).send({ error: `Account does not exist in ${nodeUrl}.` });
+      return response.status(BAD_REQUEST).send({ error: `Account does not exist in ${nodeUrl}.` });
     }
 
     TxTasks.findOneAndUpdate({ accountId }, { accountId }, { upsert: true })
       .then()
       .catch((error) => console.error({ error }));
-    response.send({ status: 'ok' });
+    response.send(OK);
   } catch (error) {
     console.error(error);
-    response.status(500).send({ error });
+    response.status(SERVER_ERROR).send({ error });
   }
 };

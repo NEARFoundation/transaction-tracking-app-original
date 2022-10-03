@@ -2,9 +2,10 @@ import { connect, Contract, keyStores, WalletConnection } from 'near-api-js';
 
 import getConfig from '../../shared/config';
 
-const REACT_APP_ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT;
-console.log('src/utils.ts', { REACT_APP_ENVIRONMENT });
-const nearConfig = getConfig(REACT_APP_ENVIRONMENT);
+import { ENVIRONMENT } from './config';
+
+console.log('src/utils.ts', { ENVIRONMENT });
+const nearConfig = getConfig(ENVIRONMENT);
 
 // Initialize contract & set global variables
 export async function initContract() {

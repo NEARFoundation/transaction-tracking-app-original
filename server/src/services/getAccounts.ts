@@ -1,12 +1,13 @@
 import { getFormattedUtcDatetime } from '../../../shared/helpers/datetime.js';
-import { respondWithServerError } from '../../../shared/helpers/errors.js';
 import { type AccountStatus } from '../../../shared/types';
+import { respondWithServerError } from '../helpers/errors.js';
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
 
 export const getAccounts = async (request: any, response: any) => {
-  const accountIds = request.body.accountId;
-  console.log('getAccounts accountIds', accountIds);
+  const { body } = request;
+  const accountIds = body.accountIds;
+  console.log(`getAccounts. body=${JSON.stringify(body)}`);
   try {
     const accounts: AccountStatus[] = [];
     for (const accountId of accountIds) {
@@ -25,7 +26,7 @@ export const getAccounts = async (request: any, response: any) => {
           lastUpdate = getFormattedUtcDatetime(new Date(txTaskForAccount.lastUpdate));
         }
       } else {
-        status = 'The account is not monitored.';
+        status = 'The account is not monitored. Please add the account again.';
       }
 
       accounts.push({ accountId, lastUpdate, status });

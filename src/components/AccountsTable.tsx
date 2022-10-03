@@ -1,15 +1,12 @@
 import { getFormattedUtcDatetime } from '../../shared/helpers/datetime';
-import { addTaskForAccountId, defaultRequestOptions } from '../App';
-import { AccountId } from '../../shared/types';
-import { stringToBoolean } from '../../shared/helpers/strings';
+import { AccountId, AccountRowProps, AccountsTableProps } from '../../shared/types';
+import { addTaskForAccountId } from '../App';
+import { ALLOW_DELETING_FROM_DATABASE, API_BASE_URL, defaultRequestOptions } from '../helpers/config';
+import { handleExportCsv } from '../helpers/csv';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-const ALLOW_DELETING_FROM_DATABASE = stringToBoolean(process.env.REACT_APP_ALLOW_DELETING_FROM_DATABASE ?? 'false');
-console.log(process.env.REACT_APP_ALLOW_DELETING_FROM_DATABASE, { ALLOW_DELETING_FROM_DATABASE });
-
-const getAccountStatus = (accountsStatus, accountId: AccountId) => {
-  if (accountsStatus.length > 0) {
-    const result = accountsStatus.find((item) => {
+const getAccountStatus = (accountStatuses: any, accountId: AccountId) => {
+  if (accountStatuses.length > 0) {
+    const result = accountStatuses.find((item: any) => {
       return item.accountId === accountId;
     });
     return result ? result : [];
@@ -18,7 +15,10 @@ const getAccountStatus = (accountsStatus, accountId: AccountId) => {
   return [];
 };
 
-async function deleteFromDb(accountId: AccountId) {
+const sometimesEmptyHeader = ALLOW_DELETING_FROM_DATABASE ? <th></th> : <></>;
+const csvDownloadButtonColSpan = ALLOW_DELETING_FROM_DATABASE ? 4 : 3;
+
+async function deleteFromDatabase(accountId: AccountId) {
   console.log('deleteFromDb', accountId);
   const requestOptions = {
     ...defaultRequestOptions,
@@ -35,14 +35,15 @@ async function deleteFromDb(accountId: AccountId) {
     });
 }
 
-function AccountRow({ accountId, deleteFromLocalStorage, accountStatus, getTransactions }) {
-  const deleteFromDbCell = ALLOW_DELETING_FROM_DATABASE ? (
+// eslint-disable-next-line max-lines-per-function
+function AccountRow({ accountId, deleteFromLocalStorage, accountStatus, getTransactions, selectedAccountId, runTask, selectedAccountIdsForCsv, addAccountCsv }: AccountRowProps) {
+  const deleteFromDatabaseCell = ALLOW_DELETING_FROM_DATABASE ? (
     <td>
       <button
         style={{ backgroundColor: 'red', color: 'black' }}
         onClick={() => {
           deleteFromLocalStorage(accountId);
-          deleteFromDb(accountId);
+          deleteFromDatabase(accountId);
         }}
       >
         Delete from DB
@@ -54,7 +55,7 @@ function AccountRow({ accountId, deleteFromLocalStorage, accountStatus, getTrans
   return (
     <tr>
       <td>
-        <div className="accountId" title="Show transactions for this account" onClick={() => getTransactions(accountId)}>
+        <div className={selectedAccountId === accountId ? 'accountIdSelected' : 'accountId'} title="Show transactions for this account" onClick={() => getTransactions(accountId)}>
           {accountId}
         </div>
       </td>
@@ -70,8 +71,14 @@ function AccountRow({ accountId, deleteFromLocalStorage, accountStatus, getTrans
         >
           Delete
         </button>
+        <button className="silverBtn" onClick={() => runTask(accountId)}>
+          Update now
+        </button>
       </td>
-      {deleteFromDbCell}
+      <td>
+        <input type="checkbox" checked={selectedAccountIdsForCsv.includes(accountId)} value={accountId} onChange={addAccountCsv} />
+      </td>
+      {deleteFromDatabaseCell}
     </tr>
   );
 }
@@ -80,50 +87,106 @@ function AddNewAccountForm({ addNewAccount, handleChange, newAccountId, exampleA
   return (
     <form onSubmit={addNewAccount}>
       <input type="text" onChange={handleChange} value={newAccountId} placeholder={exampleAccount} />
-      <button type="submit" title="Add new account">
+      <button type="submit" title="Add new account" className="silverBtn">
         {buttonText}
       </button>
     </form>
   );
 }
 
-export function AccountsTable({ accountIDs, getTransactions, setAccountIDs, accountsStatus, handleChange, newAccountId, addNewAccount, exampleAccount }) {
-  // console.log({ accountIDs });
+// eslint-disable-next-line max-lines-per-function
+export function AccountsTable({
+  accountIds,
+  setAccountIds,
+  accountStatuses,
+  handleChange,
+  addNewAccount,
+  exampleAccount,
+  selectedAccountIdsForCsv,
+  setSelectedAccountIdsForCsv,
+  messageCsv,
+  csvTransactions,
+  newAccountId,
+  startDate,
+  endDate,
+  getTransactions,
+  runTask,
+  selectedAccountId,
+}: AccountsTableProps) {
+  // console.log({ accountIds });
 
-  function deleteFromLocalStorage(accountId: AccountId) {
-    const newAccountIDs = accountIDs.filter((item) => item !== accountId);
-    console.log('deleteFromLocalStorage', accountId, newAccountIDs);
-    setAccountIDs(newAccountIDs);
+  function deleteFromLocalStorage(accountIdToDelete: AccountId) {
+    const newAccountIDs = accountIds.filter((item: any) => item !== accountIdToDelete);
+    console.log('deleteFromLocalStorage', accountIdToDelete, newAccountIDs);
+    setAccountIds(newAccountIDs);
   }
 
-  const props = { addNewAccount, handleChange, newAccountId, exampleAccount };
+  const addAccountCsv = (event: any) => {
+    const { value, checked } = event.target;
+    setSelectedAccountIdsForCsv([...selectedAccountIdsForCsv, value]);
+    if (!checked) {
+      setSelectedAccountIdsForCsv(selectedAccountIdsForCsv.filter((item: any) => item !== value));
+    }
+  };
+
+  const handleSelectAll = (event: any) => {
+    const { checked } = event.target;
+    if (checked) setSelectedAccountIdsForCsv(accountIds);
+    else setSelectedAccountIdsForCsv([]);
+  };
+
+  const props = { addNewAccount, handleChange, exampleAccount, newAccountId };
   const inlineProps = { ...props, buttonText: '+' };
   return (
     <div style={{ textAlign: 'center' }}>
-      {accountIDs.length > 0 ? (
+      {accountIds.length > 0 ? (
         <>
-          <table>
+          <table className="accountsTable">
             <thead>
               <tr>
                 <th>Account ID</th>
                 <th>Status</th>
                 <th>Last Update</th>
                 <th></th>
+                <th>
+                  <input type="checkbox" onChange={handleSelectAll} />
+                </th>
+                {sometimesEmptyHeader}
               </tr>
             </thead>
             <tbody>
-              {accountIDs.map((accountId: AccountId, index: number) => {
-                const accountStatus = getAccountStatus(accountsStatus, accountId);
-                const rowProps = { accountId, deleteFromLocalStorage, accountStatus, getTransactions };
+              {accountIds.map((accountIdForRow: AccountId, index: number) => {
+                const accountStatus = getAccountStatus(accountStatuses, accountIdForRow);
+                const rowProps = {
+                  accountId: accountIdForRow,
+                  deleteFromLocalStorage,
+                  accountStatus,
+                  getTransactions,
+                  runTask,
+                  selectedAccountId,
+                  selectedAccountIdsForCsv,
+                  addAccountCsv,
+                };
                 return <AccountRow {...rowProps} key={index} />;
               })}
               <tr key="addAccountId">
-                <td className="max-width-none">
+                <td colSpan={2} className="max-width-none">
                   <AddNewAccountForm {...inlineProps} />
                 </td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td colSpan={csvDownloadButtonColSpan} style={{ textAlign: 'right' }}>
+                  {csvTransactions.length > 0 ? (
+                    <button
+                      className="downloadBtn"
+                      onClick={() => {
+                        handleExportCsv(csvTransactions, startDate, endDate, accountIds);
+                      }}
+                    >
+                      Download as CSV
+                    </button>
+                  ) : (
+                    messageCsv
+                  )}
+                </td>
               </tr>
             </tbody>
           </table>

@@ -14,8 +14,9 @@ WHERE r.predecessor_account_id = $1
   AND r.receiver_account_id = r.predecessor_account_id
   AND e.status = 'SUCCESS_VALUE'
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'new'
-  AND COALESCE((ra.args::json->'args_json')::json->>'num_confirmations', '') = '2'
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'method_name'::text = 'new'
+  AND (ra.args -> 'args_json'::text) ->> 'num_confirmations'::text = '2'
   AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args::json->'args_json', '{}')::jsonb)) = 1
   AND EXISTS(
     SELECT 1

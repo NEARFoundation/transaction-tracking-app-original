@@ -14,9 +14,10 @@ WHERE r.predecessor_account_id = $1
   AND r.receiver_account_id = 'v2.ref-farming.near'
   AND e.status = 'SUCCESS_VALUE'
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'withdraw_reward'
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'method_name'::text = 'withdraw_reward'
+  AND (ra.args -> 'args_json'::text) ->> 'token_id'::text = 'token.v2.ref-finance.near'
   AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args::json->'args_json', '{}')::jsonb)) >= 1
-  AND COALESCE((ra.args::json->'args_json')::json->>'token_id', '') = 'token.v2.ref-finance.near'
   AND b.block_timestamp > $2
   AND EXISTS(
         SELECT 1

@@ -14,10 +14,11 @@ WHERE r.predecessor_account_id = $1
   AND r.receiver_account_id = 'v2.ref-farming.near'
   AND e.status = 'SUCCESS_VALUE'
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'withdraw_seed'
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'method_name'::text = 'withdraw_seed'
+  AND (ra.args -> 'args_json'::text) ->> 'seed_id'::text LIKE 'v2.ref-finance.near@%'
+  AND (ra.args -> 'args_json'::text) ->> 'amount'::text ~ '^[0-9]+$'
   AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args::json->'args_json', '{}')::jsonb)) IN (2, 3)
-  AND COALESCE((ra.args::json->'args_json')::json->>'seed_id', '') LIKE 'v2.ref-finance.near@%'
-  AND COALESCE((ra.args::json->'args_json')::json->>'amount', '') ~ '^[0-9]+$'
   AND b.block_timestamp > $2
 AND EXISTS(
     SELECT 1

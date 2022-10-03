@@ -14,7 +14,8 @@ WHERE r.receiver_account_id = 'sputnik-dao.near'
   AND r.predecessor_account_id = $1
   AND e.status = 'SUCCESS_RECEIPT_ID'
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'create'
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'method_name'::text = 'create'
   AND b.block_timestamp > $2
   AND EXISTS(
     SELECT 1

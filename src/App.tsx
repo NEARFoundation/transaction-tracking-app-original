@@ -1,31 +1,26 @@
 /* eslint-disable max-lines */
 import { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
-import CsvDownload from 'react-json-to-CSV';
 import 'react-datepicker/dist/react-datepicker.css';
 import MultiSelect from 'react-select'; // https://react-select.com/home
 
 import getConfig from '../shared/config';
-import { getFormattedUtcDatetime, getCsvFilename, getBeginningOfTodayUtc, getEndOfTodayUtc } from '../shared/helpers/datetime';
-import { logAndDisplayError } from '../shared/helpers/errors';
+import { getFormattedUtcDatetime, getDefaultStartUtc, getEndOfTodayUtc } from '../shared/helpers/datetime';
+import { BAD_REQUEST, SUCCESS } from '../shared/helpers/statusCodes';
 import { AccountId, OptionType } from '../shared/types';
 
 import { AccountsTable } from './components/AccountsTable';
 import { MainTable } from './components/MainTable';
+import { ACCOUNT_UPDATE_POLLING_INTERVAL, API_BASE_URL, defaultRequestOptions, ENVIRONMENT } from './helpers/config';
+import { getTransactionsCsv } from './helpers/csv';
+import { logAndDisplayError } from './helpers/errors';
 import { useLocalStorage } from './helpers/localStorage';
 
 import './global.css';
 
-const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT;
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const nearConfig = getConfig(ENVIRONMENT);
 console.log({ ENVIRONMENT, API_BASE_URL, nearConfig });
 const { exampleAccount, explorerUrl } = nearConfig;
-
-export const defaultRequestOptions = {
-  headers: { 'Content-Type': 'application/json' },
-  method: 'POST',
-};
 
 export async function addTaskForAccountId(accountId: AccountId) {
   console.log('addTaskForAccountId:', accountId);
@@ -38,38 +33,24 @@ export async function addTaskForAccountId(accountId: AccountId) {
 
 // eslint-disable-next-line max-lines-per-function
 export default function App() {
-  const [message, setMessage] = useState('');
-  // const [accountId, setNewAccountId] = useState('');
-  const [selectedAccountId, setSelectedAccountId] = useState('');
+  const [message, setMessage] = useState<string>('');
+  const [messageCsv, setMessageCsv] = useState<string>('');
+  const [newAccountId, setNewAccountId] = useState<AccountId>('');
+  const [selectedAccountId, setSelectedAccountId] = useState<AccountId>('');
+  const [selectedAccountIdsForCsv, setSelectedAccountIdsForCsv] = useState<AccountId[]>([]);
   const [transactions, setTransactions] = useState([]);
   const [types, setTypes] = useState([]);
   const [selectedTypes, setSelectedTypes] = useState([]);
-  const [allTransactions, setAllTransactions] = useState([]);
+  const [csvTransactions, setCsvTransactions] = useState([]);
   const [lastUpdate, setLastUpdate] = useState('');
-  const [prependFilenameWithAcctNames, setPrependFilenameWithAcctNames] = useState(true);
-  const [divisorPower, setDivisorPower] = useLocalStorage('divisorPower', 9);
+
+  const [divisorPower, setDivisorPower] = useLocalStorage<number>('divisorPower', 9);
   const divisorPowerOptions = [0, 9].map((x) => ({ value: x, label: x ? `1e${x}` : 1 }));
-  const [decimalPlaces, setDecimalPlaces] = useLocalStorage('decimalPlaces', 6);
+  const [decimalPlaces, setDecimalPlaces] = useLocalStorage<number>('decimalPlaces', 6);
   const decimalPlacesOptions = [1, 2, 3, 4, 5, 6, 7, 8].map((x) => ({ value: x, label: x }));
   console.log({ divisorPowerOptions, decimalPlacesOptions });
-  const [startDate, setStartDate] = useState(() => {
-    const saved = localStorage.getItem('rangeDate') ?? '';
-    const initialValue = JSON.parse(saved);
-    if (initialValue) {
-      return new Date(initialValue.startDate);
-    } else {
-      return getBeginningOfTodayUtc();
-    }
-  });
-  const [endDate, setEndDate] = useState(() => {
-    const saved = localStorage.getItem('rangeDate') ?? '';
-    const initialValue = JSON.parse(saved);
-    if (initialValue) {
-      return new Date(initialValue.endDate);
-    } else {
-      return getEndOfTodayUtc();
-    }
-  });
+  const [startDate, setStartDate] = useLocalStorage<Date>('startDate', getDefaultStartUtc());
+  const [endDate, setEndDate] = useLocalStorage<Date>('endDate', getEndOfTodayUtc());
 
   const getTypes = async () => {
     const requestOptions = {
@@ -86,15 +67,12 @@ export default function App() {
       });
   };
 
-  const [accountIDs, setAccountIDs] = useState(() => {
-    const saved = localStorage.getItem('accountIDs') ?? '';
-    const initialValue = JSON.parse(saved);
-    return initialValue || [];
-  });
-  const [accountsStatus, setAccountsStatus] = useState([]);
+  const initialAccountIds: AccountId[] = [];
+  const [accountIds, setAccountIds] = useLocalStorage<AccountId[]>('accountIds', initialAccountIds); // These are the accounts shown in the table at the top.
+  const [accountStatuses, setAccountStatuses] = useState<string[]>([]);
 
   const getTransactions = async (accountId: AccountId) => {
-    setMessage('');
+    setMessage('Receiving data...');
     setSelectedAccountId(accountId);
     console.log('getTransactions', { accountId, start: getFormattedUtcDatetime(startDate), end: getFormattedUtcDatetime(endDate) });
     const requestOptions = {
@@ -103,7 +81,7 @@ export default function App() {
         accountId: [accountId],
         endDate,
         startDate,
-        types: Array.isArray(selectedTypes) ? selectedTypes.map((option: OptionType) => option.value) : [],
+        types: selectedTypes.map((option: OptionType) => option.value),
       }),
     };
     await fetch(API_BASE_URL + '/transactions', requestOptions)
@@ -121,22 +99,38 @@ export default function App() {
   };
 
   const getAccounts = async () => {
-    const localStorageAccountIds = localStorage.getItem('accountIDs') ?? '';
-    console.log({ localStorageAccountIds });
+    return; // TODO
     const requestOptions = {
       ...defaultRequestOptions,
-      body: JSON.stringify({ accountId: JSON.parse(localStorageAccountIds) }),
+      body: JSON.stringify({ accountIds }),
     };
     await fetch(API_BASE_URL + '/accounts', requestOptions)
       .then(async (response) => {
         const data = await response.json();
         // console.log(data['accounts']);
-        setAccountsStatus(data.accounts);
+        setAccountStatuses(data.accounts);
       })
       .catch((error) => {
-        setAccountsStatus([]);
+        setAccountStatuses([]);
         logAndDisplayError(error, setMessage);
       });
+  };
+
+  const runTask = async (accountId: AccountId) => {
+    setMessage('');
+    const requestOptions = {
+      ...defaultRequestOptions,
+      body: JSON.stringify({ accountId }),
+    };
+    await fetch(API_BASE_URL + '/runTask', requestOptions)
+      .then(async (response) => {
+        await response.json();
+      })
+      .catch((error) => {
+        console.error('There was an error!', error);
+        setMessage('Unknown error!');
+      });
+    getAccounts();
   };
 
   useEffect(() => {
@@ -144,31 +138,37 @@ export default function App() {
     getAccounts();
     setInterval(() => {
       getAccounts();
-    }, 30_000);
+    }, ACCOUNT_UPDATE_POLLING_INTERVAL);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('accountIDs', JSON.stringify(accountIDs));
-    setAllTransactions([]);
+    setCsvTransactions([]);
     getAccounts();
-  }, [accountIDs]);
+  }, [accountIds]);
+
+  useEffect(() => {
+    getTransactionsCsv({ selectedAccountIdsForCsv, setMessageCsv, startDate, endDate, selectedTypes, setCsvTransactions });
+  }, [selectedAccountIdsForCsv]);
 
   useEffect(() => {
     setMessage('');
     if (selectedAccountId) getTransactions(selectedAccountId);
-    localStorage.setItem('rangeDate', JSON.stringify({ endDate, startDate }));
-    setAllTransactions([]);
+    setCsvTransactions([]);
   }, [startDate, endDate, selectedTypes]);
 
   const MultiSelectStyles = {
-    valueContainer: (base) => ({
+    option: (base: any) => ({
+      ...base,
+      color: '#444',
+    }),
+    valueContainer: (base: any) => ({
       ...base,
       maxHeight: 500,
       overflowY: 'auto',
     }),
   };
 
-  const onChangeTypes = (value, event) => {
+  const onChangeTypes = (value: any, event: any) => {
     if (event.action === 'select-option' && event.option.value === '*') {
       if (selectedTypes.length === types.length) setSelectedTypes([]);
       else setSelectedTypes(types);
@@ -177,56 +177,31 @@ export default function App() {
     }
   };
 
-  function onChangeDivisorPower(chosenOption, event) {
+  function onChangeDivisorPower(chosenOption: any, event: any) {
     const { value } = chosenOption;
     console.log('onChangeDivisorPower', { value, event });
     setDivisorPower(value);
   }
 
-  function onChangeDecimalPlaces(chosenOption, event) {
+  function onChangeDecimalPlaces(chosenOption: any, event: any) {
     const { value } = chosenOption;
     console.log('onChangeDecimalPlaces', { value, event });
     setDecimalPlaces(value);
   }
 
-  const getAllTransactions = async () => {
-    setMessage('');
-    console.log('getAllTransactions', accountIDs);
-    const requestOptions = {
-      ...defaultRequestOptions,
-      body: JSON.stringify({
-        accountId: accountIDs,
-        endDate,
-        startDate,
-        types: Array.isArray(selectedTypes) ? selectedTypes.map((option: OptionType) => option.value) : [],
-      }),
-    };
-    await fetch(API_BASE_URL + '/transactions', requestOptions)
-      .then(async (response) => {
-        const data = await response.json();
-        setAllTransactions(data.transactions);
-        console.log(data.transactions);
-        if (data.transactions.length === 0) setMessage('No transactions have been received yet. Please check back later.');
-      })
-      .catch((error) => {
-        logAndDisplayError(error, setMessage);
-        setAllTransactions([]);
-      });
-  };
-
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     const accountId = event.target.value;
-    setSelectedAccountId(accountId);
+    setNewAccountId(accountId);
     console.log('handleChange. accountId=', accountId);
   };
 
-  const addTasks = async (accountId) => {
+  const addTasks = async (accountId: AccountId) => {
     setMessage('');
     await addTaskForAccountId(accountId)
       .then(async (response) => {
-        if (response.status === 200) {
-          if (!accountIDs.includes(accountId)) setAccountIDs([...accountIDs, accountId]);
-        } else if (response.status === 400) {
+        if (response.status === SUCCESS) {
+          if (!accountIds.includes(accountId)) setAccountIds([...accountIds, accountId]);
+        } else if (response.status === BAD_REQUEST) {
           const status = await response.json();
           setMessage(status.error);
           console.error(status.error);
@@ -237,16 +212,34 @@ export default function App() {
       });
   };
 
-  const addNewAccount = async (event) => {
+  const addNewAccount = async (event: any) => {
+    // Temp note to self: this function was formerly called `handleSubmit`.
     event.preventDefault();
-    console.log('addNewAccount', selectedAccountId);
-    if (selectedAccountId) {
-      await addTasks(selectedAccountId);
-      setSelectedAccountId('');
+    console.log('addNewAccount', newAccountId);
+    if (newAccountId) {
+      await addTasks(newAccountId);
+      setNewAccountId('');
     }
   };
 
-  const accountsTableProps = { accountIDs, accountsStatus, exampleAccount, handleChange, newAccountId: selectedAccountId, getTransactions, addNewAccount, setAccountIDs };
+  const accountsTableProps = {
+    accountIds,
+    accountStatuses,
+    exampleAccount,
+    handleChange,
+    selectedAccountId,
+    getTransactions,
+    addNewAccount,
+    setAccountIds,
+    selectedAccountIdsForCsv,
+    setSelectedAccountIdsForCsv,
+    runTask,
+    messageCsv,
+    csvTransactions,
+    endDate,
+    newAccountId,
+    startDate,
+  };
   // console.log({ accountsTableProps });
 
   return (
@@ -278,11 +271,11 @@ export default function App() {
             />
           </span>
           <hr />
-          {accountIDs.length > 0 ? (
+          {accountIds.length > 0 ? (
             <>
               <div style={{ paddingBottom: '6px', textAlign: 'center' }}>
-                From: <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} showMonthDropdown showYearDropdown dateFormat="yyyy-MM-dd" />
-                To: <DatePicker selected={endDate} onChange={(date) => setEndDate(date)} showMonthDropdown showYearDropdown dateFormat="yyyy-MM-dd" />
+                From: <DatePicker selected={startDate} onChange={(date: any) => setStartDate(date)} showMonthDropdown showYearDropdown dateFormat="yyyy-MM-dd" />
+                To: <DatePicker selected={endDate} onChange={(date: any) => setEndDate(date)} showMonthDropdown showYearDropdown dateFormat="yyyy-MM-dd" />
               </div>
 
               <MultiSelect
@@ -294,30 +287,6 @@ export default function App() {
                 isMulti
                 styles={MultiSelectStyles}
               />
-
-              {allTransactions.length > 0 ? (
-                <>
-                  <button onClick={getAllTransactions} style={{ backgroundColor: '#175730' }}>
-                    Update data for the CSV file
-                  </button>
-                  <CsvDownload
-                    data={allTransactions}
-                    filename={getCsvFilename(prependFilenameWithAcctNames ? accountIDs : [], startDate, endDate)}
-                    style={{ backgroundColor: '#175730' }}
-                  >
-                    Download CSV file
-                  </CsvDownload>
-                  <label style={{ fontSize: '0.7rem' }}>
-                    <input type="checkbox" checked={prependFilenameWithAcctNames} onChange={(event) => setPrependFilenameWithAcctNames(event.target.checked)} /> Prepend filename w/
-                    acct names
-                  </label>
-                </>
-              ) : (
-                <button onClick={getAllTransactions} style={{ backgroundColor: '#175730' }}>
-                  Prepare data for the CSV file
-                </button>
-              )}
-              <hr />
             </>
           ) : null}
         </div>

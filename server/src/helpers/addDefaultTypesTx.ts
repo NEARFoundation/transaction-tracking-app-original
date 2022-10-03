@@ -1,11 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { TxTasks } from '../models/TxTasks.js';
 import { TxTypes } from '../models/TxTypes.js';
 
 export const addDefaultTypesTx = async () => {
   const sqlFolder = './src/helpers/TxTypes/';
   console.log({ sqlFolder });
+  await TxTasks.updateMany({ isRunning: true }, { isRunning: false })
+    .then()
+    .catch((error) => console.log(error));
   fs.readdir(sqlFolder, (readdirError, files) => {
     for (const file of files) {
       if (path.extname(file) === '.sql') {

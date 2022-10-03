@@ -13,7 +13,8 @@ FROM receipts r
 WHERE r.predecessor_account_id = $1
   AND e.status = 'SUCCESS_VALUE'
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'nft_transfer'
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'method_name'::text = 'nft_transfer'
   AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args::json->'args_json', '{}')::jsonb)) BETWEEN 2 AND 4
   AND COALESCE((ra.args::json->'args_json')::json->>'receiver_id', '') <> ''
   AND COALESCE((ra.args::json->'args_json')::json->>'token_id', '') <> ''
