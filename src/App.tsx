@@ -1,8 +1,5 @@
 /* eslint-disable max-lines */
 import { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import MultiSelect from 'react-select'; // https://react-select.com/home
 
 import getConfig from '../shared/config';
 import { getFormattedUtcDatetime, getDefaultStartUtc, getEndOfTodayUtc } from '../shared/helpers/datetime';
@@ -10,7 +7,9 @@ import { BAD_REQUEST, SUCCESS } from '../shared/helpers/statusCodes';
 import { AccountId, OptionType } from '../shared/types';
 
 import { AccountsTable } from './components/AccountsTable';
+import { FormattingControls } from './components/FormattingControls';
 import { MainTable } from './components/MainTable';
+import { TransactionsFilterControls } from './components/TransactionsFilterControls';
 import { ACCOUNT_UPDATE_POLLING_INTERVAL, API_BASE_URL, defaultRequestOptions, ENVIRONMENT } from './helpers/config';
 import { getTransactionsCsv } from './helpers/csv';
 import { logAndDisplayError } from './helpers/errors';
@@ -155,18 +154,6 @@ export default function App() {
     setCsvTransactions([]);
   }, [startDate, endDate, selectedTypes]);
 
-  const MultiSelectStyles = {
-    option: (base: any) => ({
-      ...base,
-      color: '#444',
-    }),
-    valueContainer: (base: any) => ({
-      ...base,
-      maxHeight: 500,
-      overflowY: 'auto',
-    }),
-  };
-
   const onChangeTypes = (value: any, event: any) => {
     if (event.action === 'select-option' && event.option.value === '*') {
       if (selectedTypes.length === types.length) setSelectedTypes([]);
@@ -248,46 +235,10 @@ export default function App() {
         <AccountsTable {...accountsTableProps} />
         {message ? <div className="msg">{message}</div> : null}
         <div>
+          <FormattingControls {...{ divisorPowerOptions, divisorPower, onChangeDivisorPower, decimalPlacesOptions, decimalPlaces, onChangeDecimalPlaces }} />
           <hr />
-          <span style={{ paddingRight: '1rem' }}>
-            Divide by:{' '}
-            <MultiSelect
-              options={divisorPowerOptions}
-              placeholder="Divide by"
-              defaultValue={divisorPowerOptions.find((option) => option.value === divisorPower)}
-              className="my-react-select-container divisorPower"
-              onChange={onChangeDivisorPower}
-            />
-          </span>
-          <span>
-            Decimal places:{' '}
-            <MultiSelect
-              options={decimalPlacesOptions}
-              placeholder="Decimal places"
-              defaultValue={decimalPlacesOptions.find((option) => option.value === decimalPlaces)}
-              className="my-react-select-container decimalPlaces"
-              onChange={onChangeDecimalPlaces}
-            />
-          </span>
+          <TransactionsFilterControls {...{ accountIds, startDate, setStartDate, endDate, setEndDate, types, selectedTypes, onChangeTypes }} />
           <hr />
-          {accountIds.length > 0 ? (
-            <>
-              <div style={{ paddingBottom: '6px', textAlign: 'center' }}>
-                From: <DatePicker selected={startDate} onChange={(date: any) => setStartDate(date)} showMonthDropdown showYearDropdown dateFormat="yyyy-MM-dd" />
-                To: <DatePicker selected={endDate} onChange={(date: any) => setEndDate(date)} showMonthDropdown showYearDropdown dateFormat="yyyy-MM-dd" />
-              </div>
-
-              <MultiSelect
-                options={[{ label: '--- Select All ---', value: '*' }, ...types]}
-                placeholder="Select transaction types"
-                value={selectedTypes}
-                className="my-react-select-container"
-                onChange={onChangeTypes}
-                isMulti
-                styles={MultiSelectStyles}
-              />
-            </>
-          ) : null}
         </div>
       </nav>
       <div style={{ paddingTop: '10px', textAlign: 'center' }}>
