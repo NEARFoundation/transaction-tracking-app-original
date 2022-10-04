@@ -50,6 +50,8 @@ export type TxActionsFilter = {
   };
   txType?: string[];
 };
+
+export type PoolsCurrency = any; // TODO: Is this named properly? What is this type?
 // --------------------------------------------------------
 
 export type OptionType = { label: string; value: string }; // https://github.com/JedWatson/react-select/issues/2902#issuecomment-624806537
