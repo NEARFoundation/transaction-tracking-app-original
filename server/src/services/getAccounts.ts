@@ -8,7 +8,7 @@ import { TxTasks } from '../models/TxTasks.js';
 
 export const getAccounts = async (request: Request, response: Response) => {
   const { body } = request;
-  const accountIds = body.accountIds;
+  const { accountIds } = body;
   console.log(`getAccounts. body=${JSON.stringify(body)}`);
   try {
     const accounts: AccountStatus[] = [];

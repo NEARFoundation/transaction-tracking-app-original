@@ -74,20 +74,23 @@ export function round(amount: string, decimals = 0, divisorPower = 0, locale?: s
  */
 export async function convertAmount(amount: number | string, currency: string, getDecimals: (currency: string) => Promise<PoolsCurrency>): Promise<string> {
   const yoctoPower = 24;
-  if (currency === 'NEAR' || currency === 'wNEAR')
+  if (currency === 'NEAR' || currency === 'wNEAR') {
     return new Decimal(amount)
       .div(new Decimal(10 ** yoctoPower))
       .toDecimalPlaces(10)
       .toString();
+  }
+
   const decimals = await getDecimals(currency);
-  if (decimals?.decimals)
+  if (decimals?.decimals) {
     return new Decimal(amount)
       .div(new Decimal(10 ** decimals.decimals))
       .toDecimalPlaces(10)
       .toString();
-  else
+  } else {
     return new Decimal(amount)
       .div(new Decimal(10 ** yoctoPower))
       .toDecimalPlaces(10)
       .toString();
+  }
 }

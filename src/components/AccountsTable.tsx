@@ -131,8 +131,11 @@ export function AccountsTable({
 
   const handleSelectAll = (event: any) => {
     const { checked } = event.target;
-    if (checked) setSelectedAccountIdsForCsv(accountIds);
-    else setSelectedAccountIdsForCsv([]);
+    if (checked) {
+      setSelectedAccountIdsForCsv(accountIds);
+    } else {
+      setSelectedAccountIdsForCsv([]);
+    }
   };
 
   const basePropsForAddNewAccountForm = { addNewAccount, handleNewAccountIdInputChange, exampleAccount, newAccountId };
