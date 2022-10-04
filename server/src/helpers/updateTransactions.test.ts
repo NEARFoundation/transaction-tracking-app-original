@@ -3,7 +3,8 @@
 // import { TxActions } from '../models/TxActions';
 import { seedTheMockIndexerDatabase } from '../../test_helpers/updateTestData';
 
-import { DEFAULT_LENGTH, updateTransactions } from './updateTransactions';
+import { DEFAULT_LENGTH } from './config';
+import { updateTransactions } from './updateTransactions';
 
 beforeAll(async () => {
   await seedTheMockIndexerDatabase();

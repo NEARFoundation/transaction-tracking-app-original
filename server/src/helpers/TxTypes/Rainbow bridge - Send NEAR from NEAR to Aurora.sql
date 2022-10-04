@@ -3,7 +3,7 @@ SELECT b.block_timestamp,
        b.block_height,
        convert_from(decode(ra.args ->> 'args_base64', 'base64'), 'UTF8') args_base64,
        r.originated_from_transaction_hash transaction_hash,
-       ra.args ->> 'deposit' amount_transferred,
+       ra.args ->'args_json' ->> 'amount' amount_transferred,
        'NEAR' currency_transferred,
        r.receiver_account_id receiver_owner_account
 FROM receipts r

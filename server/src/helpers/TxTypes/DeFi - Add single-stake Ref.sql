@@ -14,7 +14,8 @@ WHERE r.predecessor_account_id = $1
   AND r.receiver_account_id = 'xtoken.ref-finance.near'
   AND e.status = 'SUCCESS_VALUE'
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'storage_deposit'
-  AND COALESCE((ra.args::json->'args_json')::json->>'account_id', '') = r.predecessor_account_id
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'method_name'::text = 'storage_deposit'
+  AND (ra.args -> 'args_json'::text) ->> 'account_id'::text = r.predecessor_account_id
   AND b.block_timestamp > $2
 ORDER BY b.block_timestamp LIMIT $3

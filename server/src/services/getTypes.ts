@@ -1,7 +1,7 @@
-import { respondWithServerError } from '../../../shared/helpers/errors.js';
+import { respondWithServerError } from '../helpers/errors.js';
 import { TxTypes } from '../models/TxTypes.js';
 
-export const getTypes = async (request, response) => {
+export const getTypes = async (request: any, response: any) => {
   try {
     const types = await TxTypes.aggregate([
       {

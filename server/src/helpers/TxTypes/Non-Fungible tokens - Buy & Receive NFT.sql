@@ -14,9 +14,10 @@ WHERE r.predecessor_account_id = $1
   AND r.receiver_account_id = 'x.paras.near'
   AND e.status = 'SUCCESS_VALUE'
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'nft_buy'
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'method_name'::text = 'nft_buy'
+  AND COALESCE((ra.args -> 'args_json'::text) ->> 'token_series_id'::text, '') <> ''
+  AND COALESCE((ra.args -> 'args_json'::text) ->> 'receiver_id'::text, '') <> ''
   AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args::json->'args_json', '{}')::jsonb)) = 2
-  AND COALESCE((ra.args::json->'args_json')::json->>'token_series_id', '') <> ''
-  AND COALESCE((ra.args::json->'args_json')::json->>'receiver_id', '') <> ''
   AND b.block_timestamp > $2
 ORDER BY b.block_timestamp LIMIT $3

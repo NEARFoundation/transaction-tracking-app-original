@@ -14,6 +14,7 @@ WHERE r.receiver_account_id = 'e-near.near'
 AND r.predecessor_account_id = $1
 AND e.status = 'SUCCESS_VALUE'
 AND ra.action_kind = 'FUNCTION_CALL'
-AND COALESCE(ra.args::json->>'method_name', '') = 'migrate_to_ethereum'
+AND ra.args ->> 'args_json'::text IS NOT NULL
+AND ra.args ->> 'method_name'::text = 'migrate_to_ethereum'
 AND b.block_timestamp > $2
 ORDER BY b.block_timestamp LIMIT $3

@@ -23,7 +23,8 @@ WHERE r.receiver_account_id LIKE '%.sputnik-dao.near'
     )
    OR e.status = 'SUCCESS_VALUE')
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'act_proposal'
-  AND COALESCE((ra.args::json->'args_json')::json->>'action', '') = 'VoteApprove'
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'method_name'::text = 'act_proposal'
+  AND (ra.args -> 'args_json'::text) ->> 'action'::text = 'VoteApprove'
   AND b.block_timestamp > $2
 ORDER BY b.block_timestamp LIMIT $3

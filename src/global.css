@@ -250,6 +250,25 @@ td {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  margin: 0;
+  padding: 0.2rem;
+  border-bottom: 1px solid black;
+  border-right: 1px solid black;
+}
+
+#transactionsTable th,
+#transactionsTable td {
+  word-break: break-all;
+  max-width: 25ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.accountsTable {
+  width: max-content;
+  min-width: 640px;
 }
 
 .msg {
@@ -260,9 +279,14 @@ td {
 .accountId {
   cursor: pointer;
 }
+
 .accountId:hover {
   text-decoration: underline;
   color: var(--secondary);
+}
+
+.accountIdSelected {
+  font-weight: bold;
 }
 
 .react-datepicker__input-container input {
@@ -292,4 +316,18 @@ td {
 .my-react-select-container.divisorPower,
 .my-react-select-container.decimalPlaces {
   display: inline-block;
+  width: auto !important;
+}
+
+.react-datepicker__tab-loop {
+  display: inline-block;
+}
+
+.silverBtn {
+  background-color: #ccc;
+  color: #000000;
+}
+
+.downloadBtn {
+  background-color: var(--secondary);
 }

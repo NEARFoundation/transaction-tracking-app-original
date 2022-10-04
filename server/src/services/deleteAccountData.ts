@@ -1,3 +1,4 @@
+import { OK, SERVER_ERROR } from '../../../shared/helpers/statusCodes.js';
 import { stringToBoolean } from '../../../shared/helpers/strings.js';
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
@@ -19,9 +20,9 @@ export const deleteAccountData = async (request, response) => {
     TxActions.deleteMany({ accountId })
       .then()
       .catch((error) => console.error({ error }));
-    response.send({ status: 'ok' });
+    response.send(OK);
   } catch (error) {
     console.error(error);
-    response.status(500).send({ error });
+    response.status(SERVER_ERROR).send({ error });
   }
 };
