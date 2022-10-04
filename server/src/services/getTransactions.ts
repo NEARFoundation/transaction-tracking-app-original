@@ -15,22 +15,25 @@ import { TxTasks } from '../models/TxTasks.js';
  * @returns {string}
  */
 async function convertAmount(amount: number | string, currency: string): Promise<string> {
-  if (currency === 'NEAR' || currency === 'wNEAR')
+  if (currency === 'NEAR' || currency === 'wNEAR') {
     return new Decimal(amount)
       .div(new Decimal(10 ** 24))
       .toDecimalPlaces(10)
       .toString();
+  }
+
   const decimals = await PoolsCurrencies.findOne({ currency }).select('decimals');
-  if (decimals?.decimals)
+  if (decimals?.decimals) {
     return new Decimal(amount)
       .div(new Decimal(10 ** decimals.decimals))
       .toDecimalPlaces(10)
       .toString();
-  else
+  } else {
     return new Decimal(amount)
       .div(new Decimal(10 ** 24))
       .toDecimalPlaces(10)
       .toString();
+  }
 }
 
 // eslint-disable-next-line max-lines-per-function, complexity
