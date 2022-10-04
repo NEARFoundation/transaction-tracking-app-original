@@ -83,10 +83,10 @@ function AccountRow({ accountId, deleteFromLocalStorage, accountStatus, getTrans
   );
 }
 
-function AddNewAccountForm({ addNewAccount, handleChange, newAccountId, exampleAccount, buttonText = 'Add' }) {
+function AddNewAccountForm({ addNewAccount, handleNewAccountIdInputChange, newAccountId, exampleAccount, buttonText = 'Add' }) {
   return (
     <form onSubmit={addNewAccount}>
-      <input type="text" onChange={handleChange} value={newAccountId} placeholder={exampleAccount} />
+      <input type="text" onChange={handleNewAccountIdInputChange} value={newAccountId} placeholder={exampleAccount} />
       <button type="submit" title="Add new account" className="silverBtn">
         {buttonText}
       </button>
@@ -99,7 +99,7 @@ export function AccountsTable({
   accountIds,
   setAccountIds,
   accountStatuses,
-  handleChange,
+  handleNewAccountIdInputChange,
   addNewAccount,
   exampleAccount,
   selectedAccountIdsForCsv,
@@ -138,8 +138,7 @@ export function AccountsTable({
     }
   };
 
-  const props = { addNewAccount, handleChange, exampleAccount, newAccountId };
-  const inlineProps = { ...props, buttonText: '+' };
+  const basePropsForAddNewAccountForm = { addNewAccount, handleNewAccountIdInputChange, exampleAccount, newAccountId };
   return (
     <div style={{ textAlign: 'center' }}>
       {accountIds.length > 0 ? (
@@ -160,21 +159,25 @@ export function AccountsTable({
             <tbody>
               {accountIds.map((accountIdForRow: AccountId, index: number) => {
                 const accountStatus = getAccountStatus(accountStatuses, accountIdForRow);
-                const rowProps = {
-                  accountId: accountIdForRow,
-                  deleteFromLocalStorage,
-                  accountStatus,
-                  getTransactions,
-                  runTask,
-                  selectedAccountId,
-                  selectedAccountIdsForCsv,
-                  addAccountCsv,
-                };
-                return <AccountRow {...rowProps} key={index} />;
+                return (
+                  <AccountRow
+                    {...{
+                      accountId: accountIdForRow,
+                      deleteFromLocalStorage,
+                      accountStatus,
+                      getTransactions,
+                      runTask,
+                      selectedAccountId,
+                      selectedAccountIdsForCsv,
+                      addAccountCsv,
+                    }}
+                    key={index}
+                  />
+                );
               })}
               <tr key="addAccountId">
                 <td colSpan={2} className="max-width-none">
-                  <AddNewAccountForm {...inlineProps} />
+                  <AddNewAccountForm {...{ ...basePropsForAddNewAccountForm, buttonText: '+' }} />
                 </td>
                 <td colSpan={csvDownloadButtonColSpan} style={{ textAlign: 'right' }}>
                   {csvTransactions.length > 0 ? (
@@ -197,7 +200,7 @@ export function AccountsTable({
       ) : (
         <>
           <p>Enter the account ID:</p>
-          <AddNewAccountForm {...props} />
+          <AddNewAccountForm {...basePropsForAddNewAccountForm} />
         </>
       )}
     </div>

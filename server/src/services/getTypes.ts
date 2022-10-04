@@ -1,7 +1,9 @@
+import { type Request, type Response } from 'express';
+
 import { respondWithServerError } from '../helpers/errors.js';
 import { TxTypes } from '../models/TxTypes.js';
 
-export const getTypes = async (request: any, response: any) => {
+export const getTypes = async (request: Request, response: Response) => {
   try {
     const types = await TxTypes.aggregate([
       {

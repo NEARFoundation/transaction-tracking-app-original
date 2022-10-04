@@ -1,43 +1,27 @@
-import { Decimal } from 'decimal.js';
+import { type Request, type Response } from 'express';
 
 import { getFormattedDatetimeUtcFromBlockTimestamp, getRangeFilter } from '../../../shared/helpers/datetime.js';
-import { type TxActionRow, type TxActionsFilter } from '../../../shared/types';
+import { convertAmount } from '../../../shared/helpers/precision.js';
+import { type PoolsCurrency, type TxActionRow, type TxActionsFilter } from '../../../shared/types';
 import { respondWithServerError } from '../helpers/errors.js';
 import { PoolsCurrencies } from '../models/PoolsCurrencies.js';
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
 
 /**
- * TODO: Document what this is doing and why. Also consider moving it to the precision helper file.
- *
- * @param {number | string} amount
- * @param {string} currency
- * @returns {string}
+ * TODO: Document what this is doing and why. Consider renaming.
  */
-async function convertAmount(amount: number | string, currency: string): Promise<string> {
-  if (currency === 'NEAR' || currency === 'wNEAR') {
-    return new Decimal(amount)
-      .div(new Decimal(10 ** 24))
-      .toDecimalPlaces(10)
-      .toString();
-  }
-
+async function getDecimals(currency: string): Promise<PoolsCurrency> {
   const decimals = await PoolsCurrencies.findOne({ currency }).select('decimals');
-  if (decimals?.decimals) {
-    return new Decimal(amount)
-      .div(new Decimal(10 ** decimals.decimals))
-      .toDecimalPlaces(10)
-      .toString();
-  } else {
-    return new Decimal(amount)
-      .div(new Decimal(10 ** 24))
-      .toDecimalPlaces(10)
-      .toString();
-  }
+  return decimals;
+}
+
+async function formatAmount(amount: number | string | undefined, currency: string | undefined): Promise<string> {
+  return amount && currency ? await convertAmount(amount, currency, getDecimals) : '';
 }
 
 // eslint-disable-next-line max-lines-per-function, complexity
-export const getTransactions = async (request: any, response: any) => {
+export const getTransactions = async (request: Request, response: Response) => {
   try {
     const { body } = request;
     const datetimeRangeFilter = getRangeFilter(body.startDate, body.endDate);
@@ -63,11 +47,9 @@ export const getTransactions = async (request: any, response: any) => {
         block_height: transaction.block_height ?? null,
         args_base64: transaction.args_base64 ?? '',
         transaction_hash: transaction.transaction_hash ?? '',
-        amount_transferred:
-          transaction.amount_transferred && transaction.currency_transferred ? await convertAmount(transaction.amount_transferred, transaction.currency_transferred) : '',
+        amount_transferred: await formatAmount(transaction.amount_transferred, transaction.currency_transferred),
         currency_transferred: transaction.currency_transferred ?? '',
-        amount_transferred2:
-          transaction.amount_transferred2 && transaction.currency_transferred2 ? await convertAmount(transaction.amount_transferred2, transaction.currency_transferred2) : '',
+        amount_transferred2: await formatAmount(transaction.amount_transferred2, transaction.currency_transferred2),
         currency_transferred2: transaction.currency_transferred2 ?? '',
         receiver_owner_account: transaction.receiver_owner_account ?? '',
         receiver_lockup_account: transaction.receiver_lockup_account ?? '',

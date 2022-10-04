@@ -1,3 +1,5 @@
+import type React from 'react';
+
 export type AccountId = string;
 
 export type AccountStatus = {
@@ -48,15 +50,9 @@ export type TxActionsFilter = {
   };
   txType?: string[];
 };
-// --------------------------------------------------------
 
-// export type CustomWindow = Window & {
-//   // See https://stackoverflow.com/a/45352250/ and https://bobbyhadz.com/blog/typescript-property-does-not-exist-on-type-window
-//   accountId: AccountId;
-//   contract: any;
-//   nearInitPromise: any;
-//   walletConnection: any;
-// };
+export type PoolsCurrency = any; // TODO: Is this named properly? What is this type?
+// --------------------------------------------------------
 
 export type OptionType = { label: string; value: string }; // https://github.com/JedWatson/react-select/issues/2902#issuecomment-624806537
 
@@ -76,12 +72,12 @@ export type AccountRowProps = {
 export type AccountsTableProps = {
   accountIds: any;
   accountStatuses: any;
-  addNewAccount: any;
+  addNewAccount: (event: React.FormEvent<HTMLFormElement>) => void;
   csvTransactions: any;
   endDate: any;
   exampleAccount: any;
   getTransactions: any;
-  handleChange: any;
+  handleNewAccountIdInputChange: (event: React.FormEvent<HTMLInputElement>) => void;
   messageCsv: any;
   newAccountId: any;
   runTask: any;

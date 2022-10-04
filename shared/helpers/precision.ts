@@ -1,5 +1,7 @@
 import { Decimal } from 'decimal.js'; // https://github.com/MikeMcl/decimal.js
 
+import { type PoolsCurrency } from '../types';
+
 function getDecimalChar(locale: string | undefined): string {
   const decimalFormat = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const decimalFullString = '1.1';
@@ -61,4 +63,34 @@ export function round(amount: string, decimals = 0, divisorPower = 0, locale?: s
   // console.log(`round(${amount}, decimals = ${decimals}, divisorPower = ${divisorPower}) = ${value}`, divisor);
   const localeString = getLocaleStringToDecimals(value, decimals, locale);
   return localeString;
+}
+
+/**
+ * TODO: Document what this is doing and why. Consider removing / moving hard-coded strings.
+ *
+ * @param {number | string} amount
+ * @param {string} currency
+ * @returns {string}
+ */
+export async function convertAmount(amount: number | string, currency: string, getDecimals: (currency: string) => Promise<PoolsCurrency>): Promise<string> {
+  const yoctoPower = 24;
+  if (currency === 'NEAR' || currency === 'wNEAR') {
+    return new Decimal(amount)
+      .div(new Decimal(10 ** yoctoPower))
+      .toDecimalPlaces(10)
+      .toString();
+  }
+
+  const decimals = await getDecimals(currency);
+  if (decimals?.decimals) {
+    return new Decimal(amount)
+      .div(new Decimal(10 ** decimals.decimals))
+      .toDecimalPlaces(10)
+      .toString();
+  } else {
+    return new Decimal(amount)
+      .div(new Decimal(10 ** yoctoPower))
+      .toDecimalPlaces(10)
+      .toString();
+  }
 }
