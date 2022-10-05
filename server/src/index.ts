@@ -1,9 +1,9 @@
 import cors from 'cors';
 import express from 'express';
-import { mongoConnectionString, port } from 'helpers/config.js';
 import mongoose from 'mongoose';
 
 import { addDefaultTypesTx } from './helpers/addDefaultTypesTx.js';
+import { mongoConnectionString, port } from './helpers/config.js';
 import { SyncedCron } from './helpers/syncedCron.js';
 import { routes } from './routes/collector.routes.js';
 
