@@ -15,7 +15,7 @@ import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
 
 let isAlreadyRunning = 0;
 
-export const runTask = async (request: Request, response: Response) => {
+export const runTaskForThisAccount = async (request: Request, response: Response) => {
   // TODO: See whether we can reduce duplication with `runTasks`.
   try {
     const account = await TxTasks.findOne({ accountId: request.body.accountId });

@@ -64,7 +64,7 @@ export type AccountRowProps = {
   addAccountCsv: any;
   deleteFromLocalStorage: any;
   getTransactions: any;
-  runTask: any;
+  runTaskForThisAccount: any;
   selectedAccountId: any;
   selectedAccountIdsForCsv: any;
 };
@@ -80,7 +80,7 @@ export type AccountsTableProps = {
   handleNewAccountIdInputChange: (event: React.FormEvent<HTMLInputElement>) => void;
   messageCsv: any;
   newAccountId: any;
-  runTask: any;
+  runTaskForThisAccount: any;
   selectedAccountId: any;
   selectedAccountIdsForCsv: any;
   setAccountIds: any;

@@ -115,13 +115,13 @@ export default function App() {
       });
   };
 
-  const runTask = async (accountId: AccountId) => {
+  const runTaskForThisAccount = async (accountId: AccountId) => {
     setMessage('');
     const requestOptions = {
       ...defaultRequestOptions,
       body: JSON.stringify({ accountId }),
     };
-    await fetch(API_BASE_URL + '/runTask', requestOptions)
+    await fetch(API_BASE_URL + '/runTaskForThisAccount', requestOptions)
       .then(async (response) => {
         await response.json();
       })
@@ -224,7 +224,7 @@ export default function App() {
             setAccountIds,
             selectedAccountIdsForCsv,
             setSelectedAccountIdsForCsv,
-            runTask,
+            runTaskForThisAccount,
             messageCsv,
             csvTransactions,
             endDate,
