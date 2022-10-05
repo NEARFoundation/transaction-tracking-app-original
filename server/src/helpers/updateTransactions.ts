@@ -15,12 +15,11 @@ import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
 
 let isAlreadyRunning = 0;
 
-export const runTaskForThisAccount = async (request: Request, response: Response) => {
+async function runThisTaskByAccountId(accountId: AccountId) {
   // TODO: See whether we can reduce duplication with `runAllNonRunningTasks`.
   try {
-    const account = await TxTasks.findOne({ accountId: request.body.accountId });
+    const account = await TxTasks.findOne({ accountId });
     if (account) {
-      response.send(OK);
       if (account.isRunning === false) {
         const types: TxTypeRow[] = await TxTypes.find({});
         for (const type of types) {
@@ -40,11 +39,21 @@ export const runTaskForThisAccount = async (request: Request, response: Response
         }
       }
     } else {
-      response.status(SERVER_ERROR).send({ error: 'accountId not found' });
+      throw new Error(`accountId '${accountId}' not found.`);
     }
   } catch (error) {
     console.error(error);
-    response.status(SERVER_ERROR).send({ error: 'Please try again' });
+    throw new Error('Please try again.');
+  }
+}
+
+export const runTaskForThisAccount = async (request: Request, response: Response) => {
+  try {
+    await runThisTaskByAccountId(request.params.accountId);
+    response.send(OK);
+  } catch (error) {
+    console.error(error);
+    response.status(SERVER_ERROR).send({ error });
   }
 };
 
