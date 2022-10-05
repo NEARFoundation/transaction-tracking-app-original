@@ -10,10 +10,8 @@ import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
 import { TxTypes } from '../models/TxTypes.js';
 
-import { CONNECTION_STRING, DEFAULT_LENGTH } from './config.js';
+import { CONNECTION_STRING, DEFAULT_LENGTH, TIMEOUT } from './config.js';
 import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
-
-const TIMEOUT = 900_000; // 15 minutes
 
 let isAlreadyRunning = 0;
 
