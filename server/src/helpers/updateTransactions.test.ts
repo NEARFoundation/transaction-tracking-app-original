@@ -1,25 +1,43 @@
+// Run via `yarn test server/src/helpers/updateTransactions.test.ts`.
+
 // https://jestjs.io/docs/setup-teardown#scoping
 
-// import { TxActions } from '../models/TxActions';
-import { seedTheMockIndexerDatabase } from '../../test_helpers/updateTestData';
+import mongoose, { type Mongoose } from 'mongoose';
 
-import { DEFAULT_LENGTH } from './config';
+import { seedTheMockIndexerDatabase } from '../../test_helpers/updateTestData';
+import { TxActions } from '../models/TxActions';
+import { TxTypes } from '../models/TxTypes';
+
+import { addDefaultTypesTx } from './addDefaultTypesTx';
+import { DEFAULT_LENGTH, mongoConnectionString } from './config';
 import { updateTransactions } from './updateTransactions';
 
-beforeAll(async () => {
-  await seedTheMockIndexerDatabase();
-});
+describe('insert', () => {
+  let connection: Mongoose;
 
-test('TODO', async () => {
-  await updateTransactions('TODO', 'TODO', DEFAULT_LENGTH);
-  // const mostRecentTxAction = await TxActions.findOne({
-  //   accountId,
-  //   txType,
-  // }).sort([['block_timestamp', -1]]);
-  // expect(JSON.stringify(mostRecentTxAction)).toBe('TODO');
-  expect(JSON.stringify(1)).toBe('TODO');
-});
+  beforeAll(async () => {
+    connection = await mongoose.connect(mongoConnectionString);
+    await addDefaultTypesTx('./server');
+    console.log('txTypes count', await TxTypes.countDocuments());
+    await seedTheMockIndexerDatabase();
+  });
 
-// afterAll(async () => {
-//   //
-// });
+  afterAll(async () => {
+    await connection.disconnect();
+  });
+
+  const multisig = 'Multisig - Confirm and execute request';
+  const accountId = 'asdf1';
+  jest.setTimeout(3_000);
+  test(multisig, async () => {
+    await updateTransactions(accountId, multisig, DEFAULT_LENGTH);
+    console.log('about to call Mongo');
+    const txActions = await TxActions.find({
+      accountId,
+      multisig,
+    }).sort([['block_timestamp', -1]]);
+    console.log({ txActions });
+    expect(JSON.stringify(txActions)).toBe('TODO');
+    expect(JSON.stringify(1)).toBe('TODO');
+  });
+});

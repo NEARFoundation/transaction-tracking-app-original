@@ -6,7 +6,8 @@ This [React] app was initialized with [create-near-app]
 
 To run this project locally:
 
-1. Prerequisites: Make sure you've installed [Node.js] ≥ 12 and [Mongo](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/) or [Docker](https://docs.docker.com/get-docker/). See below about Mongo.
+1. Make sure you've installed [Node.js] ≥ 12.
+1. Install [Mongo](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/) using the instructions in its own section below.
 1. `cp .env.development .env.development.local && cp server/.env.development server/.env.development.local`
 1. Edit the values for each of those local env files. If you set REACT_APP_ALLOW_DELETING_FROM_DATABASE to "true" in .env.development.local and ALLOW_DELETING_FROM_DATABASE to "true" in server/.env.development.local, you will see a button in the frontend that allows you to delete records from the database, which is useful when you are manually testing whether transaction processing is working after editing the SQL queries.
 1. Start Mongo (unless you'll be starting Docker) with something like `brew services start mongodb-community@5.0`.
@@ -102,17 +103,30 @@ Run a new container
 
     docker-compose --file docker-compose.yml --project-name api-near-accounting-report up -d
 
-# Setting up Mongo
-
-https://medium.com/@haxzie/getting-started-with-mongodb-setting-up-admin-and-user-accounts-4fdd33687741 was useful in explaining that you can create your first user in your database like this:
+# Setting up Mongo and MongoDB Shell
 
 ```
+brew install mongodb-community@5.0
+brew install mongosh
+mongosh
 use admin
+show databases
 db.createUser(
   {
-    user: "someUsernameHere",
-    pwd: "yourSecretPasswordHere",
+    user: "MongoTestDbUser",
+    pwd: "MongoTestDbSecretPhrase",
+    roles: [ { role: "readWrite", db: "test" } ]
+  }
+)
+db.createUser(
+  {
+    user: "MongoDbUser",
+    pwd: "MongoDbSecretPhrase",
     roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
   }
 )
+show users
+exit
 ```
+
+https://medium.com/@haxzie/getting-started-with-mongodb-setting-up-admin-and-user-accounts-4fdd33687741 was useful.

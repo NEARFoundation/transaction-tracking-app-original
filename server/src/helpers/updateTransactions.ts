@@ -127,8 +127,10 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
     .then()
     .catch((error: any) => console.error(error));
   let minBlockTimestamp = await getMostRecentBlockTimestamp(accountId, txType);
+  console.log({ minBlockTimestamp });
 
   let transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, length);
+  // console.log({ transactions });
 
   while (transactions.length > 0) {
     for (const item of transactions) {
