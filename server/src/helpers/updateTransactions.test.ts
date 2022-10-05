@@ -12,7 +12,7 @@ import { addDefaultTypesTx } from './addDefaultTypesTx';
 import { DEFAULT_LENGTH, mongoConnectionString } from './config';
 import { updateTransactions } from './updateTransactions';
 
-describe('insert', () => {
+describe('updateTransactions', () => {
   let connection: Mongoose;
 
   beforeAll(async () => {
