@@ -27,25 +27,28 @@ export const runTask = async (request: Request, response: Response) => {
           await updateTransactions(account.accountId, type.name, DEFAULT_LENGTH);
         }
 
-        await TxTasks.findOneAndUpdate(
-          { accountId: account.accountId },
-          {
-            lastUpdate: Math.floor(Date.now()),
-            isRunning: false,
-          },
-        )
-          .then()
-          .catch((error) => console.log(error));
+        try {
+          await TxTasks.findOneAndUpdate(
+            { accountId: account.accountId },
+            {
+              lastUpdate: Math.floor(Date.now()),
+              isRunning: false,
+            },
+          );
+        } catch (error) {
+          console.error(error);
+        }
       }
     } else {
       response.status(SERVER_ERROR).send({ error: 'accountId not found' });
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     response.status(SERVER_ERROR).send({ error: 'Please try again' });
   }
 };
 
+// eslint-disable-next-line max-lines-per-function
 export const runTasks = async () => {
   if (isAlreadyRunning === 0) {
     try {
@@ -58,16 +61,18 @@ export const runTasks = async () => {
           await updateTransactions(task.accountId, type.name, DEFAULT_LENGTH);
         }
 
-        // eslint-disable-next-line promise/valid-params
-        await TxTasks.findOneAndUpdate(
-          { accountId: task.accountId },
-          {
-            lastUpdate: Math.floor(Date.now()),
-            isRunning: false,
-          },
-        )
-          .then()
-          .catch((error: any) => console.error(error));
+        try {
+          // eslint-disable-next-line promise/valid-params
+          await TxTasks.findOneAndUpdate(
+            { accountId: task.accountId },
+            {
+              lastUpdate: Math.floor(Date.now()),
+              isRunning: false,
+            },
+          );
+        } catch (error) {
+          console.error(error);
+        }
       }
     } catch (error) {
       console.error(error);
