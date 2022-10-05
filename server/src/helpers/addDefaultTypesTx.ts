@@ -7,9 +7,13 @@ import { TxTypes } from '../models/TxTypes.js';
 export const addDefaultTypesTx = async (subfolder = '.') => {
   const sqlFolder = `${subfolder}/src/helpers/TxTypes/`;
   console.log({ sqlFolder });
-  await TxTasks.updateMany({ isRunning: true }, { isRunning: false })
-    .then()
-    .catch((error) => console.log(error));
+  try {
+    await TxTasks.updateMany({ isRunning: true }, { isRunning: false });
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+
   const files = fs.readdirSync(sqlFolder);
   console.log({ files });
   for (const file of files) {
@@ -18,14 +22,18 @@ export const addDefaultTypesTx = async (subfolder = '.') => {
 
       // console.log({ file, data }); // Or use `console.log(path.parse(file).name);` if you don't want the extension.
       // eslint-disable-next-line promise/valid-params
-      TxTypes.findOneAndUpdate(
-        { name: path.parse(file).name },
-        {
-          name: path.parse(file).name,
-          sql: data,
-        },
-        { upsert: true },
-      );
+      try {
+        await TxTypes.findOneAndUpdate(
+          { name: path.parse(file).name },
+          {
+            name: path.parse(file).name,
+            sql: data,
+          },
+          { upsert: true },
+        );
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 };

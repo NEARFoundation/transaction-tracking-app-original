@@ -18,7 +18,8 @@ describe('insert', () => {
   beforeAll(async () => {
     connection = await mongoose.connect(mongoConnectionString);
     await addDefaultTypesTx('./server');
-    console.log('txTypes count', await TxTypes.countDocuments());
+    const txTypesCountDocuments = await TxTypes.countDocuments();
+    console.log({ txTypesCountDocuments });
     await seedTheMockIndexerDatabase();
   });
 
