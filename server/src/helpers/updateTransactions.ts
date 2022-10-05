@@ -3,7 +3,7 @@ import { performance } from 'perf_hooks';
 import { type Request, type Response } from 'express';
 import pg, { type Client } from 'pg';
 
-import { getFormattedDatetimeUtcFromBlockTimestamp, getFormattedUtcDatetime, millisToMinutesAndSeconds } from '../../../shared/helpers/datetime.js';
+import { getFormattedDatetimeUtcFromBlockTimestamp, getFormattedUtcDatetimeNow, millisToMinutesAndSeconds } from '../../../shared/helpers/datetime.js';
 import { OK, SERVER_ERROR } from '../../../shared/helpers/statusCodes.js';
 import { type AccountId, type TxActionRow, type TxTypeRow } from '../../../shared/types';
 import { TxActions } from '../models/TxActions.js';
@@ -53,7 +53,7 @@ export const runTasks = async () => {
   if (isAlreadyRunning === 0) {
     try {
       isAlreadyRunning = 1;
-      console.log('runTasks() isAlreadyRunning', new Date());
+      console.log('runTasks() isAlreadyRunning', getFormattedUtcDatetimeNow());
       const types: TxTypeRow[] = await TxTypes.find({});
       const tasks = await TxTasks.find({ isRunning: false });
       for (const task of tasks) {
@@ -88,7 +88,7 @@ async function getTransactions(pgClient: Client, accountId: AccountId, txTypeNam
   try {
     const txType: TxTypeRow | null = await TxTypes.findOne({ name: txTypeName });
     if (txType) {
-      console.log(getFormattedUtcDatetime(new Date()), `getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
+      console.log(getFormattedUtcDatetimeNow(), `getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
       const startTime = performance.now();
       const result = await pgClient.query(txType.sql, [accountId, blockTimestamp.toString(), length]);
       const endTime = performance.now();
