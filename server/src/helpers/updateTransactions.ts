@@ -59,7 +59,6 @@ export const runTaskForThisAccount = async (request: Request, response: Response
   }
 };
 
-// eslint-disable-next-line max-lines-per-function
 export const runAllNonRunningTasks = async () => {
   const promisesOfAllTasks: Array<Promise<void>> = [];
   try {
@@ -106,8 +105,32 @@ async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string)
   return Number(mostRecentBlockTimestamp); // server/src/models/TxActions.js uses Decimal128 for this field, which React can't display. https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-decimal.html
 }
 
+function getTxAction(accountId: AccountId, txType: string, transaction: TxActionRow): TxActionRow {
+  // TODO: Figure out the types. It doesn't make much sense that the input type (TxActionRow) and output type are the same.
+  return {
+    accountId,
+    txType,
+    block_timestamp: transaction.block_timestamp,
+    from_account: transaction.from_account,
+    block_height: transaction.block_height,
+    args_base64: transaction.args_base64,
+    transaction_hash: transaction.transaction_hash,
+    amount_transferred: transaction.amount_transferred,
+    currency_transferred: transaction.currency_transferred,
+    amount_transferred2: transaction.amount_transferred2,
+    currency_transferred2: transaction.currency_transferred2,
+    receiver_owner_account: transaction.receiver_owner_account,
+    receiver_lockup_account: transaction.receiver_lockup_account,
+    lockup_start: transaction.lockup_start,
+    lockup_duration: transaction.lockup_duration,
+    cliff_duration: transaction.cliff_duration,
+    release_duration: transaction.release_duration,
+  };
+}
+
 // eslint-disable-next-line max-lines-per-function
 export async function updateTransactions(accountId: AccountId, txType: string, length: number) {
+  // TODO: Make this function more efficient (see if we can parallelize the queries instead of using so many `await`s).
   console.log(`updateTransactions(${accountId}, ${txType})`);
   const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: TIMEOUT });
   await pgClient.connect();
@@ -127,35 +150,13 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
   // console.log({ transactions });
 
   while (transactions.length > 0) {
-    for (const item of transactions) {
-      console.log('Received: ', item.block_timestamp, item.transaction_hash);
+    for (const transaction of transactions) {
+      console.log('Received: ', transaction.block_timestamp, transaction.transaction_hash);
       // eslint-disable-next-line canonical/id-match
-      if (item.get_currency_by_contract) item.currency_transferred = await getCurrencyByContract(item.get_currency_by_contract);
-      if (item.pool_id) [item.currency_transferred, item.currency_transferred2] = await getCurrencyByPool(Number(item.pool_id));
+      if (transaction.get_currency_by_contract) transaction.currency_transferred = await getCurrencyByContract(transaction.get_currency_by_contract);
+      if (transaction.pool_id) [transaction.currency_transferred, transaction.currency_transferred2] = await getCurrencyByPool(Number(transaction.pool_id));
       // eslint-disable-next-line promise/valid-params
-      await TxActions.findOneAndUpdate(
-        { transaction_hash: item.transaction_hash, txType },
-        {
-          accountId,
-          txType,
-          block_timestamp: item.block_timestamp,
-          from_account: item.from_account,
-          block_height: item.block_height,
-          args_base64: item.args_base64,
-          transaction_hash: item.transaction_hash,
-          amount_transferred: item.amount_transferred,
-          currency_transferred: item.currency_transferred,
-          amount_transferred2: item.amount_transferred2,
-          currency_transferred2: item.currency_transferred2,
-          receiver_owner_account: item.receiver_owner_account,
-          receiver_lockup_account: item.receiver_lockup_account,
-          lockup_start: item.lockup_start,
-          lockup_duration: item.lockup_duration,
-          cliff_duration: item.cliff_duration,
-          release_duration: item.release_duration,
-        },
-        { upsert: true },
-      )
+      await TxActions.findOneAndUpdate({ transaction_hash: transaction.transaction_hash, txType }, getTxAction(accountId, txType, transaction), { upsert: true })
         .then()
         .catch((error: any) => console.error(error));
     }
