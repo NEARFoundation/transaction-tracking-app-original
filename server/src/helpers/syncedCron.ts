@@ -4,23 +4,32 @@ import { getFormattedUtcDatetimeNow } from '../../../shared/helpers/datetime.js'
 
 import { runAllNonRunningTasks } from './updateTransactions.js';
 
-let isAlreadyRunning = 0;
+let isAlreadyRunningBoolean = false;
+
+function isAlreadyRunning(): boolean {
+  return isAlreadyRunningBoolean;
+}
 
 export const SyncedCron = cron.schedule(
   '* * * * *', // every minute
+  // '* * * * * *', // every second. Only for careful local development purposes. https://www.freeformatter.com/cron-expression-generator-quartz.html
   // '0/5 * * * * *', // every 5 seconds. This line does not seem to work. https://www.freeformatter.com/cron-expression-generator-quartz.html
   async () => {
-    console.log(getFormattedUtcDatetimeNow(), 'SyncedCron is checking the value of isAlreadyRunning...');
-    if (isAlreadyRunning === 0) {
+    // console.log('========================================');
+    // console.log(getFormattedUtcDatetimeNow(), 'SyncedCron is checking the value of isAlreadyRunning...');
+
+    if (isAlreadyRunning() === false) {
+      console.log(getFormattedUtcDatetimeNow(), 'Calling runAllNonRunningTasks() now...');
       try {
-        isAlreadyRunning = 1;
-        console.log('runAllNonRunningTasks() isAlreadyRunning', getFormattedUtcDatetimeNow());
+        isAlreadyRunningBoolean = true;
+        // console.log('is now set to 1 because about to call runAllNonRunningTasks');
         await runAllNonRunningTasks();
       } catch (error) {
         console.error(error);
       }
 
-      isAlreadyRunning = 0;
+      isAlreadyRunningBoolean = false;
+      console.log(`Finished cron, so isAlreadyRunningBoolean = ${isAlreadyRunningBoolean}`);
     } else {
       console.log('SyncedCron: runAllNonRunningTasks is already running.');
     }
