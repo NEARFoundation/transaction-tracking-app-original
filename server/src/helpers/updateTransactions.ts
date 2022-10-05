@@ -13,8 +13,6 @@ import { TxTypes } from '../models/TxTypes.js';
 import { CONNECTION_STRING, DEFAULT_LENGTH, TIMEOUT } from './config.js';
 import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
 
-let isAlreadyRunning = 0;
-
 async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) {
   try {
     const txTask = await TxTasks.findOne({ accountId });
@@ -45,9 +43,14 @@ async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) 
   }
 }
 
+async function getAllTypes(): Promise<TxTypeRow[]> {
+  const types: TxTypeRow[] = await TxTypes.find({});
+  return types;
+}
+
 export const runTaskForThisAccount = async (request: Request, response: Response) => {
   try {
-    const types: TxTypeRow[] = await TxTypes.find({});
+    const types = await getAllTypes();
     await runThisTaskByAccountId(request.params.accountId, types);
     response.send(OK);
   } catch (error) {
@@ -58,23 +61,18 @@ export const runTaskForThisAccount = async (request: Request, response: Response
 
 // eslint-disable-next-line max-lines-per-function
 export const runAllNonRunningTasks = async () => {
-  if (isAlreadyRunning === 0) {
-    try {
-      isAlreadyRunning = 1;
-      console.log('runAllNonRunningTasks() isAlreadyRunning', getFormattedUtcDatetimeNow());
-      const types: TxTypeRow[] = await TxTypes.find({});
-      const tasks = await TxTasks.find({ isRunning: false });
-      for (const task of tasks) {
-        await runThisTaskByAccountId(task.accountId, types);
-      }
-    } catch (error) {
-      console.error(error);
+  const promisesOfAllTasks: Array<Promise<void>> = [];
+  try {
+    const [types, tasks] = await Promise.all([getAllTypes(), TxTasks.find({ isRunning: false })]);
+    for (const task of tasks) {
+      const promise = runThisTaskByAccountId(task.accountId, types);
+      promisesOfAllTasks.push(promise);
     }
-
-    isAlreadyRunning = 0;
-  } else {
-    console.log('SyncedCron: runAllNonRunningTasks is already running.');
+  } catch (error) {
+    console.error(error);
   }
+
+  return promisesOfAllTasks;
 };
 
 async function getTransactions(pgClient: Client, accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
