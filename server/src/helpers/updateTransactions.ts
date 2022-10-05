@@ -16,7 +16,7 @@ import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
 let isAlreadyRunning = 0;
 
 export const runTaskForThisAccount = async (request: Request, response: Response) => {
-  // TODO: See whether we can reduce duplication with `runTasks`.
+  // TODO: See whether we can reduce duplication with `runAllNonRunningTasks`.
   try {
     const account = await TxTasks.findOne({ accountId: request.body.accountId });
     if (account) {
@@ -49,11 +49,11 @@ export const runTaskForThisAccount = async (request: Request, response: Response
 };
 
 // eslint-disable-next-line max-lines-per-function
-export const runTasks = async () => {
+export const runAllNonRunningTasks = async () => {
   if (isAlreadyRunning === 0) {
     try {
       isAlreadyRunning = 1;
-      console.log('runTasks() isAlreadyRunning', getFormattedUtcDatetimeNow());
+      console.log('runAllNonRunningTasks() isAlreadyRunning', getFormattedUtcDatetimeNow());
       const types: TxTypeRow[] = await TxTypes.find({});
       const tasks = await TxTasks.find({ isRunning: false });
       for (const task of tasks) {
@@ -80,7 +80,7 @@ export const runTasks = async () => {
 
     isAlreadyRunning = 0;
   } else {
-    console.log('SyncedCron: runTasks is already running');
+    console.log('SyncedCron: runAllNonRunningTasks is already running.');
   }
 };
 
