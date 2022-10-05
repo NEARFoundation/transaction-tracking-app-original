@@ -16,7 +16,8 @@ import { getTransactionsCsv } from './helpers/csv';
 import { logAndDisplayError } from './helpers/errors';
 import { useLocalStorage } from './helpers/localStorage';
 
-import './global.css';
+// eslint-disable-next-line import/no-unassigned-import
+import './global.scss';
 
 const nearConfig = getConfig(ENVIRONMENT);
 console.log({ ENVIRONMENT, API_BASE_URL, nearConfig });
@@ -35,6 +36,7 @@ export async function addTaskForAccountId(accountId: AccountId) {
 export default function App() {
   const [message, setMessage] = useState<string>('');
   const [messageCsv, setMessageCsv] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [newAccountId, setNewAccountId] = useState<AccountId>('');
   const [selectedAccountId, setSelectedAccountId] = useState<AccountId>('');
   const [selectedAccountIdsForCsv, setSelectedAccountIdsForCsv] = useState<AccountId[]>([]);
@@ -72,7 +74,7 @@ export default function App() {
   const [accountStatuses, setAccountStatuses] = useState<string[]>([]);
 
   const getTransactions = async (accountId: AccountId) => {
-    setMessage('Receiving data...');
+    setIsLoading(true);
     setSelectedAccountId(accountId);
     console.log('getTransactions', { accountId, start: getFormattedUtcDatetime(startDate), end: getFormattedUtcDatetime(endDate) });
     const requestOptions = {
@@ -91,6 +93,7 @@ export default function App() {
         setTransactions(data.transactions);
         if (data.lastUpdate > 0) setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
         else setLastUpdate('');
+        setIsLoading(false);
       })
       .catch((error) => {
         setTransactions([]);
@@ -241,13 +244,13 @@ export default function App() {
         </div>
       </nav>
       <div style={{ paddingTop: '10px', textAlign: 'center' }}>
-        <AccountUpdatedLabel {...{ selectedAccountId, lastUpdate }} />
+        <AccountUpdatedLabel {...{ selectedAccountId, lastUpdate, isLoading }} />
         {transactions.length > 0 ? (
           <>
-            <MainTable transactions={transactions} explorerUrl={explorerUrl} divisorPower={divisorPower} decimalPlaces={decimalPlaces} />
+            <MainTable {...{ transactions, explorerUrl, divisorPower, decimalPlaces, isLoading }} />
           </>
         ) : null}
-        {transactions.length === 0 && selectedAccountId ? <>No data</> : null}
+        {transactions.length === 0 && selectedAccountId ? <>{isLoading ? 'Loading...' : 'No data'}</> : null}
       </div>
     </main>
   );

@@ -1,4 +1,4 @@
-export function AccountUpdatedLabel({ selectedAccountId, lastUpdate }): JSX.Element {
+export function AccountUpdatedLabel({ selectedAccountId, lastUpdate, isLoading }): JSX.Element {
   if (selectedAccountId) {
     return (
       <>
@@ -7,7 +7,9 @@ export function AccountUpdatedLabel({ selectedAccountId, lastUpdate }): JSX.Elem
             {selectedAccountId}. Last update: {lastUpdate}
           </div>
         ) : (
-          <div>{selectedAccountId}. Check back later</div>
+          <div>
+            {selectedAccountId}. {isLoading ? 'Loading...' : 'Check back later'}
+          </div>
         )}
       </>
     );
