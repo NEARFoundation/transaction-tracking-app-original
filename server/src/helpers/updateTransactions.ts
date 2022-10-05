@@ -15,20 +15,18 @@ import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
 
 let isAlreadyRunning = 0;
 
-async function runThisTaskByAccountId(accountId: AccountId) {
-  // TODO: See whether we can reduce duplication with `runAllNonRunningTasks`.
+async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) {
   try {
-    const account = await TxTasks.findOne({ accountId });
-    if (account) {
-      if (account.isRunning === false) {
-        const types: TxTypeRow[] = await TxTypes.find({});
+    const txTask = await TxTasks.findOne({ accountId });
+    if (txTask) {
+      if (txTask.isRunning === false) {
         for (const type of types) {
-          await updateTransactions(account.accountId, type.name, DEFAULT_LENGTH);
+          await updateTransactions(txTask.accountId, type.name, DEFAULT_LENGTH);
         }
 
         try {
           await TxTasks.findOneAndUpdate(
-            { accountId: account.accountId },
+            { accountId: txTask.accountId },
             {
               lastUpdate: Math.floor(Date.now()),
               isRunning: false,
@@ -49,7 +47,8 @@ async function runThisTaskByAccountId(accountId: AccountId) {
 
 export const runTaskForThisAccount = async (request: Request, response: Response) => {
   try {
-    await runThisTaskByAccountId(request.params.accountId);
+    const types: TxTypeRow[] = await TxTypes.find({});
+    await runThisTaskByAccountId(request.params.accountId, types);
     response.send(OK);
   } catch (error) {
     console.error(error);
@@ -66,22 +65,7 @@ export const runAllNonRunningTasks = async () => {
       const types: TxTypeRow[] = await TxTypes.find({});
       const tasks = await TxTasks.find({ isRunning: false });
       for (const task of tasks) {
-        for (const type of types) {
-          await updateTransactions(task.accountId, type.name, DEFAULT_LENGTH);
-        }
-
-        try {
-          // eslint-disable-next-line promise/valid-params
-          await TxTasks.findOneAndUpdate(
-            { accountId: task.accountId },
-            {
-              lastUpdate: Math.floor(Date.now()),
-              isRunning: false,
-            },
-          );
-        } catch (error) {
-          console.error(error);
-        }
+        await runThisTaskByAccountId(task.accountId, types);
       }
     } catch (error) {
       console.error(error);
