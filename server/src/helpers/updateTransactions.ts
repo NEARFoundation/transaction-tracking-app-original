@@ -6,7 +6,7 @@ import pg, { type Client } from 'pg';
 import { getFormattedDatetimeUtcFromBlockTimestamp, getFormattedUtcDatetimeNow, millisToMinutesAndSeconds } from '../../../shared/helpers/datetime.js';
 import { OK, SERVER_ERROR } from '../../../shared/helpers/statusCodes.js';
 import { type AccountId, type TxActionRow, type TxTypeRow } from '../../../shared/types';
-import { TxActions } from '../models/TxActions.js';
+import { TxActions, getTxActionModel } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
 import { TxTypes } from '../models/TxTypes.js';
 
@@ -105,29 +105,6 @@ async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string)
   return Number(mostRecentBlockTimestamp); // server/src/models/TxActions.js uses Decimal128 for this field, which React can't display. https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-decimal.html
 }
 
-function getTxAction(accountId: AccountId, txType: string, transaction: TxActionRow): TxActionRow {
-  // TODO: Figure out the types. It doesn't make much sense that the input type (TxActionRow) and output type are the same.
-  return {
-    accountId,
-    txType,
-    block_timestamp: transaction.block_timestamp,
-    from_account: transaction.from_account,
-    block_height: transaction.block_height,
-    args_base64: transaction.args_base64,
-    transaction_hash: transaction.transaction_hash,
-    amount_transferred: transaction.amount_transferred,
-    currency_transferred: transaction.currency_transferred,
-    amount_transferred2: transaction.amount_transferred2,
-    currency_transferred2: transaction.currency_transferred2,
-    receiver_owner_account: transaction.receiver_owner_account,
-    receiver_lockup_account: transaction.receiver_lockup_account,
-    lockup_start: transaction.lockup_start,
-    lockup_duration: transaction.lockup_duration,
-    cliff_duration: transaction.cliff_duration,
-    release_duration: transaction.release_duration,
-  };
-}
-
 // eslint-disable-next-line max-lines-per-function
 export async function updateTransactions(accountId: AccountId, txType: string, length: number) {
   // TODO: Make this function more efficient (see if we can parallelize the queries instead of using so many `await`s).
@@ -151,12 +128,12 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
 
   while (transactions.length > 0) {
     for (const transaction of transactions) {
-      console.log('Received: ', getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp), transaction.transaction_hash);
+      // console.log('Received: ', getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp), transaction.transaction_hash);
       // eslint-disable-next-line canonical/id-match
       if (transaction.get_currency_by_contract) transaction.currency_transferred = await getCurrencyByContract(transaction.get_currency_by_contract);
       if (transaction.pool_id) [transaction.currency_transferred, transaction.currency_transferred2] = await getCurrencyByPool(Number(transaction.pool_id));
       // eslint-disable-next-line promise/valid-params
-      await TxActions.findOneAndUpdate({ transaction_hash: transaction.transaction_hash, txType }, getTxAction(accountId, txType, transaction), { upsert: true })
+      await TxActions.findOneAndUpdate({ transaction_hash: transaction.transaction_hash, txType }, getTxActionModel(accountId, txType, transaction), { upsert: true })
         .then()
         .catch((error: any) => console.error(error));
     }

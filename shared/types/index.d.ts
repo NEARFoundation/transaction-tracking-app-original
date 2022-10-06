@@ -37,6 +37,8 @@ export type TxActionRow = {
   txType: string;
 };
 
+export type TxActionModel = TxActionRow; // TODO
+
 export type TxTypeRow = {
   name: string;
   sql: string;

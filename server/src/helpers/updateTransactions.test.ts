@@ -4,10 +4,10 @@
 
 import mongoose, { type Mongoose } from 'mongoose';
 
-import { type RowOfExpectedOutput } from '../../../shared/types';
+import { type TxActionRow, type AccountId } from '../../../shared/types';
 import { getRowsOfExpectedOutput } from '../../test_helpers/internal/csvToJson';
 import { seedTheMockIndexerDatabase } from '../../test_helpers/internal/updateTestData';
-import { TxActions } from '../models/TxActions';
+import { TxActions, convertFromModelToTxActionRow } from '../models/TxActions';
 import { TxTypes } from '../models/TxTypes';
 
 import { addTransactionTypeSqlToDatabase, DOT_SQL, getSqlFolder } from './addDefaultTypesTx';
@@ -40,10 +40,13 @@ describe('updateTransactions', () => {
 
   const rowsOfExpectedOutput = getRowsOfExpectedOutput();
 
-  console.log({ rowsOfExpectedOutput });
+  // console.log({ rowsOfExpectedOutput });
 
-  async function runTest(rowOfExpectedOutput: RowOfExpectedOutput) {
-    const { accountId, txType } = rowOfExpectedOutput;
+  function getRelevantRowsOfExpectedOutput(accountId: AccountId, txType: string) {
+    return rowsOfExpectedOutput.filter((row) => row.accountId === accountId && row.txType === txType);
+  }
+
+  async function runTest(accountId: AccountId, txType: string) {
     test(txType, async () => {
       const file = `${txType}${DOT_SQL}`;
       await addTransactionTypeSqlToDatabase(sqlFolder, file);
@@ -52,16 +55,24 @@ describe('updateTransactions', () => {
         accountId,
         txType,
       }).sort([['block_timestamp', -1]]);
-      console.log({ txActions });
-      expect(JSON.stringify(txActions)).toBe(JSON.stringify(rowOfExpectedOutput));
+      const txActionsConverted: TxActionRow[] = [];
+      for (const txAction of txActions) {
+        const txActionConverted = await convertFromModelToTxActionRow(txAction);
+        txActionsConverted.push(txActionConverted);
+      }
+
+      // console.log({ txActionsConverted });
+      const relevantRowsOfExpectedOutput = getRelevantRowsOfExpectedOutput(accountId, txType);
+      expect(txActionsConverted).toEqual(relevantRowsOfExpectedOutput.sort((a, b) => b.block_timestamp - a.block_timestamp));
     });
   }
 
   for (const rowOfExpectedOutput of rowsOfExpectedOutput) {
-    runTest(rowOfExpectedOutput)
+    const { accountId, txType } = rowOfExpectedOutput;
+    runTest(accountId, txType)
       // eslint-disable-next-line promise/prefer-await-to-then
       .then((result) => {
-        console.log({ result });
+        // console.log({ result });
       })
       // eslint-disable-next-line promise/prefer-await-to-then
       .catch((error) => {
