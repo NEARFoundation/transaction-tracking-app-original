@@ -69,12 +69,14 @@ export const getCurrencyByPool = async (poolId: number): Promise<[string, string
 };
 
 export const getCurrencyByContract = async (fungibleTokenContractAccountId: string): Promise<string> => {
+  console.log('getCurrencyByContract', fungibleTokenContractAccountId);
   const currency = await PoolsCurrencies.findOne({ contract: fungibleTokenContractAccountId });
   if (currency) {
     console.log('Found currency', currency.currency);
     return currency.currency;
   } else {
     try {
+      console.log('Using near-api-js to check for the FT symbol for contract', fungibleTokenContractAccountId);
       const ftMetadataResult = await new nearApi.Account(connection, '').viewFunction(fungibleTokenContractAccountId, 'ft_metadata', {});
       // eslint-disable-next-line promise/valid-params
       await PoolsCurrencies.findOneAndUpdate(
