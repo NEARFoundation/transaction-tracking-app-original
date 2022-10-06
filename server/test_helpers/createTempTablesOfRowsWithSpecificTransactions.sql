@@ -7,10 +7,25 @@ https://dba.stackexchange.com/a/86726/
 CREATE TEMP TABLE transactionHashes AS
 WITH t (transactionHash) AS (
  VALUES
- ('FzfAU2MWTj76L3jRWo6wYQSmj1WR6GdHZNZZ5fKfVUjm'),
-('ABMgV1tA88oVuJtc2n9r9xvBMiwQtmaFrwUNKowqFiqD'),
-('Wc15ScL3hVMJB1EPymmgQ1JwaE14ejpTbPBP2guGDFf'),
-('Fw7GXvpm1Akse7CCzVJR1b5SMkGBbqR1C9iNuC1R19jk')
+
+('EvUvPUGaH4qiRZbvfGjxmxGCTzxC5sRXLK2ea6bCnmhc'),
+
+('6MUJAkUB9acN1GVX92XvrNgtUseZnpNU8P9QWUv2Fqkx'),
+('3L9WjpFmm11g9L5VW4JMZ4NSW3Czd5e2zmdQrkARW8jj'),
+('3vqwtcf3R1xWZmNJikiuWZzQDEjhhptZxuNFMXP8D4di'),
+('9RM9gQXbDXrn78wYXWaEcrnfkjZqazXdZbEpAdphvaaA'),
+
+('HivQc1gQfvLmyiyAKwvL4AxvnSn9Y4dnWqKBhsBnpShh'),
+('AVt7xkpnv3erFaP16TZsaGNzMT5rGgN41xmvvR6BEqau'),
+('7ciBvqEAmGaYWcqBgAafRCf631M2Wy4jphjmt3ZBKT9H'),
+('9Wh28jmkrvR8tZ21KjjJXkq3oAup1kMrwsRZqAoCyER4'),
+('3x1CTJmK5ea31xCbwpqVY21Vv2m9TPBc6Hqzg72Qs47H'),
+('8P8p9YrGomnJB6EwhJhGtaJc5zQNfmxMV6bogjo1pz1Y'),
+
+('F1V3VRcuDsypkmHCdqMvFrLrGK24TG8UNswPNkMgQA4v'),
+('3upmFK2CB7VaYQ4aMoMB2pC5nkxXv9y5vRdHWjmGraju'),
+('FEwtUcz8uiUMC6CRxtX4HE9TDiBStEmKvXezWCcnW1sL'),
+('CZmao3BjFyPwoZMxaHckF22QXm1jYVGCcJmNKiB85AGh')
 )
 SELECT * FROM t;
 /* =============================================================== */
@@ -96,3 +111,13 @@ LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
 LEFT JOIN ACTION_RECEIPT_ACTIONS ARA ON ARA.RECEIPT_ID = R.RECEIPT_ID
 WHERE 
 T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
+/* =============================================================== */
+CREATE TABLE temp_test_export_transaction_actions AS 
+SELECT 
+	ta.transaction_hash, 
+	ta.index_in_transaction, 
+	ta."action_kind", 
+	ta.args
+FROM TRANSACTION_ACTIONS ta
+WHERE 
+ta.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);

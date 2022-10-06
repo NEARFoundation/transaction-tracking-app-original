@@ -1,7 +1,7 @@
-# Before using this file, update the values for transactionHashes in server/test_helpers/createTempTablesOfRowsWithSpecificTransactions.sql.
+# Before using this file, run `yarn ts-node  --esm ./server/test_helpers/getTransactionHashes.ts`, and then update the values for transactionHashes in server/test_helpers/createTempTablesOfRowsWithSpecificTransactions.sql.
 # Run this file like `pgCreds=___ ./server/test_helpers/updateTestData.sh`, but replace ___ with your value for POSTGRESQL_CONNECTION_STRING.
 
-TABLES=temp_test_export_transactions,temp_test_export_receipts,temp_test_export_execution_outcomes,temp_test_export_blocks,temp_test_export_action_receipt_actions
+TABLES=temp_test_export_transactions,temp_test_export_receipts,temp_test_export_execution_outcomes,temp_test_export_blocks,temp_test_export_action_receipt_actions,temp_test_export_transaction_actions
 chosenTables=''
 
 # https://stackoverflow.com/a/35894538/

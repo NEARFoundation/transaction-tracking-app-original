@@ -2,10 +2,10 @@
 
 // https://jestjs.io/docs/setup-teardown#scoping
 
-import csvToJson from 'convert-csv-to-json';
 import mongoose, { type Mongoose } from 'mongoose';
 
 import { type RowOfExpectedOutput } from '../../../shared/types';
+import { getRowsOfExpectedOutput } from '../../test_helpers/csvToJson';
 import { seedTheMockIndexerDatabase } from '../../test_helpers/updateTestData';
 import { TxActions } from '../models/TxActions';
 import { TxTypes } from '../models/TxTypes';
@@ -13,8 +13,6 @@ import { TxTypes } from '../models/TxTypes';
 import { addTransactionTypeSqlToDatabase, DOT_SQL, getSqlFolder } from './addDefaultTypesTx';
 import { DEFAULT_LENGTH, mongoConnectionString } from './config';
 import { updateTransactions } from './updateTransactions';
-
-const csvFilename = './server/test_helpers/expectedOutput.csv';
 
 // eslint-disable-next-line max-lines-per-function
 describe('updateTransactions', () => {
@@ -40,7 +38,7 @@ describe('updateTransactions', () => {
 
   jest.setTimeout(3_000);
 
-  const rowsOfExpectedOutput: RowOfExpectedOutput[] = csvToJson.fieldDelimiter(',').getJsonFromCsv(csvFilename); // https://www.npmjs.com/package/convert-csv-to-json#define-field-delimiter
+  const rowsOfExpectedOutput = getRowsOfExpectedOutput();
 
   console.log({ rowsOfExpectedOutput });
 
