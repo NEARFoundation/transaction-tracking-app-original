@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
-import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../../shared/helpers/datetime';
+import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../../shared/helpers/datetime.js';
+import { getBigNumberAsString } from '../../../shared/helpers/precision.js';
 import { type AccountId, type TxActionModel, type TxActionRow } from '../../../shared/types';
-import formatAmount from '../helpers/formatAmount';
 
 const { Schema, model } = mongoose;
 
@@ -30,7 +30,7 @@ export const TxActions = model('TxActions', schema, 'TxActions');
 
 // -----------------------------------------------------------------------------------------------
 // TODO: Figure out these functions. Reduce duplication with functions elsewhere.
-export async function convertFromModelToTxActionRow(txActionModel: TxActionModel): Promise<TxActionRow> {
+export function convertFromModelToTxActionRow(txActionModel: TxActionModel): TxActionRow {
   return {
     accountId: txActionModel.accountId ?? '',
     txType: txActionModel.txType ?? '',
@@ -40,9 +40,9 @@ export async function convertFromModelToTxActionRow(txActionModel: TxActionModel
     block_height: txActionModel.block_height ?? null,
     args_base64: txActionModel.args_base64 ?? '',
     transaction_hash: txActionModel.transaction_hash ?? '',
-    amount_transferred: await formatAmount(txActionModel.amount_transferred, txActionModel.currency_transferred),
+    amount_transferred: txActionModel.amount_transferred ?? '',
     currency_transferred: txActionModel.currency_transferred ?? '',
-    amount_transferred2: await formatAmount(txActionModel.amount_transferred2, txActionModel.currency_transferred2),
+    amount_transferred2: txActionModel.amount_transferred2 ?? '',
     currency_transferred2: txActionModel.currency_transferred2 ?? '',
     receiver_owner_account: txActionModel.receiver_owner_account ?? '',
     receiver_lockup_account: txActionModel.receiver_lockup_account ?? '',
@@ -73,5 +73,14 @@ export function getTxActionModel(accountId: AccountId, txType: string, transacti
     cliff_duration: transaction.cliff_duration,
     release_duration: transaction.release_duration,
   };
+}
+
+export function cleanExpectedOutputFromCsv(row: any): any {
+  const result = { ...row };
+  // eslint-disable-next-line canonical/id-match
+  result.amount_transferred = getBigNumberAsString(result.amount_transferred);
+  // eslint-disable-next-line canonical/id-match
+  result.amount_transferred2 = getBigNumberAsString(result.amount_transferred2);
+  return result;
 }
 // -----------------------------------------------------------------------------------------------

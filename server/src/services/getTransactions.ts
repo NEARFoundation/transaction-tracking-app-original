@@ -23,7 +23,7 @@ export const getTransactions = async (request: Request, response: Response) => {
     const cleanedTransactions: TxActionRow[] = [];
     // eslint-disable-next-line array-callback-return
     for (const transaction of transactions) {
-      const txActionRow = await convertFromModelToTxActionRow(transaction);
+      const txActionRow = convertFromModelToTxActionRow(transaction);
       cleanedTransactions.push(txActionRow);
     }
 

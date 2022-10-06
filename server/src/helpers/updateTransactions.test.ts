@@ -7,7 +7,7 @@ import mongoose, { type Mongoose } from 'mongoose';
 import { type TxActionRow, type AccountId } from '../../../shared/types';
 import { getRowsOfExpectedOutput } from '../../test_helpers/internal/csvToJson';
 import { seedTheMockIndexerDatabase } from '../../test_helpers/internal/updateTestData';
-import { TxActions, convertFromModelToTxActionRow } from '../models/TxActions';
+import { TxActions, convertFromModelToTxActionRow, cleanExpectedOutputFromCsv } from '../models/TxActions';
 import { TxTypes } from '../models/TxTypes';
 
 import { addTransactionTypeSqlToDatabase, DOT_SQL, getSqlFolder } from './addDefaultTypesTx';
@@ -43,7 +43,7 @@ describe('updateTransactions', () => {
   // console.log({ rowsOfExpectedOutput });
 
   function getRelevantRowsOfExpectedOutput(accountId: AccountId, txType: string) {
-    return rowsOfExpectedOutput.filter((row) => row.accountId === accountId && row.txType === txType);
+    return rowsOfExpectedOutput.filter((row) => row.accountId === accountId && row.txType === txType).map((row) => cleanExpectedOutputFromCsv(row));
   }
 
   async function runTest(accountId: AccountId, txType: string) {
@@ -57,7 +57,7 @@ describe('updateTransactions', () => {
       }).sort([['block_timestamp', -1]]);
       const txActionsConverted: TxActionRow[] = [];
       for (const txAction of txActions) {
-        const txActionConverted = await convertFromModelToTxActionRow(txAction);
+        const txActionConverted = convertFromModelToTxActionRow(txAction);
         txActionsConverted.push(txActionConverted);
       }
 
