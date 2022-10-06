@@ -78,11 +78,11 @@ async function getTransactions(pgClient: Client, accountId: AccountId, txTypeNam
   try {
     const txType: TxTypeRow | null = await TxTypes.findOne({ name: txTypeName });
     if (txType) {
-      console.log(getFormattedUtcDatetimeNow(), `getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
+      // console.log(getFormattedUtcDatetimeNow(), `getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
       const startTime = performance.now();
       const result = await pgClient.query(txType.sql, [accountId, blockTimestamp.toString(), length]);
       const endTime = performance.now();
-      console.log(millisToMinutesAndSeconds(endTime - startTime));
+      // console.log(millisToMinutesAndSeconds(endTime - startTime), 'pgClient performance of getTransactions');
       const rows = result.rows as unknown as TxActionRow[];
       // console.log(JSON.stringify(rows));
       return rows;
@@ -108,7 +108,7 @@ async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string)
 // eslint-disable-next-line max-lines-per-function
 export async function updateTransactions(accountId: AccountId, txType: string, length: number) {
   // TODO: Make this function more efficient (see if we can parallelize the queries instead of using so many `await`s).
-  console.log(`updateTransactions(${accountId}, ${txType})`);
+  // console.log(`updateTransactions(${accountId}, ${txType})`);
   const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: TIMEOUT });
   await pgClient.connect();
   // eslint-disable-next-line promise/valid-params
@@ -121,7 +121,7 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
     .then()
     .catch((error: any) => console.error(error));
   let minBlockTimestamp = await getMostRecentBlockTimestamp(accountId, txType);
-  console.log({ minBlockTimestamp });
+  //  console.log({ minBlockTimestamp });
 
   let transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, length);
   // console.log({ transactions });
