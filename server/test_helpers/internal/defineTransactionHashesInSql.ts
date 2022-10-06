@@ -1,3 +1,6 @@
+// This file gets called automatically via updateTestData.sh.
+// It can also be called manually via `yarn ts-node  --esm ./server/test_helpers/internal/defineTransactionHashesInSql.ts`.
+
 import fs from 'node:fs';
 
 import { getRowsOfExpectedOutput } from './csvToJson.js';
