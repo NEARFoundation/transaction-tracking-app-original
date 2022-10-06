@@ -47,45 +47,52 @@ export const getCurrencyByPool = async (poolId: number): Promise<[string, string
       .catch((error) => console.error(error));
 
     const ftMetadataResult2 = await new nearApi.Account(connection, '').viewFunction(poolsResult[0].token_account_ids[1], 'ft_metadata', {});
-    await PoolsCurrencies.findOneAndUpdate(
-      { pool: poolId, contract: poolsResult[0].token_account_ids[1] },
-      {
-        pool: poolId,
-        currency: ftMetadataResult2.symbol,
-        contract: poolsResult[0].token_account_ids[1],
-        name: ftMetadataResult2.name,
-        decimals: ftMetadataResult2.decimals,
-        token_account: 2,
-      },
-      { upsert: true },
-    )
-      .then()
-      .catch((error) => console.log(error));
+    try {
+      await PoolsCurrencies.findOneAndUpdate(
+        { pool: poolId, contract: poolsResult[0].token_account_ids[1] },
+        {
+          pool: poolId,
+          currency: ftMetadataResult2.symbol,
+          contract: poolsResult[0].token_account_ids[1],
+          name: ftMetadataResult2.name,
+          decimals: ftMetadataResult2.decimals,
+          token_account: 2,
+        },
+        { upsert: true },
+      );
+    } catch (error) {
+      console.error(error);
+    }
+
     return [ftMetadataResult1.symbol, ftMetadataResult2.symbol];
   }
 };
 
-export const getCurrencyByContract = async (contract: string) => {
+export const getCurrencyByContract = async (contract: string): Promise<string> => {
   const currency = await PoolsCurrencies.findOne({ contract });
   if (currency) {
     console.log('Found currency', currency.currency);
     return currency.currency;
   } else {
-    const ftMetadataResult = await new nearApi.Account(connection, '').viewFunction(contract, 'ft_metadata', {});
-    // eslint-disable-next-line promise/valid-params
-    await PoolsCurrencies.findOneAndUpdate(
-      { contract },
-      {
-        currency: ftMetadataResult.symbol,
-        name: ftMetadataResult.name,
-        decimals: ftMetadataResult.decimals,
-        contract,
-      },
-      { upsert: true },
-    )
-      .then()
-      .catch((error) => console.error(error));
-    console.log('Get currency', ftMetadataResult.symbol);
-    return ftMetadataResult.symbol;
+    try {
+      const ftMetadataResult = await new nearApi.Account(connection, '').viewFunction(contract, 'ft_metadata', {});
+      // eslint-disable-next-line promise/valid-params
+      await PoolsCurrencies.findOneAndUpdate(
+        { contract },
+        {
+          currency: ftMetadataResult.symbol,
+          name: ftMetadataResult.name,
+          decimals: ftMetadataResult.decimals,
+          contract,
+        },
+        { upsert: true },
+      );
+      console.log('Get currency', ftMetadataResult.symbol);
+      return ftMetadataResult.symbol;
+    } catch (error) {
+      console.error({ nearApi, error });
+    }
+
+    return '';
   }
 };

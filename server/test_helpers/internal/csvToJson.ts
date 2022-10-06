@@ -10,7 +10,7 @@ const csvFilename = './server/test_helpers/expectedOutput.csv';
 export function getRowsOfExpectedOutput(): RowOfExpectedOutput[] {
   const csv = fs.readFileSync(csvFilename, 'utf8');
   // console.log({ csv });
-  const rowsOfExpectedOutput: RowOfExpectedOutput[] = csv2json(csv, { parseNumbers: true, parseJSON: true }); // https://www.npmjs.com/package/csvjson-csv2json
+  const rowsOfExpectedOutput: RowOfExpectedOutput[] = csv2json(csv, { parseNumbers: true, parseJSON: false }); // https://www.npmjs.com/package/csvjson-csv2json
   // console.log({ rowsOfExpectedOutput });
   return rowsOfExpectedOutput;
 }
