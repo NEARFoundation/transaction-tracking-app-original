@@ -68,22 +68,22 @@ export const getCurrencyByPool = async (poolId: number): Promise<[string, string
   }
 };
 
-export const getCurrencyByContract = async (contract: string): Promise<string> => {
-  const currency = await PoolsCurrencies.findOne({ contract });
+export const getCurrencyByContract = async (fungibleTokenContractAccountId: string): Promise<string> => {
+  const currency = await PoolsCurrencies.findOne({ contract: fungibleTokenContractAccountId });
   if (currency) {
     console.log('Found currency', currency.currency);
     return currency.currency;
   } else {
     try {
-      const ftMetadataResult = await new nearApi.Account(connection, '').viewFunction(contract, 'ft_metadata', {});
+      const ftMetadataResult = await new nearApi.Account(connection, '').viewFunction(fungibleTokenContractAccountId, 'ft_metadata', {});
       // eslint-disable-next-line promise/valid-params
       await PoolsCurrencies.findOneAndUpdate(
-        { contract },
+        { contract: fungibleTokenContractAccountId },
         {
           currency: ftMetadataResult.symbol,
           name: ftMetadataResult.name,
           decimals: ftMetadataResult.decimals,
-          contract,
+          contract: fungibleTokenContractAccountId,
         },
         { upsert: true },
       );

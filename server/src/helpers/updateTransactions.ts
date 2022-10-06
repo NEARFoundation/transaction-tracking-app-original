@@ -130,7 +130,12 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
     for (const transaction of transactions) {
       // console.log('Received: ', getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp), transaction.transaction_hash);
       // eslint-disable-next-line canonical/id-match
-      if (transaction.get_currency_by_contract) transaction.currency_transferred = await getCurrencyByContract(transaction.get_currency_by_contract);
+      if (transaction.get_currency_by_contract) {
+        // console.log('fungibleTokenContractAccountId', transaction.get_currency_by_contract);
+        // eslint-disable-next-line canonical/id-match
+        transaction.currency_transferred = await getCurrencyByContract(transaction.get_currency_by_contract);
+      }
+
       if (transaction.pool_id) [transaction.currency_transferred, transaction.currency_transferred2] = await getCurrencyByPool(Number(transaction.pool_id));
       // eslint-disable-next-line promise/valid-params
       await TxActions.findOneAndUpdate({ transaction_hash: transaction.transaction_hash, txType }, getTxActionModel(accountId, txType, transaction), { upsert: true })
