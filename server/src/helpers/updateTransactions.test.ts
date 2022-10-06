@@ -2,8 +2,10 @@
 
 // https://jestjs.io/docs/setup-teardown#scoping
 
+import csvToJson from 'convert-csv-to-json';
 import mongoose, { type Mongoose } from 'mongoose';
 
+import { type RowOfExpectedOutput } from '../../../shared/types';
 import { seedTheMockIndexerDatabase } from '../../test_helpers/updateTestData';
 import { TxActions } from '../models/TxActions';
 import { TxTypes } from '../models/TxTypes';
@@ -12,10 +14,10 @@ import { addTransactionTypeSqlToDatabase, DOT_SQL, getSqlFolder } from './addDef
 import { DEFAULT_LENGTH, mongoConnectionString } from './config';
 import { updateTransactions } from './updateTransactions';
 
+const csvFilename = './server/test_helpers/expectedOutput.csv';
+
 // eslint-disable-next-line max-lines-per-function
-describe('updateTransactions one at a time', () => {
-  /* TODO: Also recreate tests like these but with a beforeAll that calls `await addDefaultTypesTx('./server');` and 
-  then the tests ensure that there are no collisions and that transactions get processed.in a mutually exclusive and collectively exhaustive way.*/
+describe('updateTransactions', () => {
   let connection: Mongoose;
   let sqlFolder: string;
 
@@ -36,24 +38,36 @@ describe('updateTransactions one at a time', () => {
     await TxActions.deleteMany({});
   });
 
-  // ------------------------------
-  /* TODO: This section should be in a loop that first finds all the various transaction types and 
-  also which account IDs and transaction hashes (as inputs) map to which expected outputs.*/
-  const multisig = 'Multisig - Confirm and execute request';
-  const accountId = 'asdf1';
-
   jest.setTimeout(3_000);
-  test(multisig, async () => {
-    const file = `${multisig}${DOT_SQL}`;
-    await addTransactionTypeSqlToDatabase(sqlFolder, file);
-    await updateTransactions(accountId, multisig, DEFAULT_LENGTH);
-    const txActions = await TxActions.find({
-      accountId,
-      multisig,
-    }).sort([['block_timestamp', -1]]);
-    console.log({ txActions });
-    expect(JSON.stringify(txActions)).toBe('TODO');
-    expect(JSON.stringify(1)).toBe('TODO');
-  });
-  // ------------------------------
+
+  const rowsOfExpectedOutput: RowOfExpectedOutput[] = csvToJson.fieldDelimiter(',').getJsonFromCsv(csvFilename); // https://www.npmjs.com/package/convert-csv-to-json#define-field-delimiter
+
+  console.log({ rowsOfExpectedOutput });
+
+  async function runTest(rowOfExpectedOutput: RowOfExpectedOutput) {
+    const { accountId, txType } = rowOfExpectedOutput;
+    test(txType, async () => {
+      const file = `${txType}${DOT_SQL}`;
+      await addTransactionTypeSqlToDatabase(sqlFolder, file);
+      await updateTransactions(accountId, txType, DEFAULT_LENGTH);
+      const txActions = await TxActions.find({
+        accountId,
+        txType,
+      }).sort([['block_timestamp', -1]]);
+      console.log({ txActions });
+      expect(JSON.stringify(txActions)).toBe(JSON.stringify(rowOfExpectedOutput));
+    });
+  }
+
+  for (const rowOfExpectedOutput of rowsOfExpectedOutput) {
+    runTest(rowOfExpectedOutput)
+      // eslint-disable-next-line promise/prefer-await-to-then
+      .then((result) => {
+        console.log({ result });
+      })
+      // eslint-disable-next-line promise/prefer-await-to-then
+      .catch((error) => {
+        console.error({ error });
+      });
+  }
 });
