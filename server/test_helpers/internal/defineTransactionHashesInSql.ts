@@ -1,10 +1,8 @@
-// Run via `yarn ts-node  --esm ./server/test_helpers/getTransactionHashes.ts`
-
 import fs from 'node:fs';
 
 import { getRowsOfExpectedOutput } from './csvToJson.js';
 
-const transactionHashesFilename = './server/test_helpers/transactionHashes.txt';
+const transactionHashesFilename = './server/test_helpers/internal/transactionHashes.sql';
 const rowsOfExpectedOutput = getRowsOfExpectedOutput();
 
 // console.log({ rowsOfExpectedOutput });
@@ -14,9 +12,12 @@ for (const rowOfExpectedOutput of rowsOfExpectedOutput) {
   transactionHashes.push(`('${rowOfExpectedOutput.transaction_hash}')`);
 }
 
-const sqlOutput = transactionHashes.join(',\n');
+const sqlOutput = `CREATE TEMP TABLE transactionHashes AS
+WITH t (transactionHash) AS (
+ VALUES
+ ${transactionHashes.join(',\n')}
+ )
+SELECT * FROM t;`;
 // console.log(sqlOutput);
 
 fs.writeFileSync(transactionHashesFilename, sqlOutput);
-
-console.log(`Now, copy from ${transactionHashesFilename} into server/test_helpers/createTempTablesOfRowsWithSpecificTransactions.sql.`);

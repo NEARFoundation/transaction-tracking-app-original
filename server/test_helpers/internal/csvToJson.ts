@@ -3,7 +3,7 @@ import fs from 'node:fs';
 // eslint-disable-next-line canonical/id-match
 import csv2json from 'csvjson-csv2json';
 
-import { type RowOfExpectedOutput } from '../../shared/types';
+import { type RowOfExpectedOutput } from '../../../shared/types';
 
 const csvFilename = './server/test_helpers/expectedOutput.csv';
 

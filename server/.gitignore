@@ -36,4 +36,5 @@ target/
 
 docker/app/
 
-test_helpers/transactionHashes.txt
+test_helpers/internal/createTempTablesOfRowsWithSpecificTransactions.sql
+test_helpers/internal/transactionHashes.sql

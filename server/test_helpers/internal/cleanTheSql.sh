@@ -4,7 +4,7 @@
 
 DB_PREFIX='public.'
 TBL_PREFIX='temp_test_export_'
-SQL_FILE=server/test_helpers/testData.sql
+SQL_FILE=server/test_helpers/internal/testData.sql
 PLACEHOLDER_FILE=$SQL_FILE.new
 
 

@@ -130,3 +130,11 @@ exit
 ```
 
 https://medium.com/@haxzie/getting-started-with-mongodb-setting-up-admin-and-user-accounts-4fdd33687741 was useful.
+
+# Tests
+
+Ensure that server/test_helpers/expectedOutput.csv contains the values that you want. The inputs for server/src/helpers/updateTransactions.test.ts come from that file (transaction hashes and account IDs), and of course so to the expected outputs.
+
+Then run `pgCreds=___ ./server/test_helpers/updateTestData.sh`, but replace `___` with your value for POSTGRESQL_CONNECTION_STRING. This command will download all of the real-world data from the mainnet indexer Postgres database, and then run the SQL queries against it to generate the expected output.
+
+Then run `yarn test` to run the tests.

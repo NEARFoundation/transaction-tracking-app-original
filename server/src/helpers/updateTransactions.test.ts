@@ -5,8 +5,8 @@
 import mongoose, { type Mongoose } from 'mongoose';
 
 import { type RowOfExpectedOutput } from '../../../shared/types';
-import { getRowsOfExpectedOutput } from '../../test_helpers/csvToJson';
-import { seedTheMockIndexerDatabase } from '../../test_helpers/updateTestData';
+import { getRowsOfExpectedOutput } from '../../test_helpers/internal/csvToJson';
+import { seedTheMockIndexerDatabase } from '../../test_helpers/internal/updateTestData';
 import { TxActions } from '../models/TxActions';
 import { TxTypes } from '../models/TxTypes';
 
