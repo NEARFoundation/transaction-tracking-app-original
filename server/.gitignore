@@ -36,5 +36,4 @@ target/
 
 docker/app/
 
-test_helpers/testData.db
 test_helpers/transactionHashes.txt
