@@ -1,6 +1,7 @@
-import nearApi from 'near-api-js';
+import * as nearAPI from 'near-api-js'; // https://docs.near.org/tools/near-api-js/quick-reference#import
 
 import getConfig from '../../../shared/config.js';
+import { type AccountId } from '../../../shared/types/index.js';
 import { getNearApiConnection } from '../helpers/nearConnection.js';
 import { PoolsCurrencies } from '../models/PoolsCurrencies.js';
 
@@ -23,13 +24,13 @@ export const getCurrencyByPool = async (poolId: number): Promise<[string, string
   if (currency1 && currency2) {
     return [currency1.currency, currency2.currency];
   } else {
-    const poolsResult = await new nearApi.Account(connection, '').viewFunction('v2.ref-finance.near', 'get_pools', {
+    const poolsResult = await new nearAPI.Account(connection, '').viewFunction('v2.ref-finance.near', 'get_pools', {
       // TODO: Document what this is doing and why it is hard-coded.
       from_index: poolId,
       limit: 1,
     });
     console.log(poolsResult);
-    const ftMetadataResult1 = await new nearApi.Account(connection, '').viewFunction(poolsResult[0].token_account_ids[0], 'ft_metadata', {});
+    const ftMetadataResult1 = await new nearAPI.Account(connection, '').viewFunction(poolsResult[0].token_account_ids[0], 'ft_metadata', {});
     // eslint-disable-next-line promise/valid-params
     await PoolsCurrencies.findOneAndUpdate(
       { pool: poolId },
@@ -46,7 +47,7 @@ export const getCurrencyByPool = async (poolId: number): Promise<[string, string
       .then()
       .catch((error) => console.error(error));
 
-    const ftMetadataResult2 = await new nearApi.Account(connection, '').viewFunction(poolsResult[0].token_account_ids[1], 'ft_metadata', {});
+    const ftMetadataResult2 = await new nearAPI.Account(connection, '').viewFunction(poolsResult[0].token_account_ids[1], 'ft_metadata', {});
     try {
       await PoolsCurrencies.findOneAndUpdate(
         { pool: poolId, contract: poolsResult[0].token_account_ids[1] },
@@ -68,31 +69,37 @@ export const getCurrencyByPool = async (poolId: number): Promise<[string, string
   }
 };
 
-export const getCurrencyByContract = async (fungibleTokenContractAccountId: string): Promise<string> => {
-  console.log('getCurrencyByContract', fungibleTokenContractAccountId);
+async function getCurrencyByContractFromNear(fungibleTokenContractAccountId: AccountId): Promise<{ decimals: any; name: string; symbol: string }> {
+  const ftMetadataResult = await new nearAPI.Account(connection, '').viewFunction(fungibleTokenContractAccountId, 'ft_metadata', {});
+  const { symbol, name, decimals } = ftMetadataResult;
+  return { symbol, name, decimals };
+}
+
+export const getCurrencyByContract = async (fungibleTokenContractAccountId: AccountId): Promise<string> => {
+  // console.log('getCurrencyByContract', fungibleTokenContractAccountId);
   const currency = await PoolsCurrencies.findOne({ contract: fungibleTokenContractAccountId });
   if (currency) {
-    console.log('Found currency', currency.currency);
+    // console.log('Found currency', currency.currency);
     return currency.currency;
   } else {
     try {
       console.log('Using near-api-js to check for the FT symbol for contract', fungibleTokenContractAccountId);
-      const ftMetadataResult = await new nearApi.Account(connection, '').viewFunction(fungibleTokenContractAccountId, 'ft_metadata', {});
+      const { symbol, name, decimals } = await getCurrencyByContractFromNear(fungibleTokenContractAccountId);
       // eslint-disable-next-line promise/valid-params
       await PoolsCurrencies.findOneAndUpdate(
         { contract: fungibleTokenContractAccountId },
         {
-          currency: ftMetadataResult.symbol,
-          name: ftMetadataResult.name,
-          decimals: ftMetadataResult.decimals,
+          currency: symbol,
+          name,
+          decimals,
           contract: fungibleTokenContractAccountId,
         },
         { upsert: true },
       );
-      console.log('Get currency', ftMetadataResult.symbol);
-      return ftMetadataResult.symbol;
+      console.log('Get currency symbol', symbol);
+      return symbol;
     } catch (error) {
-      console.error({ nearApi, error });
+      console.error({ nearAPI, error });
     }
 
     return '';
