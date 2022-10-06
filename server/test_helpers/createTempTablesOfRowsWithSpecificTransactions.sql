@@ -8,20 +8,22 @@ CREATE TEMP TABLE transactionHashes AS
 WITH t (transactionHash) AS (
  VALUES
 
+('DdgdxTGua8HfWg4AGy77Rb8a5tyG5JwfXuGiV7zxbhuo'),
+('g2i2QVbqeLAqqW4EMCxaRpdxtBCmYKi2L7TFMdA1VRK'),
 ('EvUvPUGaH4qiRZbvfGjxmxGCTzxC5sRXLK2ea6bCnmhc'),
-
+('Bfq6B4ipFcCHkKnbsooLiFykFXdSoaEKCgedJCHDcH7C'),
 ('6MUJAkUB9acN1GVX92XvrNgtUseZnpNU8P9QWUv2Fqkx'),
 ('3L9WjpFmm11g9L5VW4JMZ4NSW3Czd5e2zmdQrkARW8jj'),
 ('3vqwtcf3R1xWZmNJikiuWZzQDEjhhptZxuNFMXP8D4di'),
 ('9RM9gQXbDXrn78wYXWaEcrnfkjZqazXdZbEpAdphvaaA'),
-
+('Hpdq5oSYKkpyYHs2C4aFiDbyuYcM6Uuy7sFUZaVdUgLi'),
 ('HivQc1gQfvLmyiyAKwvL4AxvnSn9Y4dnWqKBhsBnpShh'),
 ('AVt7xkpnv3erFaP16TZsaGNzMT5rGgN41xmvvR6BEqau'),
 ('7ciBvqEAmGaYWcqBgAafRCf631M2Wy4jphjmt3ZBKT9H'),
 ('9Wh28jmkrvR8tZ21KjjJXkq3oAup1kMrwsRZqAoCyER4'),
 ('3x1CTJmK5ea31xCbwpqVY21Vv2m9TPBc6Hqzg72Qs47H'),
 ('8P8p9YrGomnJB6EwhJhGtaJc5zQNfmxMV6bogjo1pz1Y'),
-
+('HBpSCbdzkWik8vMcPfm89i1c4an5gFcpAxfKFXTxmaCP'),
 ('F1V3VRcuDsypkmHCdqMvFrLrGK24TG8UNswPNkMgQA4v'),
 ('3upmFK2CB7VaYQ4aMoMB2pC5nkxXv9y5vRdHWjmGraju'),
 ('FEwtUcz8uiUMC6CRxtX4HE9TDiBStEmKvXezWCcnW1sL'),
