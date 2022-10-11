@@ -15,7 +15,7 @@ const getConfig = (environment: string = 'development') => {
         helperUrl: 'https://helper.mainnet.near.org',
         networkId: 'mainnet',
         nodeUrl: 'https://rpc.mainnet.near.org',
-        walletUrl: 'https://wallet.near.org',
+        walletUrl: 'https://wallet.near.org', // TODO: If this URL isn't the wallet selector, we might need to update it soon.
       };
     case 'development':
     case 'testnet':

@@ -30,7 +30,10 @@ export const getTransactions = async (request: Request, response: Response) => {
       accountId: body.accountId,
       block_timestamp: datetimeRangeFilter,
     };
-    if (body.types.length > 0) filter = { ...filter, txType: body.types };
+    if (body.types.length > 0) {
+      filter = { ...filter, txType: body.types };
+    }
+
     const transactions: TxActionRow[] = await TxActions.find(filter).sort({ block_timestamp: -1 });
     const task = await TxTasks.findOne({ accountId: body.accountId }).select({ _id: 0 });
 

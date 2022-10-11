@@ -6,6 +6,7 @@ import { respondWithServerError } from '../helpers/errors.js';
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
 
+// eslint-disable-next-line max-lines-per-function
 export const getAccounts = async (request: Request, response: Response) => {
   const { body } = request;
   const { accountIds } = body;
@@ -20,9 +21,13 @@ export const getAccounts = async (request: Request, response: Response) => {
       let status = 'Pending';
       if (txTaskForAccount) {
         // if (txTaskForAccount.lastUpdate === 0) status = 'Pending';
-        if (txTaskForAccount.isRunning) status = 'In progress';
-        else if (transactions) status = 'Done';
-        else if (!transactions && txTaskForAccount.lastUpdate > 0) status = 'No data';
+        if (txTaskForAccount.isRunning) {
+          status = 'In progress';
+        } else if (transactions) {
+          status = 'Done';
+        } else if (!transactions && txTaskForAccount.lastUpdate > 0) {
+          status = 'No data';
+        }
 
         if (txTaskForAccount.lastUpdate > 0) {
           lastUpdate = getFormattedUtcDatetime(new Date(txTaskForAccount.lastUpdate));
