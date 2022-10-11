@@ -1,5 +1,6 @@
-import { round } from '../../shared/helpers/precision';
-import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../shared/helpers/datetime';
+/* eslint-disable max-lines-per-function */
+import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../../shared/helpers/datetime';
+import { round } from '../../../shared/helpers/precision';
 
 export const MainTable = ({ transactions, explorerUrl, divisorPower, decimalPlaces }) => {
   const readableAmountHeader = divisorPower ? `amount_transferred_div_by_1e${divisorPower.toString()}` : `amount_transferred_readable`;

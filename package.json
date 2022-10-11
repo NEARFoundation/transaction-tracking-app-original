@@ -9,9 +9,9 @@
     "deploy:pages": "gh-pages -d dist/",
     "deploy": "npm run build && npm run deploy:pages",
     "start": "echo The app is starting! It will automatically open in your browser when ready && env-cmd -f ./.env parcel src/index.html --open",
-    "dev": "nodemon --ext js --exec \"env-cmd -f ./.env.development.local parcel src/index.html\" --ignore \"dist\"",
-    "test": "DOTENV_CONFIG_PATH=.env.test jest",
-    "serverdev": "(cd server && yarn dev)"
+    "dev": "(cd frontend && nodemon --ext js --exec \"env-cmd -f ./.env.development.local parcel src/index.html\" --ignore \"dist\")",
+    "test": "DOTENV_CONFIG_PATH=backend/.env.test jest",
+    "backend_dev": "(cd backend && yarn dev)"
   },
   "devDependencies": {
     "@nearfoundation/near-prettier-config": "^1.0.1",

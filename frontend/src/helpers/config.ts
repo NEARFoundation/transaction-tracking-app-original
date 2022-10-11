@@ -1,4 +1,4 @@
-import { stringToBoolean } from '../../shared/helpers/strings';
+import { stringToBoolean } from '../../../shared/helpers/strings';
 
 export const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT;
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;

@@ -1,7 +1,7 @@
 // This file is deprecated.
 
-// This file runs automatically from within `server/test_helpers/updateTestData.sh`.
-// Or run manually via`./server/node_modules/.bin/ts-node --esm server/test_helpers/updateTestDataSqlite.ts`
+// This file runs automatically from within `backend/test_helpers/updateTestData.sh`.
+// Or run manually via`./backend/node_modules/.bin/ts-node --esm backend/test_helpers/updateTestDataSqlite.ts`
 
 import fs from 'fs/promises';
 
@@ -11,8 +11,8 @@ import sqlite3, { type Database } from 'sqlite3';
 // In my case, I used `);` because some data in the queries had `;`.
 const splitter = ');';
 
-const DB_FILE = 'server/test_helpers/testData.db'; // or can use `:memory:` as shown at https://github.com/TryGhost/node-sqlite3#usage
-const mainSqlFileName = 'server/test_helpers/testData.sql';
+const DB_FILE = 'backend/test_helpers/testData.db'; // or can use `:memory:` as shown at https://github.com/TryGhost/node-sqlite3#usage
+const mainSqlFileName = 'backend/test_helpers/testData.sql';
 
 export function createDatabase() {
   return new sqlite3.Database(DB_FILE, (error: any) => {

@@ -12,7 +12,7 @@
   },
   "references": [
     {
-      "path": "../server"
+      "path": "../backend"
     },
     {
       "path": "../shared"

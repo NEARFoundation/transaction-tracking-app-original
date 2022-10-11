@@ -1,5 +1,5 @@
-# Before using this file, update the values for transactionHashes in server/test_helpers/createTempTablesOfRowsWithSpecificTransactions.sql.
-# Run this file like `pgCreds=___ ./server/test_helpers/updateTestData.sh`, but replace ___ with your value for POSTGRESQL_CONNECTION_STRING.
+# Before using this file, update the values for transactionHashes in backend/test_helpers/createTempTablesOfRowsWithSpecificTransactions.sql.
+# Run this file like `pgCreds=___ ./backend/test_helpers/updateTestData.sh`, but replace ___ with your value for POSTGRESQL_CONNECTION_STRING.
 
 TABLES=temp_test_export_transactions,temp_test_export_receipts,temp_test_export_execution_outcomes,temp_test_export_blocks,temp_test_export_action_receipt_actions
 chosenTables=''
@@ -12,10 +12,10 @@ do
 done
 
 echo "Calling createTempTablesOfRowsWithSpecificTransactions..."
-psql -Atx $pgCreds -af server/test_helpers/createTempTablesOfRowsWithSpecificTransactions.sql
+psql -Atx $pgCreds -af backend/test_helpers/createTempTablesOfRowsWithSpecificTransactions.sql
 
 echo "Downloading temp tables as schemas + INSERT statements..."
-pg_dump $pgCreds $chosenTables --column-inserts > server/test_helpers/testData.sql
+pg_dump $pgCreds $chosenTables --column-inserts > backend/test_helpers/testData.sql
 
 for i in ${TABLES//,/ }
 do
@@ -23,10 +23,10 @@ do
     psql -Atx $pgCreds -c "DROP TABLE IF EXISTS $i;";
 done
 
-./server/test_helpers/cleanTheSql.sh
+./backend/test_helpers/cleanTheSql.sh
 
 # This section is disabled since probably the Jest beforeAll function will seed the DB instead.
 # echo "Calling updateTestDataSqlite.ts..."
-# rm server/test_helpers/testData.db && ./server/node_modules/.bin/ts-node --esm server/test_helpers/updateTestDataSqlite.ts
+# rm backend/test_helpers/testData.db && ./backend/node_modules/.bin/ts-node --esm backend/test_helpers/updateTestDataSqlite.ts
 
 echo "Finished!"
