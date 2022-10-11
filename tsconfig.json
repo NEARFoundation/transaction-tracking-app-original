@@ -22,7 +22,7 @@
   },
   "references": [
     {
-      "path": "server"
+      "path": "backend"
     }
   ]
 }
