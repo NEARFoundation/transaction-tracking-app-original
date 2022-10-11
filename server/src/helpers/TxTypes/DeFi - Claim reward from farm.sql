@@ -14,8 +14,9 @@ WHERE r.predecessor_account_id = $1
   AND r.receiver_account_id = 'v2.ref-farming.near'
   AND e.status = 'SUCCESS_VALUE'
   AND ra.action_kind = 'FUNCTION_CALL'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'claim_reward_by_farm'
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'method_name'::text = 'claim_reward_by_farm'
+  AND COALESCE((ra.args -> 'args_json'::text) ->> 'farm_id'::text, '') <> ''
   AND (SELECT count(*) FROM jsonb_object_keys(COALESCE(ra.args::json->'args_json', '{}')::jsonb)) = 1
-  AND COALESCE((ra.args::json->'args_json')::json->>'farm_id', '') <> ''
   AND b.block_timestamp > $2
   ORDER BY b.block_timestamp LIMIT $3

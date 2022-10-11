@@ -26,7 +26,9 @@ WHERE r.receiver_account_id = 'near'
   AND e2.status = 'SUCCESS_VALUE'
     )
   AND b.block_timestamp > $2
-  AND COALESCE(a.args::json->>'method_name', '') = 'create_account'
-  AND COALESCE(ra.args::json->>'method_name', '') = 'on_account_created'
-  AND COALESCE((a.args::json->'args_json')::json->>'new_account_id', '') = $1
+  AND a.args ->> 'args_json'::text IS NOT NULL
+  AND ra.args ->> 'args_json'::text IS NOT NULL
+  AND a.args ->> 'method_name'::text = 'create_account'
+  AND ra.args ->> 'method_name'::text = 'on_account_created'
+  AND (a.args -> 'args_json'::text) ->> 'new_account_id'::text = $1
 ORDER BY b.block_timestamp LIMIT $3
