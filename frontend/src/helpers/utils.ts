@@ -1,6 +1,6 @@
 import { connect, Contract, keyStores, WalletConnection } from 'near-api-js';
 
-import getConfig from '../../shared/config';
+import getConfig from '../../../shared/config';
 
 import { ENVIRONMENT } from './config';
 

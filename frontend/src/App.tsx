@@ -1,10 +1,10 @@
 /* eslint-disable max-lines */
 import { useState, useEffect } from 'react';
 
-import getConfig from '../shared/config';
-import { getFormattedUtcDatetime, getDefaultStartUtc, getEndOfTodayUtc } from '../shared/helpers/datetime';
-import { BAD_REQUEST, SUCCESS } from '../shared/helpers/statusCodes';
-import { AccountId, OptionType } from '../shared/types';
+import getConfig from '../../shared/config';
+import { getFormattedUtcDatetime, getDefaultStartUtc, getEndOfTodayUtc } from '../../shared/helpers/datetime';
+import { BAD_REQUEST, SUCCESS } from '../../shared/helpers/statusCodes';
+import { AccountId, OptionType } from '../../shared/types';
 
 import { AccountUpdatedLabel } from './components/AccountUpdatedLabel';
 import { AccountsTable } from './components/AccountsTable';
