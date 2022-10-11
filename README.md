@@ -32,6 +32,7 @@ To run this project locally:
 1. `yarn test`
 1. Start the backend: `yarn backend_dev`
 1. In a second terminal, start the frontend: `yarn dev` (see `package.json` for a full list of `scripts` you can run with `yarn`)
+1. Visit http://localhost:1234/ in the browser.
 
 Go ahead and play with the app and the code. As you make code changes, the app will automatically reload.
 
