@@ -6,7 +6,7 @@ This [React] app was initialized with [create-near-app]
 
 To run this project locally:
 
-1. Make sure you've installed [Node.js] ≥ 12.
+1. Make sure you've installed [Node.js] ≥ 18.
 1. Install [Mongo](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/) using the instructions in its own section below.
 1. `cp .env.development .env.development.local && cp server/.env.development server/.env.development.local`
 1. Edit the values for each of those local env files. If you set REACT_APP_ALLOW_DELETING_FROM_DATABASE to "true" in .env.development.local and ALLOW_DELETING_FROM_DATABASE to "true" in server/.env.development.local, you will see a button in the frontend that allows you to delete records from the database, which is useful when you are manually testing whether transaction processing is working after editing the SQL queries.
@@ -22,7 +22,7 @@ To run this project locally:
    ALTER ROLE testuser CREATEDB;
    \q
    psql postgres -U testuser
-   CREATE DATABASE ttatestdb;
+   CREATE DATABASE tta_test_db;
    GRANT ALL PRIVILEGES ON DATABASE tta_test_db TO testuser;
    \list
    \q
