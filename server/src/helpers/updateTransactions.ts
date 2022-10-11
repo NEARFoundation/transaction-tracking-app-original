@@ -133,9 +133,16 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
   while (transactions.length > 0) {
     for (const item of transactions) {
       console.log('Received: ', item.block_timestamp, item.transaction_hash);
-      // eslint-disable-next-line canonical/id-match
-      if (item.get_currency_by_contract) item.currency_transferred = await getCurrencyByContract(item.get_currency_by_contract);
-      if (item.pool_id) [item.currency_transferred, item.currency_transferred2] = await getCurrencyByPool(Number(item.pool_id));
+
+      if (item.get_currency_by_contract) {
+        // eslint-disable-next-line canonical/id-match
+        item.currency_transferred = await getCurrencyByContract(item.get_currency_by_contract);
+      }
+
+      if (item.pool_id) {
+        [item.currency_transferred, item.currency_transferred2] = await getCurrencyByPool(Number(item.pool_id));
+      }
+
       // eslint-disable-next-line promise/valid-params
       await TxActions.findOneAndUpdate(
         { transaction_hash: item.transaction_hash, txType },
