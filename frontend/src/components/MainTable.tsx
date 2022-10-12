@@ -3,7 +3,7 @@ import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../../shared/helpe
 import { round } from '../../../shared/helpers/precision';
 
 export const MainTable = ({ transactions, explorerUrl, divisorPower, decimalPlaces, isLoading }) => {
-  const readableAmountHeader = divisorPower ? `amount_transferred_div_by_1e${divisorPower.toString()}` : `amount_transferred_readable`;
+  const readableAmountHeader = divisorPower ? `amount_transferred_divided_by_1e${divisorPower.toString()}` : `amount_transferred_readable`;
   return (
     <table className={isLoading ? 'blur' : ''}>
       <thead>
