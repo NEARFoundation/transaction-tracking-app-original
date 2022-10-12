@@ -3,5 +3,5 @@
     "source.fixAll.eslint": true
   },
   "editor.formatOnSave": true,
-  "eslint.workingDirectories": ["./server", "./src", "./shared"]
+  "eslint.workingDirectories": ["./backend", "./src", "./shared"]
 }

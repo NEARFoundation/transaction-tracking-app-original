@@ -14,7 +14,7 @@ export type AccountStatus = {
 type Decimal128 = any; // How can we handle this?
 
 export type TxActionRow = {
-  // See server/src/models/TxActions.js and https://mongoosejs.com/docs/typescript.html
+  // See backend/src/models/TxActions.js and https://mongoosejs.com/docs/typescript.html
   accountId: string;
   amount_transferred?: string;
   amount_transferred2?: string;
