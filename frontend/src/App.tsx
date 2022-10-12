@@ -32,6 +32,21 @@ export async function addTaskForAccountId(accountId: AccountId) {
   return fetch(API_BASE_URL + '/addTasks', requestOptions);
 }
 
+const getTypes = async (setTypes: (types: OptionType[]) => void, setMessage: (message: string) => void) => {
+  const requestOptions = {
+    ...defaultRequestOptions,
+    method: 'GET',
+  };
+  await fetch(API_BASE_URL + '/types', requestOptions)
+    .then(async (response: Response) => {
+      const json = await response.json();
+      setTypes(json.types);
+    })
+    .catch((error: any) => {
+      logAndDisplayError(error, setMessage);
+    });
+};
+
 // eslint-disable-next-line max-lines-per-function
 export default function App() {
   const [message, setMessage] = useState<string>('');
@@ -41,33 +56,18 @@ export default function App() {
   const [selectedAccountId, setSelectedAccountId] = useState<AccountId>('');
   const [selectedAccountIdsForCsv, setSelectedAccountIdsForCsv] = useState<AccountId[]>([]);
   const [transactions, setTransactions] = useState([]);
-  const [types, setTypes] = useState([]);
-  const [selectedTypes, setSelectedTypes] = useState([]);
+  const [types, setTypes] = useState<OptionType[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<OptionType[]>([]);
   const [csvTransactions, setCsvTransactions] = useState([]);
-  const [lastUpdate, setLastUpdate] = useState('');
+  const [lastUpdate, setLastUpdate] = useState<string>('');
 
   const [divisorPower, setDivisorPower] = useLocalStorage<number>('divisorPower', 9);
   const divisorPowerOptions = [0, 9].map((x) => ({ value: x, label: x ? `1e${x}` : 1 }));
   const [decimalPlaces, setDecimalPlaces] = useLocalStorage<number>('decimalPlaces', 6);
   const decimalPlacesOptions = [1, 2, 3, 4, 5, 6, 7, 8].map((x) => ({ value: x, label: x }));
-  console.log({ divisorPowerOptions, decimalPlacesOptions });
+  // console.log({ divisorPowerOptions, decimalPlacesOptions });
   const [startDate, setStartDate] = useLocalStorage<Date>('startDate', getDefaultStartUtc());
   const [endDate, setEndDate] = useLocalStorage<Date>('endDate', getEndOfTodayUtc());
-
-  const getTypes = async () => {
-    const requestOptions = {
-      ...defaultRequestOptions,
-      method: 'GET',
-    };
-    await fetch(API_BASE_URL + '/types', requestOptions)
-      .then(async (response) => {
-        const json = await response.json();
-        setTypes(json.types);
-      })
-      .catch((error) => {
-        logAndDisplayError(error, setMessage);
-      });
-  };
 
   const initialAccountIds: AccountId[] = [];
   const [accountIds, setAccountIds] = useLocalStorage<AccountId[]>('accountIds', initialAccountIds); // These are the accounts shown in the table at the top.
@@ -140,7 +140,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    getTypes();
+    getTypes(setTypes, setMessage);
     getAccounts();
     setInterval(() => {
       getAccounts();
