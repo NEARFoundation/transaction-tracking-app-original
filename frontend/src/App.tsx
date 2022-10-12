@@ -91,8 +91,12 @@ export default function App() {
         const data = await response.json();
         // console.log('first transaction', data.transactions[0]);
         setTransactions(data.transactions);
-        if (data.lastUpdate > 0) setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
-        else setLastUpdate('');
+        if (data.lastUpdate > 0) {
+          setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
+        } else {
+          setLastUpdate('');
+        }
+
         setIsLoading(false);
       })
       .catch((error) => {
@@ -154,14 +158,20 @@ export default function App() {
 
   useEffect(() => {
     setMessage('');
-    if (selectedAccountId) getTransactions(selectedAccountId);
+    if (selectedAccountId) {
+      getTransactions(selectedAccountId);
+    }
+
     setCsvTransactions([]);
   }, [startDate, endDate, selectedTypes]);
 
   const onChangeTypes = (value: any, event: any) => {
     if (event.action === 'select-option' && event.option.value === '*') {
-      if (selectedTypes.length === types.length) setSelectedTypes([]);
-      else setSelectedTypes(types);
+      if (selectedTypes.length === types.length) {
+        setSelectedTypes([]);
+      } else {
+        setSelectedTypes(types);
+      }
     } else {
       setSelectedTypes(value);
     }
@@ -190,7 +200,9 @@ export default function App() {
     await addTaskForAccountId(accountId)
       .then(async (response) => {
         if (response.status === SUCCESS) {
-          if (!accountIds.includes(accountId)) setAccountIds([...accountIds, accountId]);
+          if (!accountIds.includes(accountId)) {
+            setAccountIds([...accountIds, accountId]);
+          }
         } else if (response.status === BAD_REQUEST) {
           const status = await response.json();
           setMessage(status.error);
