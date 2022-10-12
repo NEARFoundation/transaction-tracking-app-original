@@ -50,26 +50,36 @@ export default function App() {
   const [accountStatuses, setAccountStatuses] = useState<string[]>([]);
 
   const getTransactions = async (accountId: AccountId) => {
+    console.log('getTransactions', { accountId, start: getFormattedUtcDatetime(startDate), end: getFormattedUtcDatetime(endDate) });
     setIsLoading(true);
     setSelectedAccountId(accountId);
-    console.log('getTransactions', { accountId, start: getFormattedUtcDatetime(startDate), end: getFormattedUtcDatetime(endDate) });
-
-    try {
-      const response = await fetchTransactions(accountId, startDate, endDate, selectedTypes);
-      const data = await response.json();
-      console.log('Finished loading transactions. data.transactions[0] = ', data.transactions[0]);
-      setIsLoading(false);
-      setTransactions(data.transactions);
-      if (data.lastUpdate > 0) {
-        setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
-      } else {
-        setLastUpdate('');
-      }
-    } catch (error: any) {
-      setTransactions([]);
-      logAndDisplayError(error, setMessage);
-    }
   };
+
+  useEffect(() => {
+    async function inside() {
+      console.log('inside');
+      try {
+        const response = await fetchTransactions(selectedAccountId, startDate, endDate, selectedTypes);
+        const data = await response.json();
+        console.log('Finished loading transactions. data.transactions[0] = ', data.transactions[0]);
+        setIsLoading(false);
+        setTransactions(data.transactions);
+        if (data.lastUpdate > 0) {
+          setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
+        } else {
+          setLastUpdate('');
+        }
+      } catch (error: any) {
+        setTransactions([]);
+        logAndDisplayError(error, setMessage);
+      }
+    }
+
+    if (isLoading) {
+      console.log('useEffect isLoading = true');
+      inside();
+    }
+  }, [isLoading]);
 
   const getAccounts = async () => {
     const requestOptions = {
