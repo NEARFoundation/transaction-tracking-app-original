@@ -6,7 +6,8 @@ This [React] app was initialized with [create-near-app]
 
 To run this project locally:
 
-1. Prerequisites: Make sure you've installed [Node.js] ≥ 18 and [Mongo](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/) or [Docker](https://docs.docker.com/get-docker/). See below about Mongo.
+1. Make sure you've installed [Node.js] ≥ 18.
+1. Install [Mongo](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/) using the instructions in its own section below.
 1. `cp .env.development .env.development.local && cp backend/.env.development backend/.env.development.local`
 1. Edit the values for each of those local env files. If you set REACT_APP_ALLOW_DELETING_FROM_DATABASE to "true" in .env.development.local and ALLOW_DELETING_FROM_DATABASE to "true" in backend/.env.development.local, you will see a button in the frontend that allows you to delete records from the database, which is useful when you are manually testing whether transaction processing is working after editing the SQL queries.
 1. Start Mongo (unless you'll be starting Docker) with something like `brew services start mongodb-community@5.0`.
@@ -21,7 +22,7 @@ To run this project locally:
    ALTER ROLE testuser CREATEDB;
    \q
    psql postgres -U testuser
-   CREATE DATABASE ttatestdb;
+   CREATE DATABASE tta_test_db;
    GRANT ALL PRIVILEGES ON DATABASE tta_test_db TO testuser;
    \list
    \q
@@ -40,7 +41,7 @@ Go ahead and play with the app and the code. As you make code changes, the app w
 
 1. The "backend" code lives in the `/backend` folder. See the README there for
    more info.
-2. The frontend code lives in the `/src` folder. `/src/index.html` is a great
+2. The frontend code lives in the `/frontend` folder. `/src/index.html` is a great
    place to start exploring. Note that it loads in `/src/index.tsx`, where you
    can learn how the frontend connects to the NEAR blockchain.
 3. Tests use [jest](https://jestjs.io/docs/getting-started#using-typescript). You can run via `yarn test`.
@@ -103,17 +104,38 @@ Run a new container
 
     docker-compose --file docker-compose.yml --project-name api-near-accounting-report up -d
 
-# Setting up Mongo
-
-https://medium.com/@haxzie/getting-started-with-mongodb-setting-up-admin-and-user-accounts-4fdd33687741 was useful in explaining that you can create your first user in your database like this:
+# Setting up Mongo and MongoDB Shell
 
 ```
+brew install mongodb-community@5.0
+brew install mongosh
+mongosh
 use admin
+show databases
 db.createUser(
   {
-    user: "someUsernameHere",
-    pwd: "yourSecretPasswordHere",
+    user: "MongoTestDbUser",
+    pwd: "MongoTestDbSecretPhrase",
+    roles: [ { role: "readWrite", db: "test" } ]
+  }
+)
+db.createUser(
+  {
+    user: "MongoDbUser",
+    pwd: "MongoDbSecretPhrase",
     roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
   }
 )
+show users
+exit
 ```
+
+https://medium.com/@haxzie/getting-started-with-mongodb-setting-up-admin-and-user-accounts-4fdd33687741 was useful.
+
+# Tests
+
+Ensure that backend/test_helpers/expectedOutput.csv contains the values that you want. (Ideally we will have more than 1 row per transaction type.) The inputs for backend/src/helpers/updateTransactions.test.ts come from that file (transaction hashes and account IDs), and of course so do the expected outputs.
+
+Then run `pgCreds=___ ./backend/test_helpers/updateTestData.sh`, but replace `___` with your value for POSTGRESQL_CONNECTION_STRING. This command will download all of the real-world data from the mainnet indexer Postgres database into SQL files that the automated tests will use when seeing your local database (the mock indexer).
+
+Then run `yarn test` to run the tests.

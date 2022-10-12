@@ -2,10 +2,10 @@
 import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../../shared/helpers/datetime';
 import { round } from '../../../shared/helpers/precision';
 
-export const MainTable = ({ transactions, explorerUrl, divisorPower, decimalPlaces }) => {
+export const MainTable = ({ transactions, explorerUrl, divisorPower, decimalPlaces, isLoading }) => {
   const readableAmountHeader = divisorPower ? `amount_transferred_div_by_1e${divisorPower.toString()}` : `amount_transferred_readable`;
   return (
-    <table>
+    <table className={isLoading ? 'blur' : ''}>
       <thead>
         <tr>
           <th>accountId</th>

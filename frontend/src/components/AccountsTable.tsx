@@ -36,7 +36,16 @@ async function deleteFromDatabase(accountId: AccountId) {
 }
 
 // eslint-disable-next-line max-lines-per-function
-function AccountRow({ accountId, deleteFromLocalStorage, accountStatus, getTransactions, selectedAccountId, runTask, selectedAccountIdsForCsv, addAccountCsv }: AccountRowProps) {
+function AccountRow({
+  accountId,
+  deleteFromLocalStorage,
+  accountStatus,
+  getTransactions,
+  selectedAccountId,
+  runTaskForThisAccount,
+  selectedAccountIdsForCsv,
+  addAccountCsv,
+}: AccountRowProps) {
   const deleteFromDatabaseCell = ALLOW_DELETING_FROM_DATABASE ? (
     <td>
       <button
@@ -71,7 +80,7 @@ function AccountRow({ accountId, deleteFromLocalStorage, accountStatus, getTrans
         >
           Delete
         </button>
-        <button className="silverBtn" onClick={() => runTask(accountId)}>
+        <button className="silverBtn" onClick={() => runTaskForThisAccount(accountId)}>
           Update now
         </button>
       </td>
@@ -110,7 +119,7 @@ export function AccountsTable({
   startDate,
   endDate,
   getTransactions,
-  runTask,
+  runTaskForThisAccount,
   selectedAccountId,
 }: AccountsTableProps) {
   // console.log({ accountIds });
@@ -166,7 +175,7 @@ export function AccountsTable({
                       deleteFromLocalStorage,
                       accountStatus,
                       getTransactions,
-                      runTask,
+                      runTaskForThisAccount,
                       selectedAccountId,
                       selectedAccountIdsForCsv,
                       addAccountCsv,

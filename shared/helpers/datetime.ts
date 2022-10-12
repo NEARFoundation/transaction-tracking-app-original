@@ -13,6 +13,10 @@ export const getFormattedUtcDatetime = (date: Date): string => {
   return dayjs(date).utc().format('YYYY-MM-DD HH:mm:ss [UTC]'); // https://day.js.org/docs/en/manipulate/utc
 };
 
+export function getFormattedUtcDatetimeNow(): string {
+  return getFormattedUtcDatetime(new Date());
+}
+
 export const getFormattedUtcDatetimeForFilename = (date: Date): string => {
   const formattedUtcDatetime = getFormattedUtcDatetime(date);
   return formattedUtcDatetime.replaceAll(' ', '_').replaceAll(':', '');

@@ -1,4 +1,4 @@
-import { runTask } from '../helpers/updateTransactions.js';
+import { runTaskForThisAccount } from '../helpers/updateTransactions.js';
 import { addTasks } from '../services/addTasks.js';
 import { deleteAccountData } from '../services/deleteAccountData.js';
 import { getAccounts } from '../services/getAccounts.js';
@@ -10,6 +10,6 @@ export const routes = (app) => {
   app.get('/types', getTypes);
   app.post('/accounts', getAccounts);
   app.post('/addTasks', addTasks);
-  app.post('/runTask', runTask);
+  app.post('/runTaskForThisAccount', runTaskForThisAccount);
   app.post('/deleteAccountData', deleteAccountData);
 };

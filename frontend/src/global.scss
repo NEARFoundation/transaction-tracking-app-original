@@ -331,3 +331,7 @@ td {
 .downloadBtn {
   background-color: var(--secondary);
 }
+
+.blur {
+  filter: blur(3px);
+}

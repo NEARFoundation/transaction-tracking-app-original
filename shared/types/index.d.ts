@@ -37,6 +37,8 @@ export type TxActionRow = {
   txType: string;
 };
 
+export type TxActionModel = TxActionRow; // TODO
+
 export type TxTypeRow = {
   name: string;
   sql: string;
@@ -64,7 +66,7 @@ export type AccountRowProps = {
   addAccountCsv: any;
   deleteFromLocalStorage: any;
   getTransactions: any;
-  runTask: any;
+  runTaskForThisAccount: any;
   selectedAccountId: any;
   selectedAccountIdsForCsv: any;
 };
@@ -80,7 +82,7 @@ export type AccountsTableProps = {
   handleNewAccountIdInputChange: (event: React.FormEvent<HTMLInputElement>) => void;
   messageCsv: any;
   newAccountId: any;
-  runTask: any;
+  runTaskForThisAccount: any;
   selectedAccountId: any;
   selectedAccountIdsForCsv: any;
   setAccountIds: any;
@@ -89,3 +91,5 @@ export type AccountsTableProps = {
 };
 
 export type CsvTransaction = any;
+
+export type RowOfExpectedOutput = any;
