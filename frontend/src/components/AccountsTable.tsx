@@ -1,8 +1,8 @@
 import { getFormattedUtcDatetime } from '../../../shared/helpers/datetime';
 import { AccountId, AccountRowProps, AccountsTableProps } from '../../../shared/types';
-import { addTaskForAccountId } from '../App';
 import { ALLOW_DELETING_FROM_DATABASE, API_BASE_URL, defaultRequestOptions } from '../helpers/config';
 import { handleExportCsv } from '../helpers/csv';
+import { addTaskForAccountId } from '../helpers/transactions';
 
 const getAccountStatus = (accountStatuses: any, accountId: AccountId) => {
   if (accountStatuses.length > 0) {

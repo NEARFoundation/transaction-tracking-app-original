@@ -15,37 +15,13 @@ import { ACCOUNT_UPDATE_POLLING_INTERVAL, API_BASE_URL, defaultRequestOptions, E
 import { getTransactionsCsv } from './helpers/csv';
 import { logAndDisplayError } from './helpers/errors';
 import { useLocalStorage } from './helpers/localStorage';
-
 // eslint-disable-next-line import/no-unassigned-import
 import './global.scss';
+import { addTaskForAccountId, fetchTransactions, getTypes } from './helpers/transactions';
 
 const nearConfig = getConfig(ENVIRONMENT);
 console.log({ ENVIRONMENT, API_BASE_URL, nearConfig });
 const { exampleAccount, explorerUrl } = nearConfig;
-
-export async function addTaskForAccountId(accountId: AccountId) {
-  console.log('addTaskForAccountId:', accountId);
-  const requestOptions = {
-    ...defaultRequestOptions,
-    body: JSON.stringify({ accountId }),
-  };
-  return fetch(API_BASE_URL + '/addTasks', requestOptions);
-}
-
-const getTypes = async (setTypes: (types: OptionType[]) => void, setMessage: (message: string) => void) => {
-  const requestOptions = {
-    ...defaultRequestOptions,
-    method: 'GET',
-  };
-  await fetch(API_BASE_URL + '/types', requestOptions)
-    .then(async (response: Response) => {
-      const json = await response.json();
-      setTypes(json.types);
-    })
-    .catch((error: any) => {
-      logAndDisplayError(error, setMessage);
-    });
-};
 
 // eslint-disable-next-line max-lines-per-function
 export default function App() {
@@ -77,32 +53,22 @@ export default function App() {
     setIsLoading(true);
     setSelectedAccountId(accountId);
     console.log('getTransactions', { accountId, start: getFormattedUtcDatetime(startDate), end: getFormattedUtcDatetime(endDate) });
-    const requestOptions = {
-      ...defaultRequestOptions,
-      body: JSON.stringify({
-        accountId: [accountId],
-        endDate,
-        startDate,
-        types: selectedTypes.map((option: OptionType) => option.value),
-      }),
-    };
-    await fetch(API_BASE_URL + '/transactions', requestOptions)
-      .then(async (response) => {
-        const data = await response.json();
-        // console.log('first transaction', data.transactions[0]);
-        setTransactions(data.transactions);
-        if (data.lastUpdate > 0) {
-          setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
-        } else {
-          setLastUpdate('');
-        }
 
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        setTransactions([]);
-        logAndDisplayError(error, setMessage);
-      });
+    try {
+      const response = await fetchTransactions(accountId, startDate, endDate, selectedTypes);
+      const data = await response.json();
+      console.log('Finished loading transactions. data.transactions[0] = ', data.transactions[0]);
+      setIsLoading(false);
+      setTransactions(data.transactions);
+      if (data.lastUpdate > 0) {
+        setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
+      } else {
+        setLastUpdate('');
+      }
+    } catch (error: any) {
+      setTransactions([]);
+      logAndDisplayError(error, setMessage);
+    }
   };
 
   const getAccounts = async () => {
@@ -116,7 +82,7 @@ export default function App() {
         // console.log(data['accounts']);
         setAccountStatuses(data.accounts);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         setAccountStatuses([]);
         logAndDisplayError(error, setMessage);
       });
@@ -132,7 +98,7 @@ export default function App() {
       .then(async (response) => {
         await response.json();
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error('There was an error!', error);
         setMessage('Unknown error!');
       });
@@ -209,7 +175,7 @@ export default function App() {
           console.error(status.error);
         }
       })
-      .catch((error) => {
+      .catch((error: any) => {
         logAndDisplayError(error, setMessage);
       });
   };
