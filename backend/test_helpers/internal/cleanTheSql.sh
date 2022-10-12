@@ -4,11 +4,7 @@
 
 DB_PREFIX='public.'
 TBL_PREFIX='temp_test_export_'
-<<<<<<<< HEAD:backend/test_helpers/internal/cleanTheSql.sh
 SQL_FILE=backend/test_helpers/internal/testData.sql
-========
-SQL_FILE=backend/test_helpers/testData.sql
->>>>>>>> develop:backend/test_helpers/cleanTheSql.sh
 PLACEHOLDER_FILE=$SQL_FILE.new
 
 
