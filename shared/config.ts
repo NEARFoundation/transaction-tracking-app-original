@@ -7,6 +7,7 @@ const getConfig = (environment: string = 'development') => {
   console.log('shared/config.js getConfig', { environment });
   switch (environment) {
     case 'production':
+    case 'test': // The reason for putting 'test' here, causing mainnet to be used is that tests like getCurrencyByContract depend on real world data. What are the risks, though?
     case 'mainnet':
       return {
         contractName,
@@ -15,7 +16,7 @@ const getConfig = (environment: string = 'development') => {
         helperUrl: 'https://helper.mainnet.near.org',
         networkId: 'mainnet',
         nodeUrl: 'https://rpc.mainnet.near.org',
-        walletUrl: 'https://wallet.near.org',
+        walletUrl: 'https://wallet.near.org', // TODO: If this URL isn't the wallet selector, we might need to update it soon.
       };
     case 'development':
     case 'testnet':
@@ -45,7 +46,6 @@ const getConfig = (environment: string = 'development') => {
         nodeUrl: 'http://localhost:3030',
         walletUrl: 'http://localhost:4000/wallet',
       };
-    case 'test':
     case 'ci':
       return {
         contractName,

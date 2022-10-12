@@ -14,7 +14,7 @@ export type AccountStatus = {
 type Decimal128 = any; // How can we handle this?
 
 export type TxActionRow = {
-  // See server/src/models/TxActions.js and https://mongoosejs.com/docs/typescript.html
+  // See backend/src/models/TxActions.js and https://mongoosejs.com/docs/typescript.html
   accountId: string;
   amount_transferred?: string;
   amount_transferred2?: string;
@@ -36,6 +36,8 @@ export type TxActionRow = {
   transaction_hash?: string;
   txType: string;
 };
+
+export type TxActionModel = TxActionRow; // TODO
 
 export type TxTypeRow = {
   name: string;
@@ -64,7 +66,7 @@ export type AccountRowProps = {
   addAccountCsv: any;
   deleteFromLocalStorage: any;
   getTransactions: any;
-  runTask: any;
+  runTaskForThisAccount: any;
   selectedAccountId: any;
   selectedAccountIdsForCsv: any;
 };
@@ -80,7 +82,7 @@ export type AccountsTableProps = {
   handleNewAccountIdInputChange: (event: React.FormEvent<HTMLInputElement>) => void;
   messageCsv: any;
   newAccountId: any;
-  runTask: any;
+  runTaskForThisAccount: any;
   selectedAccountId: any;
   selectedAccountIdsForCsv: any;
   setAccountIds: any;
@@ -89,3 +91,5 @@ export type AccountsTableProps = {
 };
 
 export type CsvTransaction = any;
+
+export type RowOfExpectedOutput = any;

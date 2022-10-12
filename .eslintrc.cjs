@@ -19,6 +19,7 @@ module.exports = {
     window: true,
   },
   rules: {
+    curly: 'error', // https://eslint.org/docs/latest/rules/curly
     'canonical/sort-keys': 'off',
     'no-console': 'off',
     'consistent-return': 'off',

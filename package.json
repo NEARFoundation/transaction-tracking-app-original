@@ -9,12 +9,15 @@
     "deploy:pages": "gh-pages -d dist/",
     "deploy": "npm run build && npm run deploy:pages",
     "start": "echo The app is starting! It will automatically open in your browser when ready && env-cmd -f ./.env parcel src/index.html --open",
-    "dev": "nodemon --ext js --exec \"env-cmd -f ./.env.development.local parcel src/index.html\" --ignore \"dist\"",
-    "test": "DOTENV_CONFIG_PATH=.env.test jest",
-    "serverdev": "(cd server && yarn dev)"
+    "dev": "(cd frontend && nodemon --ext js --exec \"env-cmd -f ./.env.development.local parcel src/index.html\" --ignore \"dist\")",
+    "test": "DOTENV_CONFIG_PATH=backend/.env.test jest",
+    "t": "DOTENV_CONFIG_PATH=backend/.env.test jest backend/src/helpers/updateTransactions.test.ts",
+    "backend_dev": "(cd backend && yarn dev)"
   },
   "devDependencies": {
     "@nearfoundation/near-prettier-config": "^1.0.1",
+    "@parcel/transformer-sass": "2.7.0",
+    "@shelf/jest-mongodb": "^4.1.0",
     "@types/jest": "^29.0.3",
     "@types/pg": "^8.6.5",
     "buffer": "^6.0.3",
@@ -29,6 +32,7 @@
     "prettier": "^2.7.1",
     "process": "^0.11.10",
     "react-test-renderer": "~17.0.1",
+    "sass": "^1.55.0",
     "shelljs": "~0.8.4",
     "ts-jest": "^29.0.1",
     "typescript": "^4.7.4"
@@ -38,13 +42,13 @@
     "decimal.js": "^10.4.1",
     "near-api-js": "~0.43.1",
     "near-units": "^0.1.9",
+    "papaparse": "^5.3.2",
     "react": "~17.0.1",
     "react-datepicker": "^4.7.0",
     "react-dom": "~17.0.1",
     "react-json-to-csv": "^1.0.4",
     "react-select": "^5.3.2",
-    "regenerator-runtime": "~0.13.5",
-    "papaparse": "^5.3.2"
+    "regenerator-runtime": "~0.13.5"
   },
   "resolutions": {
     "@babel/preset-env": "7.13.8"
@@ -61,5 +65,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "engines": {
+    "node": ">=18.0.0 <19.0.0"
   }
 }
