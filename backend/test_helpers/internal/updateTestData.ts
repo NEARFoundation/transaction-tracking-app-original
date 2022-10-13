@@ -9,6 +9,9 @@ console.log({ NODE_ENV }, `process.cwd()) = ${process.cwd()}`);
 
 const sqlFileName = './backend/test_helpers/internal/testData.sql';
 
+/**
+ * Populate the local PostgreSQL test database using './backend/test_helpers/internal/testData.sql'.
+ */
 export async function seedTheMockIndexerDatabase() {
   console.log('seedTheMockIndexerDatabase', { POSTGRESQL_CONNECTION_STRING });
   const sqlCommands = await fs.readFile(sqlFileName, { encoding: 'utf8' });

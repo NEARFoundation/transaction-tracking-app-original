@@ -1,3 +1,5 @@
+// This file simply converts './backend/test_helpers/expectedOutput.csv' to JSON, which gets used by `backend/test_helpers/updateTestData.sh` (via `backend/test_helpers/internal/defineTransactionHashesInSql.ts`) and also by backend/src/helpers/updateTransactions.test.ts.
+
 import fs from 'node:fs';
 
 // eslint-disable-next-line canonical/id-match

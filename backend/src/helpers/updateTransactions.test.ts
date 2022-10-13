@@ -20,6 +20,7 @@ describe('updateTransactions', () => {
   let sqlFolder: string;
 
   beforeAll(async () => {
+    // Before any of this suite starts running, connect to Mongo, connect to PostgreSQL, seed the PostgreSQL test database, and close the PostgreSQL test database connection.
     connection = await mongoose.connect(mongoConnectionString);
     sqlFolder = getSqlFolder('./backend');
     const txTypesCountDocuments = await TxTypes.countDocuments();
@@ -28,10 +29,12 @@ describe('updateTransactions', () => {
   });
 
   afterAll(async () => {
+    // After all the tests of this suite finish, close the DB connection.
     await connection.disconnect();
   });
 
   beforeEach(async () => {
+    // At the beginning of each test, clear out the Mongo database.
     await TxTypes.deleteMany({});
     await TxActions.deleteMany({});
   });
