@@ -1,10 +1,18 @@
-FROM node:14.17.3
+#backend
+FROM node:18
 
-RUN mkdir -p /usr/src/near-accounting-report/app
-WORKDIR /usr/src/near-accounting-report
-COPY ./app /usr/src/near-accounting-report/
+RUN mkdir -p /usr/src/backend/
+RUN mkdir -p /usr/src/shared/
 
-RUN npm install
+WORKDIR /usr/src/backend/
+COPY ./backend/ /usr/src/backend/
+COPY ../shared/ /usr/src/shared/
 
+ENV PORT=8086
+EXPOSE 8086
 
-CMD ["npm", "start"]
+#RUN npm install
+RUN yarn install
+
+CMD ["yarn", "dev"]
+#CMD ["npm", "start"]
