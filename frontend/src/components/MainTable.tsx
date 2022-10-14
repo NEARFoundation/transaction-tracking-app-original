@@ -38,7 +38,7 @@ export const MainTable = ({ transactions, explorerUrl, divisorPower, decimalPlac
               <td>{transaction.txType}</td>
               <td className="fixed-width">{getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp)}</td>
               <td className="max-width-none">
-                <a href={`${explorerUrl}/transactions/${transaction.transaction_hash}`} className="fixed-width">
+                <a href={`${explorerUrl}/transactions/${transaction.transaction_hash}`} className="fixed-width" target="_blank">
                   {transaction.transaction_hash}
                 </a>
               </td>

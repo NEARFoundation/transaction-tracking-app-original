@@ -1,4 +1,10 @@
-/* https://stackoverflow.com/a/63349501/ 
+/* 
+This file defines the "CREATE TABLE" SQL queries based on the 6 tables of the indexer database that this app needs to read from, and those table 
+definitions include WHERE clauses to filter down the rows to include only the ones relevant to `backend/test_helpers/expectedOutput.csv` (used in tests).
+Why create new tables (which requires write access)? Because Ryan Walsh thinks there might not be a better way to download only matching rows. pg_dump 
+doesn't support WHERE clauses and also doesn't support views.
+
+https://stackoverflow.com/a/63349501/ 
 https://stackoverflow.com/a/12816187/ 
 https://dba.stackexchange.com/a/86726/
 */
