@@ -1,11 +1,12 @@
 /* eslint-disable canonical/filename-match-exported */
 const contractName = process.env.CONTRACT_NAME ?? 'near-transactions-accounting-report';
 const localHome = process.env.HOME;
+const CHAIN = process.env.REACT_APP_CHAIN ?? process.env.CHAIN ?? 'mainnet';
 
 // eslint-disable-next-line max-lines-per-function
-const getConfig = (environment: string = 'development') => {
-  console.log('shared/config.js getConfig', { environment });
-  switch (environment) {
+const getConfig = () => {
+  console.log('shared/config.js getConfig', { CHAIN });
+  switch (CHAIN) {
     case 'production':
     case 'test': // The reason for putting 'test' here, causing mainnet to be used is that tests like getCurrencyByContract depend on real world data. What are the risks, though?
     case 'mainnet':
@@ -61,7 +62,7 @@ const getConfig = (environment: string = 'development') => {
         nodeUrl: 'https://rpc.ci-betanet.near.org',
       };
     default:
-      throw new Error(`Unconfigured environment '${environment}'. Can be configured in shared/config.js.`);
+      throw new Error(`Unconfigured CHAIN '${CHAIN}'. Can be configured in shared/config.js.`);
   }
 };
 

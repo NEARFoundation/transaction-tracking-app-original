@@ -11,7 +11,7 @@ import { AccountsTable } from './components/AccountsTable';
 import { FormattingControls } from './components/FormattingControls';
 import { MainTable } from './components/MainTable';
 import { TransactionsFilterControls } from './components/TransactionsFilterControls';
-import { ACCOUNT_UPDATE_POLLING_INTERVAL, API_BASE_URL, defaultRequestOptions, ENVIRONMENT } from './helpers/config';
+import { ACCOUNT_UPDATE_POLLING_INTERVAL, API_BASE_URL, defaultRequestOptions } from './helpers/config';
 import { getTransactionsCsv } from './helpers/csv';
 import { logAndDisplayError } from './helpers/errors';
 import { useLocalStorage } from './helpers/localStorage';
@@ -19,8 +19,8 @@ import { useLocalStorage } from './helpers/localStorage';
 import './global.scss';
 import { addTaskForAccountId, fetchTransactions, getTypes } from './helpers/transactions';
 
-const nearConfig = getConfig(ENVIRONMENT);
-console.log({ ENVIRONMENT, API_BASE_URL, nearConfig });
+const nearConfig = getConfig();
+console.log({ API_BASE_URL, nearConfig });
 const { exampleAccount, explorerUrl } = nearConfig;
 
 // eslint-disable-next-line max-lines-per-function

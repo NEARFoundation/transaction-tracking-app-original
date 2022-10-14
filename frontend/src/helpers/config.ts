@@ -1,6 +1,5 @@
 import { stringToBoolean } from '../../../shared/helpers/strings';
 
-export const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT;
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 export const ALLOW_DELETING_FROM_DATABASE: boolean = stringToBoolean(process.env.REACT_APP_ALLOW_DELETING_FROM_DATABASE ?? 'false');
 export const defaultRequestOptions = {

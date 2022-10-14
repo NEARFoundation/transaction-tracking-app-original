@@ -5,7 +5,7 @@ import { type AccountId } from '../../../shared/types/index.js';
 import { getNearApiConnection } from '../helpers/nearConnection.js';
 import { PoolsCurrencies } from '../models/PoolsCurrencies.js';
 
-const nearConfig = getConfig(process.env.NODE_ENV);
+const nearConfig = getConfig();
 
 const { nodeUrl } = nearConfig;
 
