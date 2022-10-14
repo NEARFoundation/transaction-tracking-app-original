@@ -34,4 +34,5 @@ module.exports = {
   parserOptions: {
     project: './tsconfig.eslint.json',
   },
+  ignorePatterns: ['.eslintrc.cjs'] // https://stackoverflow.com/a/65063702/
 };
