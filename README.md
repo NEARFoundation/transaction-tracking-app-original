@@ -50,7 +50,7 @@ To run this project locally:
    \q
    ```
 
-1. Install dependencies for frontend and backend: `yarn install && cd frontend && yarn install && cd backend && yarn install && cd ..`
+1. Install dependencies for frontend and backend: `yarn install_all`
 1. `POSTGRESQL_CONNECTION_STRING=___ ./backend/test_helpers/updateTestData.sh` (where `___` is the mainnet Postgres credentials string)
 1. `yarn test`
 1. Start the backend: `yarn backend_dev`

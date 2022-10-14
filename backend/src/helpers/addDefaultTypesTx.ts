@@ -7,7 +7,7 @@ import { TxTypes } from '../models/TxTypes.js';
 export const DOT_SQL = '.sql';
 
 export function getSqlFolder(subfolder: string): string {
-  const sqlFolder = `${subfolder}/src/helpers/TxTypes/`;
+  const sqlFolder = `${subfolder}src/helpers/TxTypes/`;
   console.log({ sqlFolder });
   return sqlFolder;
 }

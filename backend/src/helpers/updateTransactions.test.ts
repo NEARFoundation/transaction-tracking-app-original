@@ -14,6 +14,8 @@ import { addTransactionTypeSqlToDatabase, DOT_SQL, getSqlFolder } from './addDef
 import { DEFAULT_LENGTH, mongoConnectionString } from './config';
 import { updateTransactions } from './updateTransactions';
 
+const subfolder = process.env.BACKEND_FOLDER ?? '';
+
 // eslint-disable-next-line max-lines-per-function
 describe('updateTransactions', () => {
   let connection: Mongoose;
@@ -22,7 +24,7 @@ describe('updateTransactions', () => {
   beforeAll(async () => {
     // Before any of this suite starts running, connect to Mongo, connect to PostgreSQL, seed the PostgreSQL test database, and close the PostgreSQL test database connection.
     connection = await mongoose.connect(mongoConnectionString);
-    sqlFolder = getSqlFolder('./backend');
+    sqlFolder = getSqlFolder(subfolder);
     const txTypesCountDocuments = await TxTypes.countDocuments();
     console.log({ txTypesCountDocuments });
     await seedTheMockIndexerDatabase();

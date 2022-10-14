@@ -7,7 +7,11 @@ import csv2json from 'csvjson-csv2json';
 
 import { type RowOfExpectedOutput } from '../../../shared/types';
 
-const csvFilename = './backend/test_helpers/expectedOutput.csv';
+const subfolder = process.env.BACKEND_FOLDER ?? '';
+
+const csvFilename = `./${subfolder}test_helpers/expectedOutput.csv`;
+
+// console.log({ subfolder, csvFilename });
 
 export function getRowsOfExpectedOutput(): RowOfExpectedOutput[] {
   const csv = fs.readFileSync(csvFilename, 'utf8');
