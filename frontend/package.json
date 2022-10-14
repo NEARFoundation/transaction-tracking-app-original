@@ -1,0 +1,66 @@
+{
+  "name": "near-transactions-accounting-report",
+  "version": "0.1.0",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "build": "env-cmd -f .env.local parcel build src/index.html --public-url ./",
+    "start": "echo The app is starting! It will automatically open in your browser when ready && env-cmd -f ./.env.local parcel src/index.html --open",
+    "dev": "nodemon --ext js --exec \"env-cmd -f ./.env.development.local parcel src/index.html\" --ignore \"dist\""
+  },
+  "devDependencies": {
+    "@nearfoundation/near-prettier-config": "^1.0.1",
+    "@parcel/transformer-sass": "2.7.0",
+    "@shelf/jest-mongodb": "^4.1.0",
+    "@types/jest": "^29.0.3",
+    "@types/pg": "^8.6.5",
+    "buffer": "^6.0.3",
+    "env-cmd": "~10.1.0",
+    "eslint": "^8.22.0",
+    "eslint-config-near": "^1.0.3",
+    "gh-pages": "~3.1.0",
+    "jest": "^29.0.3",
+    "jest-environment-node": "~26.6.2",
+    "nodemon": "^2.0.19",
+    "parcel": "^2.7.0",
+    "prettier": "^2.7.1",
+    "process": "^0.11.10",
+    "react-test-renderer": "~17.0.1",
+    "sass": "^1.55.0",
+    "shelljs": "~0.8.4",
+    "ts-jest": "^29.0.1",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.5",
+    "decimal.js": "^10.4.1",
+    "near-api-js": "~0.43.1",
+    "near-units": "^0.1.9",
+    "papaparse": "^5.3.2",
+    "react": "~17.0.1",
+    "react-datepicker": "^4.7.0",
+    "react-dom": "~17.0.1",
+    "react-json-to-csv": "^1.0.4",
+    "react-select": "^5.3.2",
+    "regenerator-runtime": "~0.13.5"
+  },
+  "resolutions": {
+    "@babel/preset-env": "7.13.8"
+  },
+  "prettier": "@nearfoundation/near-prettier-config",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0 <19.0.0"
+  }
+}

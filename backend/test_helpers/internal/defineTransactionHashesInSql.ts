@@ -1,5 +1,8 @@
-// This file gets called automatically via updateTestData.sh.
-// It can also be called manually via `yarn ts-node  --esm ./backend/test_helpers/internal/defineTransactionHashesInSql.ts`.
+/* This file gets called automatically via updateTestData.sh.
+ It can also be called manually via `yarn ts-node  --esm ./backend/test_helpers/internal/defineTransactionHashesInSql.ts`.
+ It finds all of the transaction hashes of './backend/test_helpers/expectedOutput.csv' and uses them while crafting a "CREATE TEMP 
+ TABLE" SQL query that gets saved to './backend/test_helpers/internal/transactionHashes.sql', which then will be concatenated with 
+ `backend/test_helpers/internal/tableDefinitions.sql` from within `backend/test_helpers/updateTestData.sh`. */
 
 import fs from 'node:fs';
 
