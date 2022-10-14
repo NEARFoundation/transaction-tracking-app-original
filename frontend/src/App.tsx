@@ -38,9 +38,9 @@ export default function App() {
   const [lastUpdate, setLastUpdate] = useState<string>('');
 
   const [divisorPower, setDivisorPower] = useLocalStorage<number>('divisorPower', 9);
-  const divisorPowerOptions = [0, 9].map((x) => ({ value: x, label: x ? `1e${x}` : 1 }));
+  const divisorPowerOptions = [0, 9, 24].map((x) => ({ value: x, label: x ? `1e${x}` : 1 }));
   const [decimalPlaces, setDecimalPlaces] = useLocalStorage<number>('decimalPlaces', 6);
-  const decimalPlacesOptions = [1, 2, 3, 4, 5, 6, 7, 8].map((x) => ({ value: x, label: x }));
+  const decimalPlacesOptions = [0, 1, 2, 3, 4, 5, 6, 7, 8].map((x) => ({ value: x, label: x }));
   // console.log({ divisorPowerOptions, decimalPlacesOptions });
   const [startDate, setStartDate] = useLocalStorage<Date>('startDate', getDefaultStartUtc());
   const [endDate, setEndDate] = useLocalStorage<Date>('endDate', getEndOfTodayUtc());
@@ -71,7 +71,7 @@ export default function App() {
     }
   };
 
-  const getAccounts = async () => {
+  const fetchAccountStatuses = async () => {
     const requestOptions = {
       ...defaultRequestOptions,
       body: JSON.stringify({ accountIds }),
@@ -102,20 +102,20 @@ export default function App() {
         console.error('There was an error!', error);
         setMessage('Unknown error!');
       });
-    getAccounts();
+    fetchAccountStatuses();
   };
 
   useEffect(() => {
     getTypes(setTypes, setMessage);
-    getAccounts();
+    fetchAccountStatuses();
     setInterval(() => {
-      getAccounts();
+      fetchAccountStatuses();
     }, ACCOUNT_UPDATE_POLLING_INTERVAL);
   }, []);
 
   useEffect(() => {
     setCsvTransactions([]);
-    getAccounts();
+    fetchAccountStatuses();
   }, [accountIds]);
 
   useEffect(() => {
@@ -143,16 +143,16 @@ export default function App() {
     }
   };
 
-  function onChangeDivisorPower(chosenOption: any, event: any) {
+  function onChangeDivisorPower(chosenOption: OptionType, event: any) {
     const { value } = chosenOption;
     console.log('onChangeDivisorPower', { value, event });
-    setDivisorPower(value);
+    setDivisorPower(Number(value));
   }
 
-  function onChangeDecimalPlaces(chosenOption: any, event: any) {
+  function onChangeDecimalPlaces(chosenOption: OptionType, event: any) {
     const { value } = chosenOption;
     console.log('onChangeDecimalPlaces', { value, event });
-    setDecimalPlaces(value);
+    setDecimalPlaces(Number(value));
   }
 
   const handleNewAccountIdInputChange = (event: React.FormEvent<HTMLInputElement>) => {
