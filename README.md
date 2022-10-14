@@ -17,7 +17,7 @@ When you specify one or more NEAR acccount IDs, those account IDs get saved to y
 - The frontend is a React app in the "frontend" folder.
   - `/frontend/src/index.html` is a great place to start exploring. Note that it loads in `/frontend/src/index.tsx`, where you can learn how the frontend connects to the NEAR blockchain.
 - The backend is an Express app (with cron jobs and a Mongo database) in the "backend" folder.
-  - The backend relies on a private clone of the NEAR Explorer indexer, a large PostgreSQL database (certain tables are ~1 TB). We use our own clone of NEAR Explorer (on a bare metal Hetzner server) instead of using the public credentials of the actual NEAR Explorer because the complicated queries take too long and time out.
+  - The backend relies on a private [clone](https://github.com/near/near-indexer-for-explorer/) of the [NEAR Explorer](https://explorer.near.org) indexer, a large PostgreSQL database (certain tables are ~1 TB). We use our own clone of NEAR Explorer (on a bare metal Hetzner server) instead of using the public credentials of the actual NEAR Explorer because the complicated queries take too long and time out.
   - There are also old notes about [Docker](/backend/docker/README.md) even though the team hasn't used it recently.
 - There is also a folder called "shared" for code that both apps use.
 - Tests use [jest](https://jestjs.io/docs/getting-started#using-typescript). You can run via `yarn test`.
