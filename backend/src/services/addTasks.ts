@@ -7,7 +7,7 @@ import { type AccountId } from '../../../shared/types';
 import { getNearApiConnection } from '../helpers/nearConnection.js';
 import { TxTasks } from '../models/TxTasks.js';
 
-const nearConfig = getConfig(process.env.NODE_ENV);
+const nearConfig = getConfig();
 
 const { nodeUrl } = nearConfig;
 
