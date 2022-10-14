@@ -3,10 +3,10 @@ FROM node:18
 
 MAINTAINER andyopstein@near.foundation
 
-RUN mkdir -p /usr/src/frontend
-RUN mkdir -p /usr/src/shared
+RUN mkdir -p /usr/src/frontend/
+RUN mkdir -p /usr/src/shared/
 
-WORKDIR /usr/src/frontend
+WORKDIR /usr/src/frontend/
 
 ENV PORT=8085
 EXPOSE 8085
