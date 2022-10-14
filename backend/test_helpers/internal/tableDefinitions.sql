@@ -1,18 +1,15 @@
-/* https://stackoverflow.com/a/63349501/ 
+/* 
+This file defines the "CREATE TABLE" SQL queries based on the 6 tables of the indexer database that this app needs to read from, and those table 
+definitions include WHERE clauses to filter down the rows to include only the ones relevant to `backend/test_helpers/expectedOutput.csv` (used in tests).
+Why create new tables (which requires write access)? Because Ryan Walsh thinks there might not be a better way to download only matching rows. pg_dump 
+doesn't support WHERE clauses and also doesn't support views.
+
+https://stackoverflow.com/a/63349501/ 
 https://stackoverflow.com/a/12816187/ 
 https://dba.stackexchange.com/a/86726/
 */
 
-/* =============================================================== */
-CREATE TEMP TABLE transactionHashes AS
-WITH t (transactionHash) AS (
- VALUES
- ('FzfAU2MWTj76L3jRWo6wYQSmj1WR6GdHZNZZ5fKfVUjm'),
-('ABMgV1tA88oVuJtc2n9r9xvBMiwQtmaFrwUNKowqFiqD'),
-('Wc15ScL3hVMJB1EPymmgQ1JwaE14ejpTbPBP2guGDFf'),
-('Fw7GXvpm1Akse7CCzVJR1b5SMkGBbqR1C9iNuC1R19jk')
-)
-SELECT * FROM t;
+
 /* =============================================================== */
 CREATE TABLE temp_test_export_transactions AS 
 SELECT 
@@ -96,3 +93,13 @@ LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
 LEFT JOIN ACTION_RECEIPT_ACTIONS ARA ON ARA.RECEIPT_ID = R.RECEIPT_ID
 WHERE 
 T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
+/* =============================================================== */
+CREATE TABLE temp_test_export_transaction_actions AS 
+SELECT 
+	ta.transaction_hash, 
+	ta.index_in_transaction, 
+	ta."action_kind", 
+	ta.args
+FROM TRANSACTION_ACTIONS ta
+WHERE 
+ta.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);

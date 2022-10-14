@@ -4,11 +4,15 @@ import pg from 'pg';
 
 const NODE_ENV = process.env.NODE_ENV;
 export const POSTGRESQL_CONNECTION_STRING = process.env.POSTGRESQL_CONNECTION_STRING ?? '';
+const subfolder = process.env.BACKEND_FOLDER ?? '';
 
-console.log({ NODE_ENV }, `process.cwd()) = ${process.cwd()}`);
+console.log({ NODE_ENV, subfolder }, `process.cwd()) = ${process.cwd()}`);
 
-const sqlFileName = './backend/test_helpers/testData.sql';
+const sqlFileName = `./${subfolder}test_helpers/internal/testData.sql`;
 
+/**
+ * Populate the local PostgreSQL test database using './backend/test_helpers/internal/testData.sql'.
+ */
 export async function seedTheMockIndexerDatabase() {
   console.log('seedTheMockIndexerDatabase', { POSTGRESQL_CONNECTION_STRING });
   const sqlCommands = await fs.readFile(sqlFileName, { encoding: 'utf8' });

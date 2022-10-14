@@ -1,6 +1,6 @@
 import MultiSelect from 'react-select'; // https://react-select.com/home
 
-import { OptionType } from '../../shared/types';
+import { OptionType } from '../../../shared/types';
 
 // eslint-disable-next-line max-lines-per-function
 export function FormattingControls({ divisorPowerOptions, divisorPower, onChangeDivisorPower, decimalPlacesOptions, decimalPlaces, onChangeDecimalPlaces }): JSX.Element {

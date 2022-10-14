@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import nearApi from 'near-api-js';
+import * as nearAPI from 'near-api-js'; // https://docs.near.org/tools/near-api-js/quick-reference#import
 
 import getConfig from '../../../shared/config.js';
 import { BAD_REQUEST, OK, SERVER_ERROR } from '../../../shared/helpers/statusCodes.js';
@@ -17,7 +17,7 @@ const connection = getNearApiConnection(nodeUrl);
 
 const accountExists = async (accountId: AccountId) => {
   try {
-    await new nearApi.Account(connection, accountId).state();
+    await new nearAPI.Account(connection, accountId).state();
     return true;
   } catch {
     return false;

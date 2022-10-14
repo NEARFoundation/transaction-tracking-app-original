@@ -10,6 +10,16 @@ function getDecimalChar(locale: string | undefined): string {
   return decimalChar;
 }
 
+export function getBigNumberAsString(number: number | null | undefined): string {
+  if (number) {
+    Decimal.set({ precision: 1_000 }); // https://mikemcl.github.io/decimal.js/#precision // TODO: What precision should we use?
+    const decimal = new Decimal(`${number}`);
+    return decimal.toFixed(0);
+  } else {
+    return '';
+  }
+}
+
 /**
  *
  * @param amount {string}
@@ -17,7 +27,7 @@ function getDecimalChar(locale: string | undefined): string {
  * @param locale {string} e.g. 'en-US' or 'de-DE'
  * @returns {string} e.g. 1,000.000000
  */
-export function getLocaleStringToDecimals(amount: string, decimals: any, locale?: string): string {
+export function getLocaleStringToDecimals(amount: string, decimals: number, locale?: string): string {
   // Thanks to https://stackoverflow.com/a/68906367/ because https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString and https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt/toLocaleString would not work for huge numbers or numbers with many decimal places.
 
   const fixed = new Decimal(amount).toFixed(decimals);

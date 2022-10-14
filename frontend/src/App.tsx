@@ -15,87 +15,60 @@ import { ACCOUNT_UPDATE_POLLING_INTERVAL, API_BASE_URL, defaultRequestOptions, E
 import { getTransactionsCsv } from './helpers/csv';
 import { logAndDisplayError } from './helpers/errors';
 import { useLocalStorage } from './helpers/localStorage';
-
-import './global.css';
+// eslint-disable-next-line import/no-unassigned-import
+import './global.scss';
+import { addTaskForAccountId, fetchTransactions, getTypes } from './helpers/transactions';
 
 const nearConfig = getConfig(ENVIRONMENT);
 console.log({ ENVIRONMENT, API_BASE_URL, nearConfig });
 const { exampleAccount, explorerUrl } = nearConfig;
 
-export async function addTaskForAccountId(accountId: AccountId) {
-  console.log('addTaskForAccountId:', accountId);
-  const requestOptions = {
-    ...defaultRequestOptions,
-    body: JSON.stringify({ accountId }),
-  };
-  return fetch(API_BASE_URL + '/addTasks', requestOptions);
-}
-
 // eslint-disable-next-line max-lines-per-function
 export default function App() {
   const [message, setMessage] = useState<string>('');
   const [messageCsv, setMessageCsv] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [newAccountId, setNewAccountId] = useState<AccountId>('');
   const [selectedAccountId, setSelectedAccountId] = useState<AccountId>('');
   const [selectedAccountIdsForCsv, setSelectedAccountIdsForCsv] = useState<AccountId[]>([]);
   const [transactions, setTransactions] = useState([]);
-  const [types, setTypes] = useState([]);
-  const [selectedTypes, setSelectedTypes] = useState([]);
+  const [types, setTypes] = useState<OptionType[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<OptionType[]>([]);
   const [csvTransactions, setCsvTransactions] = useState([]);
-  const [lastUpdate, setLastUpdate] = useState('');
+  const [lastUpdate, setLastUpdate] = useState<string>('');
 
   const [divisorPower, setDivisorPower] = useLocalStorage<number>('divisorPower', 9);
   const divisorPowerOptions = [0, 9].map((x) => ({ value: x, label: x ? `1e${x}` : 1 }));
   const [decimalPlaces, setDecimalPlaces] = useLocalStorage<number>('decimalPlaces', 6);
   const decimalPlacesOptions = [1, 2, 3, 4, 5, 6, 7, 8].map((x) => ({ value: x, label: x }));
-  console.log({ divisorPowerOptions, decimalPlacesOptions });
+  // console.log({ divisorPowerOptions, decimalPlacesOptions });
   const [startDate, setStartDate] = useLocalStorage<Date>('startDate', getDefaultStartUtc());
   const [endDate, setEndDate] = useLocalStorage<Date>('endDate', getEndOfTodayUtc());
-
-  const getTypes = async () => {
-    const requestOptions = {
-      ...defaultRequestOptions,
-      method: 'GET',
-    };
-    await fetch(API_BASE_URL + '/types', requestOptions)
-      .then(async (response) => {
-        const json = await response.json();
-        setTypes(json.types);
-      })
-      .catch((error) => {
-        logAndDisplayError(error, setMessage);
-      });
-  };
 
   const initialAccountIds: AccountId[] = [];
   const [accountIds, setAccountIds] = useLocalStorage<AccountId[]>('accountIds', initialAccountIds); // These are the accounts shown in the table at the top.
   const [accountStatuses, setAccountStatuses] = useState<string[]>([]);
 
   const getTransactions = async (accountId: AccountId) => {
-    setMessage('Receiving data...');
+    setIsLoading(true);
     setSelectedAccountId(accountId);
     console.log('getTransactions', { accountId, start: getFormattedUtcDatetime(startDate), end: getFormattedUtcDatetime(endDate) });
-    const requestOptions = {
-      ...defaultRequestOptions,
-      body: JSON.stringify({
-        accountId: [accountId],
-        endDate,
-        startDate,
-        types: selectedTypes.map((option: OptionType) => option.value),
-      }),
-    };
-    await fetch(API_BASE_URL + '/transactions', requestOptions)
-      .then(async (response) => {
-        const data = await response.json();
-        // console.log('first transaction', data.transactions[0]);
-        setTransactions(data.transactions);
-        if (data.lastUpdate > 0) setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
-        else setLastUpdate('');
-      })
-      .catch((error) => {
-        setTransactions([]);
-        logAndDisplayError(error, setMessage);
-      });
+
+    try {
+      const response = await fetchTransactions(accountId, startDate, endDate, selectedTypes);
+      const data = await response.json();
+      console.log('Finished loading transactions. data.transactions[0] = ', data.transactions[0]);
+      setIsLoading(false);
+      setTransactions(data.transactions);
+      if (data.lastUpdate > 0) {
+        setLastUpdate(getFormattedUtcDatetime(data.lastUpdate));
+      } else {
+        setLastUpdate('');
+      }
+    } catch (error: any) {
+      setTransactions([]);
+      logAndDisplayError(error, setMessage);
+    }
   };
 
   const getAccounts = async () => {
@@ -109,23 +82,23 @@ export default function App() {
         // console.log(data['accounts']);
         setAccountStatuses(data.accounts);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         setAccountStatuses([]);
         logAndDisplayError(error, setMessage);
       });
   };
 
-  const runTask = async (accountId: AccountId) => {
+  const runTaskForThisAccount = async (accountId: AccountId) => {
     setMessage('');
     const requestOptions = {
       ...defaultRequestOptions,
       body: JSON.stringify({ accountId }),
     };
-    await fetch(API_BASE_URL + '/runTask', requestOptions)
+    await fetch(API_BASE_URL + '/runTaskForThisAccount', requestOptions)
       .then(async (response) => {
         await response.json();
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error('There was an error!', error);
         setMessage('Unknown error!');
       });
@@ -133,7 +106,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    getTypes();
+    getTypes(setTypes, setMessage);
     getAccounts();
     setInterval(() => {
       getAccounts();
@@ -151,14 +124,20 @@ export default function App() {
 
   useEffect(() => {
     setMessage('');
-    if (selectedAccountId) getTransactions(selectedAccountId);
+    if (selectedAccountId) {
+      getTransactions(selectedAccountId);
+    }
+
     setCsvTransactions([]);
   }, [startDate, endDate, selectedTypes]);
 
   const onChangeTypes = (value: any, event: any) => {
     if (event.action === 'select-option' && event.option.value === '*') {
-      if (selectedTypes.length === types.length) setSelectedTypes([]);
-      else setSelectedTypes(types);
+      if (selectedTypes.length === types.length) {
+        setSelectedTypes([]);
+      } else {
+        setSelectedTypes(types);
+      }
     } else {
       setSelectedTypes(value);
     }
@@ -187,14 +166,16 @@ export default function App() {
     await addTaskForAccountId(accountId)
       .then(async (response) => {
         if (response.status === SUCCESS) {
-          if (!accountIds.includes(accountId)) setAccountIds([...accountIds, accountId]);
+          if (!accountIds.includes(accountId)) {
+            setAccountIds([...accountIds, accountId]);
+          }
         } else if (response.status === BAD_REQUEST) {
           const status = await response.json();
           setMessage(status.error);
           console.error(status.error);
         }
       })
-      .catch((error) => {
+      .catch((error: any) => {
         logAndDisplayError(error, setMessage);
       });
   };
@@ -224,7 +205,7 @@ export default function App() {
             setAccountIds,
             selectedAccountIdsForCsv,
             setSelectedAccountIdsForCsv,
-            runTask,
+            runTaskForThisAccount,
             messageCsv,
             csvTransactions,
             endDate,
@@ -241,13 +222,13 @@ export default function App() {
         </div>
       </nav>
       <div style={{ paddingTop: '10px', textAlign: 'center' }}>
-        <AccountUpdatedLabel {...{ selectedAccountId, lastUpdate }} />
+        <AccountUpdatedLabel {...{ selectedAccountId, lastUpdate, isLoading }} />
         {transactions.length > 0 ? (
           <>
-            <MainTable transactions={transactions} explorerUrl={explorerUrl} divisorPower={divisorPower} decimalPlaces={decimalPlaces} />
+            <MainTable {...{ transactions, explorerUrl, divisorPower, decimalPlaces, isLoading }} />
           </>
         ) : null}
-        {transactions.length === 0 && selectedAccountId ? <>No data</> : null}
+        {transactions.length === 0 && selectedAccountId ? <>{isLoading ? 'Loading...' : 'No data'}</> : null}
       </div>
     </main>
   );

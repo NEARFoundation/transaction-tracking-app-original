@@ -7,7 +7,7 @@ export const defaultRequestOptions = {
   headers: { 'Content-Type': 'application/json' },
   method: 'POST',
 };
-// export const ACCOUNT_UPDATE_POLLING_INTERVAL: number = Number(process.env.REACT_APP_ACCOUNT_UPDATE_POLLING_INTERVAL) ?? 30_000; // Note, this version is dangerous because it results in `NaN` which then causes hammering of the server. Use the following line instead:
+// export const ACCOUNT_UPDATE_POLLING_INTERVAL: number = Number(process.env.REACT_APP_ACCOUNT_UPDATE_POLLING_INTERVAL) ?? 30_000; // Note, this version is dangerous because it results in `NaN` which then causes hammering of the backend. Use the following line instead:
 export const ACCOUNT_UPDATE_POLLING_INTERVAL: number = process.env.REACT_APP_ACCOUNT_UPDATE_POLLING_INTERVAL
   ? Number(process.env.REACT_APP_ACCOUNT_UPDATE_POLLING_INTERVAL)
   : 30_000;
