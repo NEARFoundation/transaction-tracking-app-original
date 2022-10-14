@@ -6,7 +6,7 @@ import { TxTypes } from '../models/TxTypes.js';
 
 export const DOT_SQL = '.sql';
 
-export function getSqlFolder(subfolder: string): string {
+export function getSqlFolder(subfolder = ''): string {
   const sqlFolder = `${subfolder}src/helpers/TxTypes/`;
   console.log({ sqlFolder });
   return sqlFolder;
@@ -31,8 +31,8 @@ export async function addTransactionTypeSqlToDatabase(sqlFolder: string, file: s
   }
 }
 
-export const addDefaultTypesTx = async (subfolder = '.') => {
-  const sqlFolder = getSqlFolder(subfolder);
+export const addDefaultTypesTx = async () => {
+  const sqlFolder = getSqlFolder();
   try {
     await TxTasks.updateMany({ isRunning: true }, { isRunning: false });
   } catch (error) {
