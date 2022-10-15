@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "env-cmd -f .env.local parcel build src/index.html --public-url ./",
-    "start": "echo The app is starting! It will automatically open in your browser when ready && env-cmd -f ./.env.local parcel src/index.html --open",
+    "start": "env-cmd -f .env.local parcel src/index.html",
     "dev": "nodemon --ext js --exec \"env-cmd -f ./.env.development.local parcel src/index.html\" --ignore \"dist\""
   },
   "devDependencies": {

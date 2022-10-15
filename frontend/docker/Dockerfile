@@ -11,14 +11,21 @@ WORKDIR /usr/src/frontend/
 ENV PORT=8085
 EXPOSE 8085
 
-COPY ./frontend/package.json /usr/src/frontend/package.json
-RUN npm install
+COPY ./frontend /usr/src/frontend/
+COPY ./shared /usr/src/shared/
 
-COPY ./frontend/ /usr/src/frontend/
-COPY ../shared/ /usr/src/shared/
+WORKDIR /usr/src/shared/
 
+RUN npm install --force
 RUN yarn install
-RUN yarn build:local
+
+
+WORKDIR /usr/src/frontend/
+
+RUN npm install --force
+RUN yarn install
+#RUN yarn build:local
+RUN yarn build
 
 CMD ["npm", "start"]
 

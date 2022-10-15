@@ -14,9 +14,17 @@ EXPOSE 8086
 COPY ./backend/ /usr/src/backend/
 COPY ../shared/ /usr/src/shared/
 
+WORKDIR /usr/src/backend/
 
 #RUN npm install
 RUN yarn install
+
+WORKDIR /usr/src/shared/
+
+#RUN npm install
+RUN yarn install
+
+WORKDIR /usr/src/backend/
 
 CMD ["yarn", "dev"]
 #CMD ["npm", "start"]
