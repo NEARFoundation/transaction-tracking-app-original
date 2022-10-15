@@ -27,7 +27,7 @@ RUN yarn install
 #RUN yarn build:local
 RUN yarn build
 
-CMD ["npm", "start"]
+CMD ["npm", "start", "develop"]
 
 #COPY ../docker_ui/frontend.js /usr/src/txtracking/
 #COPY ../docker_ui/package_frontend.json /usr/src/txtracking/package.json
