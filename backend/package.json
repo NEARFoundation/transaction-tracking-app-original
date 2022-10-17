@@ -4,7 +4,7 @@
   "main": "src/index",
   "type": "module",
   "scripts": {
-    "start": "node src/index",
+    "start": "node -r dotenv/config --loader ts-node/esm src/index.ts dotenv_config_path=.env.generic",
     "dev": "node -r dotenv/config --loader ts-node/esm src/index.ts dotenv_config_path=.env.development.local",
     "test": "DOTENV_CONFIG_PATH=.env.test jest"
   },
