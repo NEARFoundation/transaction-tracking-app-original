@@ -1,13 +1,13 @@
 version: "3.3"
 
 services:
-  txtrackingapi:
-    image: nearfoundation/txtrackingapi:local
+  backend:
+    image: nearfoundation/txtrackingbackend:local
     build:
       context: ./
-      dockerfile: ./backend/docker/Dockerfile
+      dockerfile: ./docker/backend/Dockerfile
     environment:
-      - REACT_APP_API_BASE_URL=http://localhost:8080
+      - REACT_APP_API_BASE_URL=http://localhost:8086
       # Remember to use NODE_ENV=production if you're using mainnet (so that the appropriate explorerUrl gets used in the frontend)
       - REACT_APP_ENVIRONMENT=development
       - MONGO=mongodb://mongodb:27017/
@@ -15,25 +15,32 @@ services:
       - REACT_APP_ALLOW_DELETING_FROM_DATABASE="false"
       - NODE_ENV=test
       - POSTGRESQL_CONNECTION_STRING=postgresql://pguser:pgpass@postgres:5432/tta_db_local
+      - MONGODB_USER=mongouser
+      - MONGODB_PASSWORD=mongopass
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - MONGO=mongodb://mongodb:27017/near_accounting_report_dev?authSource=admin&readPreference=primary&directConnection=true&ssl=false
+      # postgres
     depends_on:
       - postgres
       - mongodb
     ports:
       - 8086:8086
-  txtrackingui:
-    image: nearfoundation/txtrackingui:local
+  frontend:
+    image: nearfoundation/txtrackingfrontend:local
     build:
       context: ./
-      dockerfile: ./frontend/docker/Dockerfile
+      dockerfile: ./docker/frontend/Dockerfile
     environment:
       - REACT_APP_API_BASE_URL=http://localhost:8086
       # Remember to use NODE_ENV=production if you're using mainnet (so that the appropriate explorerUrl gets used in the frontend)
       - REACT_APP_ENVIRONMENT=development
       - REACT_APP_ALLOW_DELETING_FROM_DATABASE="false"
+      - BACKEND_FOLDER=../backend/
     ports:
       - 8085:8085
     depends_on:
-      - txtrackingapi
+      - backend
   postgres:
     image: postgres:latest
     ports:
