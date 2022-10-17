@@ -95,7 +95,7 @@ https://medium.com/@haxzie/getting-started-with-mongodb-setting-up-admin-and-use
 
 To test that `updateTransactions` works correctly, first ensure that `backend/test_helpers/expectedOutput.csv` contains the values that you want. (Ideally we will have more than 1 row per transaction type.)
 
-Then run `POSTGRESQL_CONNECTION_STRING=___ ./backend/test_helpers/updateTestData.sh`, but replace `___` with your value for POSTGRESQL_CONNECTION_STRING. This command will download all of the real-world data from the mainnet indexer Postgres database into SQL files that the automated tests will use when seeing your local database (the mock indexer).
+Then run `yarn update_test_data`. This command will download all of the real-world data from the mainnet indexer Postgres database into SQL files that the automated tests will use when seeing your local database (the mock indexer). (See https://stackoverflow.com/a/20909045/ for how the update_test_data script works.)
 
 To avoid downloading terabytes of data from the remote database (private indexer), the scripts look in `expectedOutput.csv` to see exactly which transaction hashes matter.
 
