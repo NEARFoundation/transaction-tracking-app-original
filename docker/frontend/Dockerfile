@@ -1,7 +1,7 @@
 #frontend
 FROM node:18
 
-MAINTAINER andyopstein@near.foundation
+MAINTAINER na
 
 RUN mkdir -p /usr/src/frontend/
 RUN mkdir -p /usr/src/shared/
@@ -16,18 +16,18 @@ COPY ./shared /usr/src/shared/
 
 WORKDIR /usr/src/shared/
 
-RUN npm install --force
+#RUN npm install --force
 RUN yarn install
 
 
 WORKDIR /usr/src/frontend/
 
-RUN npm install --force
+#RUN npm install --force
 RUN yarn install
 #RUN yarn build:local
 RUN yarn build
 
-CMD ["npm", "start", "develop"]
+CMD ["npm", "start"]
 
 #COPY ../docker_ui/frontend.js /usr/src/txtracking/
 #COPY ../docker_ui/package_frontend.json /usr/src/txtracking/package.json

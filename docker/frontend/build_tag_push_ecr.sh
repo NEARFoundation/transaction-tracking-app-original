@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #build step with initial tag
-docker build ./ -t nearfoundation/txtrackingfrontend:develop -f ./docker/frontend/Dockerfile
+docker build ./ -t nearfoundation/txtrackingfrontend:develop -f ./docker/frontend/Dockerfile --no-cache
 
 #tag step
 docker tag  nearfoundation/txtrackingfrontend:develop 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/txtrackingfrontend:develop
