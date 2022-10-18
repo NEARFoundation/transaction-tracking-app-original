@@ -4,7 +4,7 @@
 
 import mongoose, { type Mongoose } from 'mongoose';
 
-import { type TxActionRow, type AccountId } from '../../../shared/types';
+import { type RowOfExpectedOutput, type TxActionRow, type AccountId } from '../../../shared/types';
 import { getRowsOfExpectedOutput } from '../../test_helpers/internal/csvToJson';
 import jsonToCsv from '../../test_helpers/internal/jsonToCsv';
 import { seedTheMockIndexerDatabase } from '../../test_helpers/internal/updateTestData';
@@ -16,6 +16,7 @@ import { DEFAULT_LENGTH, mongoConnectionString } from './config';
 import { updateTransactions } from './updateTransactions';
 
 const subfolder = process.env.BACKEND_FOLDER ?? '';
+const prefix = '_tx_'; // This also gets used in the `t` script of `/package.json`.
 
 // eslint-disable-next-line max-lines-per-function
 describe('updateTransactions', () => {
@@ -44,7 +45,7 @@ describe('updateTransactions', () => {
 
   jest.setTimeout(3_000);
 
-  const rowsOfExpectedOutput = getRowsOfExpectedOutput();
+  const rowsOfExpectedOutput: RowOfExpectedOutput[] = getRowsOfExpectedOutput();
 
   // console.log({ rowsOfExpectedOutput });
 
@@ -53,7 +54,7 @@ describe('updateTransactions', () => {
   }
 
   async function runTest(accountId: AccountId, txType: string) {
-    test(txType, async () => {
+    test(`${prefix} ${txType}`, async () => {
       const file = `${txType}${DOT_SQL}`;
       await addTransactionTypeSqlToDatabase(sqlFolder, file);
       await updateTransactions(accountId, txType, DEFAULT_LENGTH);
@@ -74,33 +75,44 @@ describe('updateTransactions', () => {
   }
 
   for (const rowOfExpectedOutput of rowsOfExpectedOutput) {
-    const { accountId, txType } = rowOfExpectedOutput;
-    runTest(accountId, txType)
-      // eslint-disable-next-line promise/prefer-await-to-then
-      .then((result) => {
-        // console.log({ result });
-      })
-      // eslint-disable-next-line promise/prefer-await-to-then
-      .catch((error) => {
-        console.error({ error });
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const { accountId, txType, transaction_hash } = rowOfExpectedOutput;
+    if (txType) {
+      runTest(accountId, txType)
+        // eslint-disable-next-line promise/prefer-await-to-then
+        .then((result) => {
+          // console.log({ result });
+        })
+        // eslint-disable-next-line promise/prefer-await-to-then
+        .catch((error) => {
+          console.error({ error });
+        });
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-loop-func
+      test(`${prefix} ${transaction_hash}`, () => {
+        const hint = 'Where is the txType etc?'; // This test is kind of a fake test just to highlight within the test results (via test failure) that something unexpected is happening here. We don't actually expect transaction_hash to equal `hint`.
+        expect(transaction_hash).toEqual(hint);
       });
+    }
   }
 
   test('overwrite possibleExpectedOutput', async () => {
     const txActionsConverted: TxActionRow[] = [];
     for (const rowOfExpectedOutput of rowsOfExpectedOutput) {
       const { accountId, txType } = rowOfExpectedOutput;
-      const file = `${txType}${DOT_SQL}`;
-      await addTransactionTypeSqlToDatabase(sqlFolder, file);
-      await updateTransactions(accountId, txType, DEFAULT_LENGTH);
-      const txActions = await TxActions.find({
-        accountId,
-        txType,
-      }).sort([['block_timestamp', -1]]);
+      if (txType) {
+        const file = `${txType}${DOT_SQL}`;
+        await addTransactionTypeSqlToDatabase(sqlFolder, file);
+        await updateTransactions(accountId, txType, DEFAULT_LENGTH);
+        const txActions = await TxActions.find({
+          accountId,
+          txType,
+        }).sort([['block_timestamp', -1]]);
 
-      for (const txAction of txActions) {
-        const txActionConverted = convertFromModelToTxActionRow(txAction);
-        txActionsConverted.push(txActionConverted);
+        for (const txAction of txActions) {
+          const txActionConverted = convertFromModelToTxActionRow(txAction);
+          txActionsConverted.push(txActionConverted);
+        }
       }
     }
 

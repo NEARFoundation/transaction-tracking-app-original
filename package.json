@@ -10,7 +10,8 @@
     "dev": "(cd frontend && yarn dev)",
     "update_test_data": "export $(grep -v '^#' backend/.env.development.local | xargs) && BACKEND_FOLDER=backend/ ./backend/test_helpers/updateTestData.sh",
     "test": "DOTENV_CONFIG_PATH=.env.test jest",
-    "t": "(cd backend && DOTENV_CONFIG_PATH=.env.test jest src/helpers/updateTransactions.test.ts)",
+    "t": "(cd backend && DOTENV_CONFIG_PATH=.env.test jest --testNamePattern=\"_tx_\" src/helpers/updateTransactions.test.ts)",
+    "overwrite": "(cd backend && DOTENV_CONFIG_PATH=.env.test jest --testNamePattern=\"possibleExpectedOutput\")",
     "backend_dev": "(cd backend && yarn dev)"
   },
   "devDependencies": {
