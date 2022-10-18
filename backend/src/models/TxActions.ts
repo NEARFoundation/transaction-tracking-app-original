@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 import { getFormattedDatetimeUtcFromBlockTimestamp } from '../../../shared/helpers/datetime.js';
-import { getBigNumberAsString } from '../../../shared/helpers/precision.js';
 import { type AccountId, type TxActionModel, type TxActionRow } from '../../../shared/types';
 
 const { Schema, model } = mongoose;
@@ -9,9 +8,9 @@ const { Schema, model } = mongoose;
 const schema = new Schema({
   accountId: { type: String, index: true, required: true },
   txType: { type: String, index: true, required: true },
-  block_timestamp: { type: mongoose.Schema.Types.Decimal128, index: true },
+  block_timestamp: { type: mongoose.Schema.Types.Decimal128, index: true }, // TODO: Should we change this to string?
   from_account: { type: String },
-  block_height: { type: Number },
+  block_height: { type: Number }, // TODO: Should we change this to string?
   args_base64: { type: String },
   transaction_hash: { type: String },
   amount_transferred: { type: String },
@@ -75,12 +74,13 @@ export function getTxActionModel(accountId: AccountId, txType: string, transacti
   };
 }
 
-export function cleanExpectedOutputFromCsv(row: any): any {
+export function cleanExpectedOutputFromCsv(row: any): TxActionRow {
+  // This function exists because of `parseNumbers: false` in `backend/test_helpers/internal/csvToJson.ts`. See comments above about eventually converting these fields to strings in the model.
   const result = { ...row };
   // eslint-disable-next-line canonical/id-match
-  result.amount_transferred = getBigNumberAsString(result.amount_transferred);
+  result.block_height = Number(result.block_height);
   // eslint-disable-next-line canonical/id-match
-  result.amount_transferred2 = getBigNumberAsString(result.amount_transferred2);
+  result.block_timestamp = Number(result.block_timestamp);
   return result;
 }
 // -----------------------------------------------------------------------------------------------

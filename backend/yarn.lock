@@ -1960,6 +1960,11 @@ csvjson-csv2json@^5.0.6:
   resolved "https://registry.yarnpkg.com/csvjson-csv2json/-/csvjson-csv2json-5.0.6.tgz#b056f77dd3c13a2f550ada1c31f05072aad6ff3a"
   integrity sha512-to9QlVI4yQFPzSqi6XZ97lULKs5m3K8hlE/UkbvKSw81FfDwgV9MUtSbHFJ4SRT4IA7UPkuW2EqsH/MWN5YRow==
 
+csvjson-json2csv@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/csvjson-json2csv/-/csvjson-json2csv-1.0.3.tgz#5643589427a3f78bcc73dfff450493780087705c"
+  integrity sha512-Df9JFb0UonoEWy2Th+gLtawoGc6pHsLe3MTJdIDzOJo7Lvk3UM7vsBcO8MJc26VoswEF+ebLiy9lnfmLYefl3w==
+
 damerau-levenshtein@^1.0.8:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/damerau-levenshtein/-/damerau-levenshtein-1.0.8.tgz#b43d286ccbd36bc5b2f7ed41caf2d0aba1f8a6e7"

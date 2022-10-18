@@ -6,6 +6,7 @@ import mongoose, { type Mongoose } from 'mongoose';
 
 import { type TxActionRow, type AccountId } from '../../../shared/types';
 import { getRowsOfExpectedOutput } from '../../test_helpers/internal/csvToJson';
+import jsonToCsv from '../../test_helpers/internal/jsonToCsv';
 import { seedTheMockIndexerDatabase } from '../../test_helpers/internal/updateTestData';
 import { TxActions, convertFromModelToTxActionRow, cleanExpectedOutputFromCsv } from '../models/TxActions';
 import { TxTypes } from '../models/TxTypes';
@@ -84,4 +85,30 @@ describe('updateTransactions', () => {
         console.error({ error });
       });
   }
+
+  test('overwrite possibleExpectedOutput', async () => {
+    const txActionsConverted: TxActionRow[] = [];
+    for (const rowOfExpectedOutput of rowsOfExpectedOutput) {
+      const { accountId, txType } = rowOfExpectedOutput;
+      const file = `${txType}${DOT_SQL}`;
+      await addTransactionTypeSqlToDatabase(sqlFolder, file);
+      await updateTransactions(accountId, txType, DEFAULT_LENGTH);
+      const txActions = await TxActions.find({
+        accountId,
+        txType,
+      }).sort([['block_timestamp', -1]]);
+
+      for (const txAction of txActions) {
+        const txActionConverted = convertFromModelToTxActionRow(txAction);
+        txActionsConverted.push(txActionConverted);
+      }
+    }
+
+    // console.log('json', JSON.stringify(txActionsConverted, null, 2));
+    jsonToCsv(txActionsConverted);
+    console.log(
+      "If you overwrite `expectedOutput.csv` via `cp backend/test_helpers/internal/possibleExpectedOutput.csv backend/test_helpers/expectedOutput.csv`, the tests will pass. Obviously, you'll need to manually check whether those values are accurate.",
+    );
+    expect(true).toEqual(true);
+  });
 });

@@ -14,13 +14,13 @@ export type AccountStatus = {
 type Decimal128 = any; // How can we handle this?
 
 export type TxActionRow = {
-  // See backend/src/models/TxActions.js and https://mongoosejs.com/docs/typescript.html
+  // See backend/src/models/TxActions.ts and https://mongoosejs.com/docs/typescript.html
   accountId: string;
   amount_transferred?: string;
   amount_transferred2?: string;
   args_base64?: string;
-  block_height?: number | null;
-  block_timestamp?: Decimal128;
+  block_height?: number | null; // TODO: Should we change this to string?
+  block_timestamp?: Decimal128; // TODO: Should we change this to string?
   block_timestamp_utc?: string;
   cliff_duration?: string;
   currency_transferred?: string;
