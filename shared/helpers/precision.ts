@@ -10,6 +10,16 @@ function getDecimalChar(locale: string | undefined): string {
   return decimalChar;
 }
 
+export function getBigNumberAsString(number: number | null | undefined): string {
+  if (number) {
+    Decimal.set({ precision: 1_000 }); // https://mikemcl.github.io/decimal.js/#precision // TODO: What precision should we use?
+    const decimal = new Decimal(`${number}`);
+    return decimal.toFixed(0);
+  } else {
+    return '';
+  }
+}
+
 /**
  *
  * @param amount {string}

@@ -2,7 +2,7 @@
 
 import { Decimal } from 'decimal.js'; // https://github.com/MikeMcl/decimal.js
 
-import { round, getLocaleStringToDecimals } from './precision';
+import { round, getLocaleStringToDecimals, getBigNumberAsString } from './precision';
 
 type Cases = {
   [key: string]: string;
@@ -54,5 +54,14 @@ describe('precision helper', () => {
     expect(round('4_513_263_875_304_671_192_000_009', 6, 21, locale)).toBe('4,513.263875');
     expect(round('4_513_263_875_304_671_192_000_009', 6, 21, deDE)).toBe('4.513,263875');
     expect(round('4_513_263_875_304_671_192_000_009.1998679030467029262556391239', 27, undefined, locale)).toBe('4,513,263,875,304,671,192,000,009.199867903046702926255639124');
+  });
+
+  test('getBigNumberAsString', () => {
+    // eslint-disable-next-line unicorn/numeric-separators-style
+    expect(getBigNumberAsString(1664961079340576500)).toBe('1664961079340576500');
+    expect(getBigNumberAsString(1e26)).toBe('100000000000000000000000000');
+    expect(getBigNumberAsString(8e28)).toBe('80000000000000000000000000000');
+    expect(getBigNumberAsString(undefined)).toBe('');
+    expect(getBigNumberAsString(null)).toBe('');
   });
 });
