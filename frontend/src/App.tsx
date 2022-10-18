@@ -79,7 +79,7 @@ export default function App() {
     await fetch(API_BASE_URL + '/accounts', requestOptions)
       .then(async (response) => {
         const data = await response.json();
-        // console.log(data['accounts']);
+        console.log('fetchAccountStatuses', data.accounts);
         setAccountStatuses(data.accounts);
       })
       .catch((error: any) => {
@@ -89,6 +89,7 @@ export default function App() {
   };
 
   const runTaskForThisAccount = async (accountId: AccountId) => {
+    console.log('runTaskForThisAccount', { accountId });
     setMessage('');
     const requestOptions = {
       ...defaultRequestOptions,

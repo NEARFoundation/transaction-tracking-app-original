@@ -69,7 +69,7 @@ function AccountRow({
         </div>
       </td>
       <td>{accountStatus ? accountStatus.status : null}</td>
-      <td className="fixed-width">{accountStatus ? getFormattedUtcDatetime(accountStatus.lastUpdate) : null}</td>
+      <td className="fixed-width">{accountStatus && accountStatus.lastUpdate ? getFormattedUtcDatetime(accountStatus.lastUpdate) : null}</td>
       <td>
         <button
           style={{ backgroundColor: '#ccc', color: 'black' }}

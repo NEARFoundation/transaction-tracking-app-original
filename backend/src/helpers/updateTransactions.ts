@@ -51,7 +51,9 @@ async function getAllTypes(): Promise<TxTypeRow[]> {
 export const runTaskForThisAccount = async (request: Request, response: Response) => {
   try {
     const types = await getAllTypes();
-    await runThisTaskByAccountId(request.params.accountId, types);
+    const { accountId } = request.body;
+    console.log('runTaskForThisAccount', { accountId });
+    await runThisTaskByAccountId(accountId, types);
     response.send(OK);
   } catch (error) {
     console.error(error);
