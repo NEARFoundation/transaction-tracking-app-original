@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import getConfig from '../../shared/config';
 import { getFormattedUtcDatetime, getDefaultStartUtc, getEndOfTodayUtc } from '../../shared/helpers/datetime';
 import { BAD_REQUEST, SUCCESS } from '../../shared/helpers/statusCodes';
-import { AccountId, OptionType } from '../../shared/types';
+import { AccountId, AccountStatus, OptionType } from '../../shared/types';
 
 import { AccountUpdatedLabel } from './components/AccountUpdatedLabel';
 import { AccountsTable } from './components/AccountsTable';
@@ -47,7 +47,7 @@ export default function App() {
 
   const initialAccountIds: AccountId[] = [];
   const [accountIds, setAccountIds] = useLocalStorage<AccountId[]>('accountIds', initialAccountIds); // These are the accounts shown in the table at the top.
-  const [accountStatuses, setAccountStatuses] = useState<string[]>([]);
+  const [accountStatuses, setAccountStatuses] = useState<AccountStatus[]>([]);
 
   const getTransactions = async (accountId: AccountId) => {
     setIsLoading(true);

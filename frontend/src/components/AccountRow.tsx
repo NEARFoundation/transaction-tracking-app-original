@@ -1,4 +1,4 @@
-import { getFormattedUtcDatetime } from '../../../shared/helpers/datetime';
+import { getFormattedUtcDatetime, getRelativeTimeOrUtc } from '../../../shared/helpers/datetime';
 import { AccountId, AccountRowProps } from '../../../shared/types';
 import { ALLOW_DELETING_FROM_DATABASE, API_BASE_URL, defaultRequestOptions } from '../helpers/config';
 import { addTaskForAccountId } from '../helpers/transactions';
@@ -46,6 +46,7 @@ export default function AccountRow({
   ) : (
     <></>
   );
+  const utc = accountStatus?.lastUpdate ? getFormattedUtcDatetime(new Date(accountStatus.lastUpdate)) : '';
   return (
     <tr>
       <td>
@@ -54,7 +55,9 @@ export default function AccountRow({
         </div>
       </td>
       <td>{accountStatus ? accountStatus.status : null}</td>
-      <td className="fixed-width">{accountStatus && accountStatus.lastUpdate ? getFormattedUtcDatetime(accountStatus.lastUpdate) : null}</td>
+      <td className="fixed-width" title={utc}>
+        {getRelativeTimeOrUtc(utc)}
+      </td>
       <td>
         <button
           style={{ backgroundColor: '#ccc', color: 'black' }}

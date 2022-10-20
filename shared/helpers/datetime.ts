@@ -1,8 +1,10 @@
 import dayjs from 'dayjs';
 // eslint-disable-next-line import/extensions
+import relativeTime from 'dayjs/plugin/relativeTime.js';
 import utc from 'dayjs/plugin/utc.js';
-// https://day.js.org/docs/en/plugin/utc
-dayjs.extend(utc);
+
+dayjs.extend(utc); // https://day.js.org/docs/en/plugin/utc
+dayjs.extend(relativeTime); // https://day.js.org/docs/en/plugin/relative-time
 
 /**
  *
@@ -66,6 +68,7 @@ export function millisToMinutesAndSeconds(milliseconds: number): string {
   return `${minutes}:${seconds.padStart(2, '0')}`;
 }
 
+// ---------------------------------------
 // TODO: Clean up these functions.
 /* eslint-disable no-param-reassign */
 export function convertUTCToLocalDate(date: any) {
@@ -88,3 +91,18 @@ export function convertLocalToUTCDate(date: any) {
   return date;
 }
 /* eslint-enable no-param-reassign */
+// ---------------------------------------
+
+export function getRelativeTimeOrUtc(date: string): string {
+  if (date === '') {
+    return '';
+  } else {
+    const defaultMomentString = getFormattedUtcDatetime(new Date(date));
+    const defaultMoment = dayjs(defaultMomentString);
+    if (dayjs().subtract(1, 'week').isBefore(defaultMoment)) {
+      return dayjs().to(defaultMoment); // relative time, such as "2 days ago" https://day.js.org/docs/en/plugin/relative-time
+    } else {
+      return defaultMomentString;
+    }
+  }
+}

@@ -1,19 +1,20 @@
-import { AccountId, AccountsTableProps } from '../../../shared/types';
+import { AccountId, AccountsTableProps, AccountStatus } from '../../../shared/types';
 import { ALLOW_DELETING_FROM_DATABASE } from '../helpers/config';
 import { handleExportCsv } from '../helpers/csv';
 
 import AccountRow from './AccountRow';
 
-const getAccountStatus = (accountStatuses: any, accountId: AccountId) => {
+function getAccountStatus(accountStatuses: AccountStatus[], accountId: AccountId): AccountStatus | null {
+  console.log({ accountStatuses });
   if (accountStatuses.length > 0) {
-    const result = accountStatuses.find((item: any) => {
+    const result = accountStatuses.find((item: AccountStatus) => {
       return item.accountId === accountId;
     });
-    return result ? result : [];
+    return result ? result : null;
   }
 
-  return [];
-};
+  return null;
+}
 
 const sometimesEmptyHeader = ALLOW_DELETING_FROM_DATABASE ? <th></th> : <></>;
 const csvDownloadButtonColSpan = ALLOW_DELETING_FROM_DATABASE ? 4 : 3;

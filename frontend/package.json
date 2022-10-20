@@ -14,6 +14,7 @@
     "@shelf/jest-mongodb": "^4.1.0",
     "@types/jest": "^29.0.3",
     "@types/pg": "^8.6.5",
+    "@types/react": "^18.0.21",
     "buffer": "^6.0.3",
     "env-cmd": "~10.1.0",
     "eslint": "^8.22.0",

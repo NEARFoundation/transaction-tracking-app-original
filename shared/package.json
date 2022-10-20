@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "dayjs": "^1.11.5",
-    "decimal.js": "^10.4.1"
+    "decimal.js": "^10.4.1",
+    "react": "~17.0.1"
   },
   "resolutions": {
     "@babel/preset-env": "7.13.8"
@@ -33,6 +34,7 @@
     "@nearfoundation/near-prettier-config": "^1.0.1",
     "@shelf/jest-mongodb": "^4.1.1",
     "@types/jest": "^29.1.2",
+    "@types/react": "^18.0.21",
     "eslint": "^8.25.0",
     "eslint-config-near": "^1.0.3",
     "jest": "^29.2.0",

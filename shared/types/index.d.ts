@@ -4,7 +4,7 @@ export type AccountId = string;
 
 export type AccountStatus = {
   accountId: AccountId;
-  lastUpdate: string;
+  lastUpdate: string | null;
   status: string;
 };
 
@@ -62,7 +62,7 @@ export type OptionType = { label: string; value: string }; // https://github.com
 
 export type AccountRowProps = {
   accountId: any;
-  accountStatus: any;
+  accountStatus: AccountStatus | null;
   addAccountCsv: any;
   deleteFromLocalStorage: any;
   getTransactions: any;
@@ -73,7 +73,7 @@ export type AccountRowProps = {
 
 export type AccountsTableProps = {
   accountIds: any;
-  accountStatuses: any;
+  accountStatuses: AccountStatus[];
   addNewAccount: (event: React.FormEvent<HTMLFormElement>) => void;
   csvTransactions: any;
   endDate: any;
