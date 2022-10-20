@@ -10,7 +10,7 @@ import { TxActions, getTxActionModel } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
 import { TxTypes } from '../models/TxTypes.js';
 
-import { CONNECTION_STRING, DEFAULT_LENGTH, TIMEOUT } from './config.js';
+import { CONNECTION_STRING, CONNECTION_TIMEOUT, DEFAULT_LENGTH, STATEMENT_TIMEOUT } from './config.js';
 import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
 
 // eslint-disable-next-line max-lines-per-function
@@ -19,9 +19,12 @@ async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) 
   try {
     const txTask = await TxTasks.findOne({ accountId });
     if (txTask) {
+      console.log('found a task', txTask.id);
       if (txTask.isRunning === false) {
-        const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: TIMEOUT });
+        console.log('isRunning === false');
+        const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: STATEMENT_TIMEOUT, connectionTimeoutMillis: CONNECTION_TIMEOUT });
         await pgClient.connect();
+        console.log('pgClient connected');
         const promisesOfAllTasks: Array<Promise<void>> = [];
         for (const type of types) {
           const promise = updateTransactions(pgClient, txTask.accountId, type.name, DEFAULT_LENGTH);
@@ -77,9 +80,12 @@ export const runAllNonRunningTasks = async (): Promise<void> => {
     const [types, tasks] = await Promise.all([getAllTypes(), TxTasks.find({ isRunning: false })]);
     console.log(`types=${JSON.stringify(types.map((type) => type.name))}, tasks = ${JSON.stringify(tasks.map((task) => task.accountId))}`);
     for (const task of tasks) {
+      console.log('About to call runThisTaskByAccountId', task.accountId);
       const promise = runThisTaskByAccountId(task.accountId, types);
       promisesOfAllTasks.push(promise);
     }
+
+    console.log('All promises have been started in runAllNonRunningTasks.');
   } catch (error) {
     console.error(error);
   }

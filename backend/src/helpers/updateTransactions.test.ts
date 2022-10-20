@@ -12,7 +12,7 @@ import { TxActions, convertFromModelToTxActionRow, cleanExpectedOutputFromCsv } 
 import { TxTypes } from '../models/TxTypes';
 
 import { addTransactionTypeSqlToDatabase, DOT_SQL, getSqlFolder } from './addDefaultTypesTx';
-import { CONNECTION_STRING, DEFAULT_LENGTH, mongoConnectionString, TIMEOUT } from './config';
+import { CONNECTION_STRING, DEFAULT_LENGTH, mongoConnectionString, STATEMENT_TIMEOUT } from './config';
 import { updateTransactions } from './updateTransactions';
 
 const subfolder = process.env.BACKEND_FOLDER ?? '';
@@ -31,7 +31,7 @@ describe('updateTransactions', () => {
     const txTypesCountDocuments = await TxTypes.countDocuments();
     console.log({ txTypesCountDocuments, CONNECTION_STRING });
     await seedTheMockIndexerDatabase();
-    pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: TIMEOUT });
+    pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: STATEMENT_TIMEOUT });
     await pgClient.connect();
   });
 
