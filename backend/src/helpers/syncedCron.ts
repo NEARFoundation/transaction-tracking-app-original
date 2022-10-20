@@ -22,14 +22,13 @@ export const SyncedCron = cron.schedule(
       try {
         isAlreadyRunningBoolean = true;
         // console.log('is now set to 1 because about to call runAllNonRunningTasks');
-        const promises = await runAllNonRunningTasks();
-        await Promise.all(promises);
+        await runAllNonRunningTasks();
+        console.log('runAllNonRunningTasks has been awaited and completed.');
+        isAlreadyRunningBoolean = false;
+        console.log(getFormattedUtcDatetimeNow(), `Finished cron, so isAlreadyRunningBoolean = ${isAlreadyRunningBoolean}`);
       } catch (error) {
         console.error(error);
       }
-
-      isAlreadyRunningBoolean = false;
-      console.log(getFormattedUtcDatetimeNow(), `Finished cron, so isAlreadyRunningBoolean = ${isAlreadyRunningBoolean}`);
     } else {
       console.log(getFormattedUtcDatetimeNow(), 'SyncedCron: runAllNonRunningTasks is already running.');
     }

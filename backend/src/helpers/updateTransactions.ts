@@ -71,7 +71,7 @@ export const runTaskForThisAccount = async (request: Request, response: Response
   }
 };
 
-export const runAllNonRunningTasks = async () => {
+export const runAllNonRunningTasks = async (): Promise<void> => {
   const promisesOfAllTasks: Array<Promise<void>> = [];
   try {
     const [types, tasks] = await Promise.all([getAllTypes(), TxTasks.find({ isRunning: false })]);
@@ -84,7 +84,7 @@ export const runAllNonRunningTasks = async () => {
     console.error(error);
   }
 
-  return promisesOfAllTasks;
+  await Promise.all(promisesOfAllTasks);
 };
 
 async function getTransactions(pgClient: Client, accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
@@ -155,6 +155,8 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
         .catch((error: any) => console.error(error));
     }
 
+    // -------------------------------------------------
+    // TODO: Document what is happening in this section:
     let nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
     let index = 1;
     while (nextBlockTimestamp === minBlockTimestamp && transactions.length === length * index) {
@@ -172,5 +174,6 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
       minBlockTimestamp = nextBlockTimestamp;
       transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, length);
     }
+    // -------------------------------------------------
   }
 }
