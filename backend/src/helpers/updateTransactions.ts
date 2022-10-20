@@ -13,14 +13,20 @@ import { TxTypes } from '../models/TxTypes.js';
 import { CONNECTION_STRING, DEFAULT_LENGTH, TIMEOUT } from './config.js';
 import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
 
+// eslint-disable-next-line max-lines-per-function
 async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) {
+  console.log('runThisTaskByAccountId', { accountId });
   try {
     const txTask = await TxTasks.findOne({ accountId });
     if (txTask) {
       if (txTask.isRunning === false) {
+        const promisesOfAllTasks: Array<Promise<void>> = [];
         for (const type of types) {
-          await updateTransactions(txTask.accountId, type.name, DEFAULT_LENGTH);
+          const promise = updateTransactions(txTask.accountId, type.name, DEFAULT_LENGTH);
+          promisesOfAllTasks.push(promise);
         }
+
+        await Promise.all(promisesOfAllTasks);
 
         try {
           await TxTasks.findOneAndUpdate(
@@ -65,6 +71,7 @@ export const runAllNonRunningTasks = async () => {
   const promisesOfAllTasks: Array<Promise<void>> = [];
   try {
     const [types, tasks] = await Promise.all([getAllTypes(), TxTasks.find({ isRunning: false })]);
+    console.log(`types=${JSON.stringify(types.map((type) => type.name))}, tasks = ${JSON.stringify(tasks.map((task) => task.accountId))}`);
     for (const task of tasks) {
       const promise = runThisTaskByAccountId(task.accountId, types);
       promisesOfAllTasks.push(promise);
@@ -110,7 +117,7 @@ async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string)
 // eslint-disable-next-line max-lines-per-function
 export async function updateTransactions(accountId: AccountId, txType: string, length: number) {
   // TODO: Make this function more efficient (see if we can parallelize the queries instead of using so many `await`s).
-  // console.log(`updateTransactions(${accountId}, ${txType})`);
+  console.log(`updateTransactions(${accountId}, ${txType})`);
   const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: TIMEOUT });
   await pgClient.connect();
   // eslint-disable-next-line promise/valid-params
