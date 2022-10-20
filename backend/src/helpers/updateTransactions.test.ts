@@ -1,8 +1,8 @@
 // Run via `yarn test backend/src/helpers/updateTransactions.test.ts`.
 
 // https://jestjs.io/docs/setup-teardown#scoping
-
 import mongoose, { type Mongoose } from 'mongoose';
+import pg from 'pg';
 
 import { type RowOfExpectedOutput, type TxActionRow, type AccountId } from '../../../shared/types';
 import { getRowsOfExpectedOutput } from '../../test_helpers/internal/csvToJson';
@@ -12,7 +12,7 @@ import { TxActions, convertFromModelToTxActionRow, cleanExpectedOutputFromCsv } 
 import { TxTypes } from '../models/TxTypes';
 
 import { addTransactionTypeSqlToDatabase, DOT_SQL, getSqlFolder } from './addDefaultTypesTx';
-import { DEFAULT_LENGTH, mongoConnectionString } from './config';
+import { CONNECTION_STRING, DEFAULT_LENGTH, mongoConnectionString, TIMEOUT } from './config';
 import { updateTransactions } from './updateTransactions';
 
 const subfolder = process.env.BACKEND_FOLDER ?? '';
@@ -22,19 +22,23 @@ const prefix = '_tx_'; // This also gets used in the `t` script of `/package.jso
 describe('updateTransactions', () => {
   let connection: Mongoose;
   let sqlFolder: string;
+  let pgClient: pg.Client;
 
   beforeAll(async () => {
     // Before any of this suite starts running, connect to Mongo, connect to PostgreSQL, seed the PostgreSQL test database, and close the PostgreSQL test database connection.
     connection = await mongoose.connect(mongoConnectionString);
     sqlFolder = getSqlFolder(subfolder);
     const txTypesCountDocuments = await TxTypes.countDocuments();
-    console.log({ txTypesCountDocuments });
+    console.log({ txTypesCountDocuments, CONNECTION_STRING });
     await seedTheMockIndexerDatabase();
+    pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: TIMEOUT });
+    await pgClient.connect();
   });
 
   afterAll(async () => {
     // After all the tests of this suite finish, close the DB connection.
     await connection.disconnect();
+    await pgClient.end();
   });
 
   beforeEach(async () => {
@@ -57,7 +61,7 @@ describe('updateTransactions', () => {
     test(`${prefix} ${txType}`, async () => {
       const file = `${txType}${DOT_SQL}`;
       await addTransactionTypeSqlToDatabase(sqlFolder, file);
-      await updateTransactions(accountId, txType, DEFAULT_LENGTH);
+      await updateTransactions(pgClient, accountId, txType, DEFAULT_LENGTH);
       const txActions = await TxActions.find({
         accountId,
         txType,
@@ -103,7 +107,7 @@ describe('updateTransactions', () => {
       if (txType) {
         const file = `${txType}${DOT_SQL}`;
         await addTransactionTypeSqlToDatabase(sqlFolder, file);
-        await updateTransactions(accountId, txType, DEFAULT_LENGTH);
+        await updateTransactions(pgClient, accountId, txType, DEFAULT_LENGTH);
         const txActions = await TxActions.find({
           accountId,
           txType,

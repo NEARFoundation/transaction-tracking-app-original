@@ -20,14 +20,18 @@ async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) 
     const txTask = await TxTasks.findOne({ accountId });
     if (txTask) {
       if (txTask.isRunning === false) {
+        const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: TIMEOUT });
+        await pgClient.connect();
         const promisesOfAllTasks: Array<Promise<void>> = [];
         for (const type of types) {
-          const promise = updateTransactions(txTask.accountId, type.name, DEFAULT_LENGTH);
+          const promise = updateTransactions(pgClient, txTask.accountId, type.name, DEFAULT_LENGTH);
           promisesOfAllTasks.push(promise);
         }
 
+        console.log('now awaiting the resolution of each updateTransactions promise.');
         await Promise.all(promisesOfAllTasks);
-
+        console.log('All updateTransactions promises resolved.');
+        await pgClient.end();
         try {
           await TxTasks.findOneAndUpdate(
             { accountId: txTask.accountId },
@@ -54,7 +58,7 @@ async function getAllTypes(): Promise<TxTypeRow[]> {
   return types;
 }
 
-export const runTaskForThisAccount = async (request: Request, response: Response) => {
+export const runTaskForThisAccount = async (request: Request, response: Response): Promise<void> => {
   try {
     const types = await getAllTypes();
     const { accountId } = request.body;
@@ -115,25 +119,21 @@ async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string)
 }
 
 // eslint-disable-next-line max-lines-per-function
-export async function updateTransactions(accountId: AccountId, txType: string, length: number) {
-  // TODO: Make this function more efficient (see if we can parallelize the queries instead of using so many `await`s).
+export async function updateTransactions(pgClient: pg.Client, accountId: AccountId, txType: string, length: number): Promise<void> {
   console.log(`updateTransactions(${accountId}, ${txType})`);
-  const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: TIMEOUT });
-  await pgClient.connect();
   // eslint-disable-next-line promise/valid-params
   await TxTasks.findOneAndUpdate(
     { accountId },
     {
       isRunning: true,
     },
-  )
-    .then()
-    .catch((error: any) => console.error(error));
+  );
   let minBlockTimestamp = await getMostRecentBlockTimestamp(accountId, txType);
   //  console.log({ minBlockTimestamp });
 
   let transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, length);
   // console.log({ transactions });
+  console.log({ accountId }, transactions.length);
 
   while (transactions.length > 0) {
     for (const transaction of transactions) {
@@ -158,7 +158,7 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
     let nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
     let index = 1;
     while (nextBlockTimestamp === minBlockTimestamp && transactions.length === length * index) {
-      index++;
+      index += 1;
       const increasedLength = length * index;
       transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, increasedLength);
       nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
@@ -173,6 +173,4 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
       transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, length);
     }
   }
-
-  await pgClient.end();
 }
