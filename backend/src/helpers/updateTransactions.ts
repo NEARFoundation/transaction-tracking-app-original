@@ -118,6 +118,27 @@ async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string)
   return Number(mostRecentBlockTimestamp); // backend/src/models/TxActions.js uses Decimal128 for this field, which React can't display. https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-decimal.html
 }
 
+async function processTransaction(accountId: AccountId, txType: string, transaction: TxActionRow): Promise<void> {
+  console.log(getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp), 'processTransaction: ', accountId, transaction.transaction_hash);
+  const clonedTransaction = { ...transaction };
+  if (clonedTransaction.get_currency_by_contract) {
+    console.log('fungibleTokenContractAccountId', clonedTransaction.get_currency_by_contract);
+
+    // eslint-disable-next-line canonical/id-match
+    clonedTransaction.currency_transferred = await getCurrencyByContract(clonedTransaction.get_currency_by_contract);
+  }
+
+  if (clonedTransaction.pool_id) {
+    [clonedTransaction.currency_transferred, clonedTransaction.currency_transferred2] = await getCurrencyByPool(Number(clonedTransaction.pool_id));
+  }
+
+  try {
+    await TxActions.findOneAndUpdate({ transaction_hash: clonedTransaction.transaction_hash, txType }, getTxActionModel(accountId, txType, clonedTransaction), { upsert: true });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 // eslint-disable-next-line max-lines-per-function
 export async function updateTransactions(pgClient: pg.Client, accountId: AccountId, txType: string, length: number): Promise<void> {
   console.log(`updateTransactions(${accountId}, ${txType})`);
@@ -136,25 +157,13 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
   console.log({ accountId }, transactions.length);
 
   while (transactions.length > 0) {
+    const promises: Array<Promise<void>> = [];
     for (const transaction of transactions) {
-      // console.log('Received: ', getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp), transaction.transaction_hash);
-
-      if (transaction.get_currency_by_contract) {
-        // console.log('fungibleTokenContractAccountId', transaction.get_currency_by_contract);
-        // eslint-disable-next-line canonical/id-match
-        transaction.currency_transferred = await getCurrencyByContract(transaction.get_currency_by_contract);
-      }
-
-      if (transaction.pool_id) {
-        [transaction.currency_transferred, transaction.currency_transferred2] = await getCurrencyByPool(Number(transaction.pool_id));
-      }
-
-      // eslint-disable-next-line promise/valid-params
-      await TxActions.findOneAndUpdate({ transaction_hash: transaction.transaction_hash, txType }, getTxActionModel(accountId, txType, transaction), { upsert: true })
-        .then()
-        .catch((error: any) => console.error(error));
+      const promise = processTransaction(accountId, txType, transaction);
+      promises.push(promise);
     }
 
+    await Promise.all(promises);
     // -------------------------------------------------
     // TODO: Document what is happening in this section:
     let nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
