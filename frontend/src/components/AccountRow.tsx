@@ -1,7 +1,6 @@
 import { getFormattedUtcDatetime, getRelativeTimeOrUtc } from '../../../shared/helpers/datetime';
 import { AccountId, AccountRowProps } from '../../../shared/types';
 import { ALLOW_DELETING_FROM_DATABASE, API_BASE_URL, defaultRequestOptions } from '../helpers/config';
-import { addTaskForAccountId } from '../helpers/transactions';
 
 async function deleteFromDatabase(accountId: AccountId) {
   console.log('deleteFromDb', accountId);
@@ -13,7 +12,6 @@ async function deleteFromDatabase(accountId: AccountId) {
     .then(async (response) => {
       const data = await response.json();
       console.log(data);
-      addTaskForAccountId(accountId);
     })
     .catch((error) => {
       console.error(error);

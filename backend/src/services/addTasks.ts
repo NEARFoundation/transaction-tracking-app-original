@@ -37,9 +37,8 @@ export const addTasks = async (request: Request, response: Response) => {
       return response.status(BAD_REQUEST).send({ error: `Account does not exist in ${nodeUrl}.` });
     }
 
-    TxTasks.findOneAndUpdate({ accountId }, { accountId }, { upsert: true })
-      .then()
-      .catch((error) => console.error({ error }));
+    await TxTasks.findOneAndUpdate({ accountId }, { accountId }, { upsert: true });
+
     response.send(OK);
   } catch (error) {
     console.error(error);
