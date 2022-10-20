@@ -16,12 +16,9 @@ export const deleteAccountData = async (request: Request, response: Response) =>
       throw new Error('ALLOW_DELETING_FROM_DATABASE is not enabled.');
     }
 
-    TxTasks.deleteMany({ accountId })
-      .then()
-      .catch((error) => console.error({ error }));
-    TxActions.deleteMany({ accountId })
-      .then()
-      .catch((error) => console.error({ error }));
+    await TxTasks.deleteMany({ accountId });
+    await TxActions.deleteMany({ accountId });
+
     response.send(OK);
   } catch (error) {
     console.error(error);
