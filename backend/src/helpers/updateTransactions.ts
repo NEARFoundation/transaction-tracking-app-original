@@ -1,7 +1,7 @@
 import { performance } from 'perf_hooks';
 
 import { type Request, type Response } from 'express';
-import pg from 'pg';
+import pg, { type Client } from 'pg';
 
 import { getFormattedDatetimeUtcFromBlockTimestamp, millisToMinutesAndSeconds } from '../../../shared/helpers/datetime.js';
 // import { logSuccess } from '../../../shared/helpers/logging.js';
@@ -28,16 +28,20 @@ async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) 
       console.log('found a task', txTask.id);
       if (txTask.isRunning === false) {
         console.log('isRunning === false');
+        const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: STATEMENT_TIMEOUT, connectionTimeoutMillis: CONNECTION_TIMEOUT });
+        await pgClient.connect();
+        console.log('pgClient connected');
         const promisesOfAllTasks: Array<Promise<void>> = [];
         console.log('pushing all updateTransactions.');
         for (const type of types) {
-          const promise = updateTransactions(txTask.accountId, type.name, DEFAULT_LENGTH);
+          const promise = updateTransactions(pgClient, txTask.accountId, type.name, DEFAULT_LENGTH);
           promisesOfAllTasks.push(promise);
         }
 
         console.debug('Awaiting all updateTransactions promises.');
         await Promise.all(promisesOfAllTasks);
         logSuccess('Finished awaiting all updateTransactions promises.');
+        await pgClient.end();
         try {
           await TxTasks.findOneAndUpdate(
             { accountId: txTask.accountId },
@@ -100,12 +104,10 @@ export const runAllNonRunningTasks = async (): Promise<void> => {
   logSuccess('Finished awaiting all runThisTaskByAccountId promises.');
 };
 
-async function getTransactions(accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
+async function getTransactions(pgClient: Client, accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
   try {
     const txType: TxTypeRow | null = await TxTypes.findOne({ name: txTypeName });
     if (txType) {
-      const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: STATEMENT_TIMEOUT, connectionTimeoutMillis: CONNECTION_TIMEOUT });
-      await pgClient.connect();
       console.info('pgClient connected');
       console.info(`getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
       const startTime = performance.now();
@@ -114,7 +116,6 @@ async function getTransactions(accountId: AccountId, txTypeName: string, blockTi
       console.info(millisToMinutesAndSeconds(endTime - startTime), 'pgClient performance of getTransactions');
       const rows = result.rows as unknown as TxActionRow[];
       // console.log(JSON.stringify(rows));
-      await pgClient.end();
       return rows;
     } else {
       return [];
@@ -157,7 +158,7 @@ async function processTransaction(accountId: AccountId, txType: string, transact
 }
 
 // eslint-disable-next-line max-lines-per-function
-export async function updateTransactions(accountId: AccountId, txType: string, length: number): Promise<void> {
+export async function updateTransactions(pgClient: pg.Client, accountId: AccountId, txType: string, length: number): Promise<void> {
   console.log(`updateTransactions(${accountId}, ${txType})`);
   // eslint-disable-next-line promise/valid-params
   await TxTasks.findOneAndUpdate(
@@ -170,7 +171,7 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
   //  console.log({ minBlockTimestamp });
 
   console.debug('Awaiting getTransactions', accountId, txType);
-  let transactions = await getTransactions(accountId, txType, minBlockTimestamp, length);
+  let transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, length);
   // console.log({ transactions });
   console.log(`Starting the 'while' loop of updateTransactions ${txType}`);
   while (transactions.length > 0) {
@@ -194,7 +195,7 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
     while (nextBlockTimestamp === minBlockTimestamp && transactions.length === length * index) {
       index += 1;
       const increasedLength = length * index;
-      transactions = await getTransactions(accountId, txType, minBlockTimestamp, increasedLength);
+      transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, increasedLength);
       nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
     }
 
@@ -204,7 +205,7 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
 
     if (index === 1) {
       minBlockTimestamp = nextBlockTimestamp;
-      transactions = await getTransactions(accountId, txType, minBlockTimestamp, length);
+      transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, length);
     }
     // -------------------------------------------------
   }
