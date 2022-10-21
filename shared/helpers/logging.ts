@@ -15,7 +15,9 @@ const styles = {
 
 type Arguments = any;
 
+// TODO: Replace 'chalk' with a better library that doesn't need this util.inspect(() since it leads to weird displays of square brackets [].
 function getArgumentsPreserved(providedArguments: Arguments): string {
+  return providedArguments;
   // https://nodejs.org/en/knowledge/getting-started/how-to-use-util-inspect/
   // https://github.com/chalk/chalk/issues/118#issuecomment-1221385194
   return util.inspect(providedArguments, { colors: false, depth: null });
