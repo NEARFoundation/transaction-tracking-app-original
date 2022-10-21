@@ -136,7 +136,7 @@ async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string)
 }
 
 async function processTransaction(accountId: AccountId, txType: string, transaction: TxActionRow): Promise<void> {
-  console.log(getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp), 'processTransaction: ', accountId, transaction.transaction_hash);
+  console.log('processTransaction: ', accountId, transaction.transaction_hash, getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp));
   const clonedTransaction = { ...transaction };
   if (clonedTransaction.get_currency_by_contract) {
     console.log('fungibleTokenContractAccountId', clonedTransaction.get_currency_by_contract);
@@ -176,13 +176,14 @@ export async function updateTransactions(accountId: AccountId, txType: string, l
   while (transactions.length > 0) {
     const promises: Array<Promise<void>> = [];
     console.log('Pushing all processTransaction promises.');
-
+    console.group();
     for (const transaction of transactions) {
-      console.log('About to call processTransaction');
+      console.log('About to call processTransaction', transaction.transaction_hash);
       const promise = processTransaction(accountId, txType, transaction);
       promises.push(promise);
     }
 
+    console.groupEnd();
     logSuccess('Finished the `for` loop of pushing processTransaction promises (but not the `while` loop).');
     await Promise.all(promises);
     logSuccess('Finished awaiting all promises (but still in the `while` loop).');

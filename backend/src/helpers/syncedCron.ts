@@ -8,7 +8,7 @@ import { runAllNonRunningTasks } from './updateTransactions.js';
 export const SyncedCron = cron.schedule(
   CRON_SCHEDULE,
   async () => {
-    console.info('Awaiting runAllNonRunningTasks().');
+    console.debug('Awaiting runAllNonRunningTasks().');
     await runAllNonRunningTasks();
     logSuccess('Finished awaiting runAllNonRunningTasks. (Finished cron.)');
   },
