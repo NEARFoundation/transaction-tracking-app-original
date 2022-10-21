@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/index",
-    "dev": "node -r dotenv/config --loader ts-node/esm src/index.ts dotenv_config_path=.env.development.local",
+    "dev": "nodemon -r dotenv/config --esm src/index.ts dotenv_config_path=.env.development.local",
     "test": "DOTENV_CONFIG_PATH=.env.test jest"
   },
   "dependencies": {
