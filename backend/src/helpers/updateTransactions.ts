@@ -26,14 +26,15 @@ async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) 
         await pgClient.connect();
         console.log('pgClient connected');
         const promisesOfAllTasks: Array<Promise<void>> = [];
+        console.log('pushing all updateTransactions.');
         for (const type of types) {
           const promise = updateTransactions(pgClient, txTask.accountId, type.name, DEFAULT_LENGTH);
           promisesOfAllTasks.push(promise);
         }
 
-        console.log('now awaiting the resolution of each updateTransactions promise.');
+        console.log('awaiting all updateTransactions promises.');
         await Promise.all(promisesOfAllTasks);
-        console.log('All updateTransactions promises resolved.');
+        console.log('Finished awaiting all updateTransactions promises.');
         await pgClient.end();
         try {
           await TxTasks.findOneAndUpdate(
@@ -79,6 +80,7 @@ export const runAllNonRunningTasks = async (): Promise<void> => {
   try {
     const [types, tasks] = await Promise.all([getAllTypes(), TxTasks.find({ isRunning: false })]);
     console.log(`types=${JSON.stringify(types.map((type) => type.name))}, tasks = ${JSON.stringify(tasks.map((task) => task.accountId))}`);
+    console.log('pushing all runThisTaskByAccountId.');
     for (const task of tasks) {
       console.log('About to call runThisTaskByAccountId', task.accountId);
       const promise = runThisTaskByAccountId(task.accountId, types);
@@ -90,18 +92,20 @@ export const runAllNonRunningTasks = async (): Promise<void> => {
     console.error(error);
   }
 
+  console.log('awaiting all runThisTaskByAccountId promises.');
   await Promise.all(promisesOfAllTasks);
+  console.log('Finished awaiting all runThisTaskByAccountId promises.');
 };
 
 async function getTransactions(pgClient: Client, accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
   try {
     const txType: TxTypeRow | null = await TxTypes.findOne({ name: txTypeName });
     if (txType) {
-      // console.log(getFormattedUtcDatetimeNow(), `getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
+      console.log(getFormattedUtcDatetimeNow(), `getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
       const startTime = performance.now();
       const result = await pgClient.query(txType.sql, [accountId, blockTimestamp.toString(), length]);
       const endTime = performance.now();
-      // console.log(millisToMinutesAndSeconds(endTime - startTime), 'pgClient performance of getTransactions');
+      console.log(millisToMinutesAndSeconds(endTime - startTime), 'pgClient performance of getTransactions');
       const rows = result.rows as unknown as TxActionRow[];
       // console.log(JSON.stringify(rows));
       return rows;
@@ -158,18 +162,23 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
   let minBlockTimestamp = await getMostRecentBlockTimestamp(accountId, txType);
   //  console.log({ minBlockTimestamp });
 
+  console.log('awaiting getTransactions', accountId, txType);
   let transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, length);
   // console.log({ transactions });
   console.log({ accountId }, transactions.length);
 
   while (transactions.length > 0) {
     const promises: Array<Promise<void>> = [];
+    console.log('Pushing all processTransaction promises.');
     for (const transaction of transactions) {
+      console.log('About to call processTransaction');
       const promise = processTransaction(accountId, txType, transaction);
       promises.push(promise);
     }
 
+    console.log('Finished the `for` loop of pushing processTransaction promises (but not the `while` loop).');
     await Promise.all(promises);
+    console.log('Finished awaiting all promises (but still in the `while` loop).');
     // -------------------------------------------------
     // TODO: Document what is happening in this section:
     let nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
@@ -191,4 +200,6 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
     }
     // -------------------------------------------------
   }
+
+  console.log('Finished the `while` loop of updateTransactions');
 }
