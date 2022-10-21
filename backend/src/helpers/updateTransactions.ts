@@ -4,7 +4,7 @@ import { type Request, type Response } from 'express';
 import pg from 'pg';
 
 import { getFormattedDatetimeUtcFromBlockTimestamp, millisToMinutesAndSeconds } from '../../../shared/helpers/datetime.js';
-import { logSuccess } from '../../../shared/helpers/logging.js';
+// import { logSuccess } from '../../../shared/helpers/logging.js';
 import { OK, SERVER_ERROR } from '../../../shared/helpers/statusCodes.js';
 import { type AccountId, type TxActionRow, type TxTypeRow } from '../../../shared/types';
 import { TxActions, getTxActionModel } from '../models/TxActions.js';
@@ -13,6 +13,11 @@ import { TxTypes } from '../models/TxTypes.js';
 
 import { CONNECTION_STRING, CONNECTION_TIMEOUT, DEFAULT_LENGTH, STATEMENT_TIMEOUT } from './config.js';
 import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
+
+// TODO: Delete this temporary function (and instead import from shared/helpers/logging) once the Jest config works.
+function logSuccess(...args: any) {
+  console.log(...args);
+}
 
 // eslint-disable-next-line max-lines-per-function
 async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) {
