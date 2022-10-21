@@ -4,7 +4,7 @@ import chalk from 'chalk'; // https://www.npmjs.com/package/chalk
 
 import { getFormattedUtcDatetimeNow } from './datetime.js';
 
-const success = chalk.green;
+const success = chalk.bgGreen;
 
 const styles = {
   error: chalk.bold.red,
