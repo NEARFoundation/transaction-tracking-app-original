@@ -60,19 +60,23 @@ export function getLocaleStringToDecimals(amount: string, decimals: number, loca
  * @param locale {string} e.g. 'en-US' or 'de-DE'
  * @returns {string} e.g. 1,000.000000
  */
-export function round(amount: string, decimals = 0, divisorPower = 0, locale?: string): string {
-  if (divisorPower < 0) {
-    throw new Error('divisorPower must be >= 0');
-  }
+export function round(amount: string, decimals: number = 0, divisorPower: number = 0, locale?: string): string {
+  if (amount) {
+    if (divisorPower < 0) {
+      throw new Error('divisorPower must be >= 0');
+    }
 
-  const amountCleaned = amount.replaceAll('_', '');
-  const divisor = 10 ** divisorPower;
-  const precision = amount.length + decimals;
-  Decimal.set({ precision }); // https://mikemcl.github.io/decimal.js/#precision
-  const value: string = new Decimal(amountCleaned).div(divisor).toFixed(precision);
-  // console.log(`round(${amount}, decimals = ${decimals}, divisorPower = ${divisorPower}) = ${value}`, divisor);
-  const localeString = getLocaleStringToDecimals(value, decimals, locale);
-  return localeString;
+    const amountCleaned = amount.replaceAll('_', '');
+    const divisor = 10 ** divisorPower;
+    const precision = amount.length + decimals;
+    Decimal.set({ precision }); // https://mikemcl.github.io/decimal.js/#precision
+    const value: string = new Decimal(amountCleaned).div(divisor).toFixed(precision);
+    // console.log(`round(${amount}, decimals = ${decimals}, divisorPower = ${divisorPower}) = ${value}`, divisor);
+    const localeString = getLocaleStringToDecimals(value, decimals, locale);
+    return localeString;
+  } else {
+    return '';
+  }
 }
 
 /**
