@@ -7,6 +7,7 @@ import { getFormattedUtcDatetimeNow } from './datetime.js';
 const success = chalk.bgGreen;
 
 const styles = {
+  log: chalk,
   error: chalk.bold.red,
   warn: chalk.hex('#FFA500'), // Orange color
   info: chalk.gray,
@@ -15,20 +16,15 @@ const styles = {
 
 type Arguments = any;
 
-// TODO: Replace 'chalk' with a better library that doesn't need this util.inspect() since it leads to weird displays of square brackets [].
 function getArgumentsPreserved(providedArguments: Arguments): string {
-  return providedArguments;
+  // https://stackoverflow.com/a/74163827/
   // https://nodejs.org/en/knowledge/getting-started/how-to-use-util-inspect/
   // https://github.com/chalk/chalk/issues/118#issuecomment-1221385194
-  return util.inspect(providedArguments, { colors: false, depth: null });
+
+  return providedArguments.map((providedArgument: Arguments) => util.inspect(providedArgument, { colors: false, depth: null })).join(' ');
 }
 
-const originalLog = console.log; // https://developer.mozilla.org/en-US/docs/Web/API/console // https://stackoverflow.com/a/16259739/
-console.log = function (...providedArguments: Arguments) {
-  Reflect.apply(originalLog, this, [getFormattedUtcDatetimeNow(), ...providedArguments]);
-};
-
-for (const style of Object.keys(styles)) {
+for (const style of Object.keys(styles) as Array<keyof Console>) {
   const originalStyle = console[style];
   const callback = styles[style];
   console[style] = function (...providedArguments: Arguments) {
