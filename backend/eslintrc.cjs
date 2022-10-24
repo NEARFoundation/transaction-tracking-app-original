@@ -15,7 +15,7 @@ module.exports = {
   extends: ['near'],
   rules: {
     'canonical/sort-keys': 'off',
-    'no-console': 'off',
+    'no-console': 'warn',
     'consistent-return': 'off',
     'func-style': 'off',
     'import/extensions': 'off',
