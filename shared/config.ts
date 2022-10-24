@@ -2,6 +2,19 @@
 const contractName = process.env.CONTRACT_NAME ?? 'near-transactions-accounting-report';
 const localHome = process.env.HOME;
 const CHAIN = process.env.REACT_APP_CHAIN ?? process.env.CHAIN ?? 'mainnet';
+export const LOG_TO_CONSOLE = process.env.LOG_TO_CONSOLE ?? 'true';
+export const LOG_TO_CLOUDWATCH = process.env.LOG_TO_CLOUDWATCH ?? 'true';
+console.log({ LOG_TO_CONSOLE, LOG_TO_CLOUDWATCH });
+
+export const cloudwatchConfig = {
+  // https://javascript.plainenglish.io/set-up-a-logger-for-your-node-app-with-winston-and-cloudwatch-in-5-minutes-dec0c6c0d5b8
+  logGroupName: process.env.CLOUDWATCH_GROUP_NAME,
+  logStreamName: `${process.env.CLOUDWATCH_GROUP_NAME}-${process.env.NODE_ENV}`,
+  awsAccessKeyId: process.env.CLOUDWATCH_ACCESS_KEY_ID,
+  awsSecretKey: process.env.CLOUDWATCH_SECRET_KEY,
+  awsRegion: process.env.CLOUDWATCH_REGION,
+  messageFormatter: ({ level, message, additionalInfo }) => `[${level}]: ${message} \nAdditional Info: ${JSON.stringify(additionalInfo)}}`,
+};
 
 // eslint-disable-next-line max-lines-per-function
 const getConfig = () => {
