@@ -14,8 +14,8 @@ import { TxTypes } from '../models/TxTypes.js';
 import { CONNECTION_STRING, CONNECTION_TIMEOUT, DEFAULT_LENGTH, STATEMENT_TIMEOUT } from './config.js';
 import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
 
-// TODO: Delete this temporary function (and instead import from shared/helpers/logging) once the Jest config works.
-function logSuccess(...args: any) {
+// TODO: Replace this temporary function with something that prints green console logs (see also https://near-foundation.atlassian.net/jira/software/c/projects/TTA/boards/5?modal=detail&selectedIssue=TTA-34).
+export function logSuccess(...args: any) {
   console.log(...args);
 }
 
