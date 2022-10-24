@@ -1,5 +1,6 @@
 import winston from 'winston';
 import WinstonCloudWatch from 'winston-cloudwatch';
+import type * as Transport from 'winston-transport';
 import { type AbstractConfigSetLevels } from 'winston/lib/winston/config/index.js';
 
 import { cloudwatchConfig, LOG_TO_CLOUDWATCH, LOG_TO_CONSOLE } from '../config.js';
@@ -50,8 +51,7 @@ function getMaxLevelName(levels: AbstractConfigSetLevels): string {
   return maxLevelName;
 }
 
-const transports: any[] = [];
-// TODO: Add different transports based on environment variables. E.g. https://www.npmjs.com/package/datadog-winston or https://www.npmjs.com/package/winston-transport-rollbar-3
+const transports: Transport[] = [];
 if (LOG_TO_CONSOLE === 'true') {
   transports.push(new winston.transports.Console({ format: simpleConsoleLogging, level: getMaxLevelName(myCustomLevels.levels) }));
 }
