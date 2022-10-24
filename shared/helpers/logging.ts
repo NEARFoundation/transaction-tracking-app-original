@@ -1,3 +1,4 @@
+import { type TransformableInfo, type ColorizeOptions } from 'logform';
 import winston from 'winston';
 import WinstonCloudWatch from 'winston-cloudwatch';
 import type * as Transport from 'winston-transport';
@@ -28,13 +29,17 @@ const myCustomLevels: { colors: { [key: string]: string }; levels: AbstractConfi
   },
 };
 
+const colorizerOptions: ColorizeOptions = { level: true, message: false };
+const colorizer = winston.format.colorize(colorizerOptions);
+
 const simpleConsoleLogging = winston.format.combine(
   // Simple console logging for local environment.
   winston.format.timestamp(),
-  winston.format.simple(),
-  winston.format.printf((message) => {
-    const colorizerOptions = { level: true, message: false }; // TODO: Figure out why this is colorizing the message too.
-    return winston.format.colorize(colorizerOptions).colorize(message.level, `${message.timestamp} ${message.level}: ${message.message}`); // https://github.com/winstonjs/winston/issues/1388#issuecomment-432932959
+  winston.format.printf((info: TransformableInfo) => {
+    const { level, message, timestamp, ...rest } = info;
+    const coloredTimestampAndLevel = colorizer.colorize(level, `${timestamp} ${level}:`);
+    const syntaxHighlightedObjects = Object.keys(rest).length > 0 ? JSON.stringify(rest) : ''; // TODO: How can we reenable the syntax coloring that console.log had by default? https://stackoverflow.com/questions/74186705/how-to-preserve-default-syntax-highlighting-colors-in-javascript-console
+    return `${coloredTimestampAndLevel} ${message} ${syntaxHighlightedObjects}`; // https://github.com/winstonjs/winston/issues/1388#issuecomment-432932959
   }),
 );
 
