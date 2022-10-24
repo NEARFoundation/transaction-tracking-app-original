@@ -1,42 +1,45 @@
-import util from 'util';
+import winston from 'winston';
+import { type AbstractConfigSetLevels } from 'winston/lib/winston/config/index.js';
 
-import chalk from 'chalk'; // https://www.npmjs.com/package/chalk
+const simpleConsoleLogging = winston.format.combine( // Simple console logging for local environment.
+  winston.format.timestamp(),
+  winston.format.simple(),
+  winston.format.printf(message =>
+    winston.format.colorize().colorize(message.level, `${message.timestamp} ${message.level}: ${message.message}`) // https://github.com/winstonjs/winston/issues/1388#issuecomment-432932959
+  )
+);
+const transports: any[] = [];
+// TODO: Add different transports based on environment variables.
+// if (process.env.ENABLE_CONSOLE_LOGGER === 'true') {
+  transports.push(new winston.transports.Console({ format: simpleConsoleLogging }))
+// }
 
-import { getFormattedUtcDatetimeNow } from './datetime.js';
-
-const success = chalk.bgGreen;
-
-const styles = {
-  log: chalk,
-  error: chalk.bold.red,
-  warn: chalk.hex('#FFA500'), // Orange color
-  info: chalk.gray,
-  debug: chalk.blue,
+const myCustomLevels: { colors: { [key: string]: string }, levels: AbstractConfigSetLevels } = { 
+  levels: { // These are the defaults. https://github.com/winstonjs/winston#logging-levels
+    error: 0,
+    warn: 1,
+    info: 2,
+    // http: 3,
+    success: 3,
+    verbose: 4,
+    debug: 5,
+    silly: 6
+  },
+  colors: { // https://github.com/winstonjs/winston#using-custom-logging-levels
+    error: 'redBG',
+    warn: 'yellow',
+    info: 'blue',
+    debug: 'magenta',
+    silly: 'gray',
+    success: 'greenBG'
+  }
 };
 
-type Arguments = any;
+export const logger:any = winston.createLogger({
+  levels: myCustomLevels.levels,
+  format: simpleConsoleLogging,
+  // defaultMeta: { service: 'user-service' },
+  transports,
+});
 
-function getArgumentsPreserved(providedArguments: Arguments): string {
-  // https://stackoverflow.com/a/74163827/
-  // https://nodejs.org/en/knowledge/getting-started/how-to-use-util-inspect/
-  // https://github.com/chalk/chalk/issues/118#issuecomment-1221385194
-
-  return providedArguments.map((providedArgument: Arguments) => util.inspect(providedArgument, { colors: false, depth: null })).join(' ');
-}
-
-for (const style of Object.keys(styles) as Array<keyof Console>) {
-  const originalStyle = console[style];
-  const callback = styles[style];
-  console[style] = function (...providedArguments: Arguments) {
-    Reflect.apply(originalStyle, this, [getFormattedUtcDatetimeNow(), callback(getArgumentsPreserved(providedArguments))]);
-  };
-}
-
-/**
- * NOTE: Currently, importing this function is the only way that console.log, console.warn, and other functions get overwritten above.
- *
- * @param providedArguments
- */
-export function logSuccess(...providedArguments: Arguments) {
-  console.log(success(getArgumentsPreserved(providedArguments)));
-}
+winston.addColors(myCustomLevels.colors); // https://github.com/winstonjs/winston#using-custom-logging-levels
