@@ -4,7 +4,6 @@ import { type Request, type Response } from 'express';
 import pg, { type Client } from 'pg';
 
 import { getFormattedDatetimeUtcFromBlockTimestamp, millisToMinutesAndSeconds } from '../../../shared/helpers/datetime.js';
-// import { logSuccess } from '../../../shared/helpers/logging.js';
 import { OK, SERVER_ERROR } from '../../../shared/helpers/statusCodes.js';
 import { type AccountId, type TxActionRow, type TxTypeRow } from '../../../shared/types';
 import { TxActions, getTxActionModel } from '../models/TxActions.js';
