@@ -4,7 +4,7 @@
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
-    "install_all": "(cd frontend && yarn install) && (cd backend && yarn install) && (cd shared && yarn install)",
+    "install_all": "yarn install && (cd frontend && yarn install) && (cd backend && yarn install) && (cd shared && yarn install)",
     "build": "(cd ./frontend && yarn build)",
     "start": "(cd frontend && yarn start)",
     "dev": "(cd frontend && yarn dev)",
