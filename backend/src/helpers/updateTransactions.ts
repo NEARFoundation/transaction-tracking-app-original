@@ -37,9 +37,9 @@ async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) 
           promisesOfAllTasks.push(promise);
         }
 
-        console.debug('Awaiting all updateTransactions promises.');
+        console.debug(`Awaiting all updateTransactions promises for ${accountId}.`);
         await Promise.all(promisesOfAllTasks);
-        logSuccess('Finished awaiting all updateTransactions promises.');
+        logSuccess(`========= Finished awaiting all updateTransactions promises for ${accountId}.`);
         await pgClient.end();
         try {
           await TxTasks.findOneAndUpdate(
@@ -101,7 +101,7 @@ export const runAllNonRunningTasks = async (): Promise<void> => {
 
   console.debug('Awaiting all runThisTaskByAccountId promises.');
   await Promise.all(promisesOfAllTasks);
-  logSuccess('Finished awaiting all runThisTaskByAccountId promises.');
+  logSuccess('========= Finished awaiting all runThisTaskByAccountId promises.');
 };
 
 async function getTransactions(pgClient: Client, accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
@@ -152,6 +152,7 @@ async function processTransaction(accountId: AccountId, txType: string, transact
 
   try {
     await TxActions.findOneAndUpdate({ transaction_hash: clonedTransaction.transaction_hash, txType }, getTxActionModel(accountId, txType, clonedTransaction), { upsert: true });
+    console.log(`Saved to Mongo cache (TxActions): ${accountId} ${clonedTransaction.transaction_hash}`);
   } catch (error) {
     console.error(error);
   }
@@ -176,7 +177,7 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
   console.log(`Starting the 'while' loop of updateTransactions ${txType}`);
   while (transactions.length > 0) {
     const promises: Array<Promise<void>> = [];
-    console.log('Pushing all processTransaction promises.');
+    console.log(`Pushing all processTransaction promises for ${accountId} ${txType}.`);
     console.group();
     for (const transaction of transactions) {
       console.log('About to call processTransaction', transaction.transaction_hash);
@@ -186,8 +187,9 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
 
     console.groupEnd();
     logSuccess('Finished the `for` loop of pushing processTransaction promises (but not the `while` loop).');
+    console.debug(`Awaiting all updateTransactions promises for ${accountId} ${txType}.`);
     await Promise.all(promises);
-    logSuccess('Finished awaiting all promises (but still in the `while` loop).');
+    logSuccess(`========= Finished awaiting all promises (but still in the 'while' loop) for ${accountId} ${txType}.`);
     // -------------------------------------------------
     // TODO: Document what is happening in this section:
     let nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
@@ -210,5 +212,5 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
     // -------------------------------------------------
   }
 
-  logSuccess(`Finished the 'while' loop of updateTransactions ${txType}`);
+  logSuccess(`========= Finished the 'while' loop of updateTransactions ${txType}`);
 }
