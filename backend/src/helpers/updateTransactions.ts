@@ -19,8 +19,8 @@ export function logSuccess(...args: any) {
 }
 
 // eslint-disable-next-line max-lines-per-function
-async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) {
-  console.log('runThisTaskByAccountId', { accountId });
+async function updateThisAccount(accountId: AccountId, types: TxTypeRow[]) {
+  console.log('updateThisAccount', { accountId });
   try {
     const txTask = await TxTasks.findOne({ accountId });
     if (txTask) {
@@ -72,7 +72,7 @@ export const runTaskForThisAccount = async (request: Request, response: Response
     const types = await getAllTypes();
     const { accountId } = request.body;
     console.log('runTaskForThisAccount', { accountId });
-    await runThisTaskByAccountId(accountId, types);
+    await updateThisAccount(accountId, types);
     response.send(OK);
   } catch (error) {
     console.error(error);
@@ -86,11 +86,11 @@ export const runAllNonRunningTasks = async (): Promise<void> => {
     const [types, tasks] = await Promise.all([getAllTypes(), TxTasks.find({ isRunning: false })]);
     console.log(`types=${JSON.stringify(types.map((type) => type.name))}`);
     console.log(`tasks = ${JSON.stringify(tasks.map((task) => task.accountId))}`);
-    console.log('pushing all runThisTaskByAccountId.');
+    console.log('pushing all updateThisAccount.');
 
     for (const task of tasks) {
-      console.info('About to call runThisTaskByAccountId', task.accountId);
-      const promise = runThisTaskByAccountId(task.accountId, types);
+      console.info('About to call updateThisAccount', task.accountId);
+      const promise = updateThisAccount(task.accountId, types);
       promisesOfAllTasks.push(promise);
     }
 
@@ -99,9 +99,9 @@ export const runAllNonRunningTasks = async (): Promise<void> => {
     console.error(error);
   }
 
-  console.debug('Awaiting all runThisTaskByAccountId promises.');
+  console.debug('Awaiting all updateThisAccount promises.');
   await Promise.all(promisesOfAllTasks);
-  logSuccess('========= Finished awaiting all runThisTaskByAccountId promises.');
+  logSuccess('========= Finished awaiting all updateThisAccount promises.');
 };
 
 async function getTransactions(pgClient: Client, accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
