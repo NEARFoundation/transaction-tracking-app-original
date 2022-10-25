@@ -84,7 +84,8 @@ export const runAllNonRunningTasks = async (): Promise<void> => {
   const promisesOfAllTasks: Array<Promise<void>> = [];
   try {
     const [types, tasks] = await Promise.all([getAllTypes(), TxTasks.find({ isRunning: false })]);
-    console.log(`types=${JSON.stringify(types.map((type) => type.name))}, tasks = ${JSON.stringify(tasks.map((task) => task.accountId))}`);
+    console.log(`types=${JSON.stringify(types.map((type) => type.name))}`);
+    console.log(`tasks = ${JSON.stringify(tasks.map((task) => task.accountId))}`);
     console.log('pushing all runThisTaskByAccountId.');
 
     for (const task of tasks) {

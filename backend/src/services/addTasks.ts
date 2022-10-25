@@ -24,6 +24,10 @@ const accountExists = async (accountId: AccountId) => {
   }
 };
 
+export async function addTaskForAccount(accountId: AccountId) {
+  await TxTasks.findOneAndUpdate({ accountId }, { accountId }, { upsert: true });
+}
+
 // eslint-disable-next-line consistent-return
 export const addTasks = async (request: Request, response: Response) => {
   const { accountId } = request.body;
@@ -37,7 +41,7 @@ export const addTasks = async (request: Request, response: Response) => {
       return response.status(BAD_REQUEST).send({ error: `Account does not exist in ${nodeUrl}.` });
     }
 
-    await TxTasks.findOneAndUpdate({ accountId }, { accountId }, { upsert: true });
+    await addTaskForAccount(accountId);
 
     response.send(OK);
   } catch (error) {

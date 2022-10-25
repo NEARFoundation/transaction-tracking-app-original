@@ -52,7 +52,7 @@ export default function AccountRow({
           {accountId}
         </div>
       </td>
-      <td>{accountStatus ? accountStatus.status : null}</td>
+      <td className="max-width-none">{accountStatus ? accountStatus.status : null}</td>
       <td className="fixed-width" title={utc}>
         {getRelativeTimeOrUtc(utc)}
       </td>
