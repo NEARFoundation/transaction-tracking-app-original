@@ -24,12 +24,12 @@ async function updateThisAccount(accountId: AccountId, types: TxTypeRow[]) {
   try {
     const txTask = await TxTasks.findOne({ accountId });
     if (txTask) {
-      console.log('found a task', txTask.id);
+      // console.log('found a task', txTask.id);
       if (txTask.isRunning === false) {
-        console.log('isRunning === false');
+        // console.log('isRunning === false');
         const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: STATEMENT_TIMEOUT, connectionTimeoutMillis: CONNECTION_TIMEOUT });
         await pgClient.connect();
-        console.log('pgClient connected');
+        // console.log('pgClient connected');
         const promisesOfAllTasks: Array<Promise<void>> = [];
         console.log('pushing all updateTransactions.');
         for (const type of types) {
@@ -108,7 +108,6 @@ async function getTransactions(pgClient: Client, accountId: AccountId, txTypeNam
   try {
     const txType: TxTypeRow | null = await TxTypes.findOne({ name: txTypeName });
     if (txType) {
-      console.info('pgClient connected');
       console.info(`getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
       const startTime = performance.now();
       const result = await pgClient.query(txType.sql, [accountId, blockTimestamp.toString(), length]);
