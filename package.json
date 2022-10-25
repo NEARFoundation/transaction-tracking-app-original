@@ -8,6 +8,7 @@
     "build": "(cd ./frontend && yarn build)",
     "start": "(cd frontend && yarn start)",
     "dev": "(cd frontend && yarn dev)",
+    "dropActionsAndTasks": "yarn ts-node --esm ./backend/dropActionsAndTasks.ts",
     "update_test_data": "export $(grep -v '^#' backend/.env.development.local | xargs) && BACKEND_FOLDER=backend/ ./backend/test_helpers/updateTestData.sh",
     "test": "DOTENV_CONFIG_PATH=.env.test jest",
     "t": "(cd backend && DOTENV_CONFIG_PATH=.env.test jest --testNamePattern=\"_tx_\" src/helpers/updateTransactions.test.ts)",
