@@ -15,17 +15,17 @@ import { CONNECTION_STRING, CONNECTION_TIMEOUT, DEFAULT_LENGTH, STATEMENT_TIMEOU
 import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
 
 // eslint-disable-next-line max-lines-per-function
-async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) {
-  logger.info('runThisTaskByAccountId', { accountId });
+async function updateThisAccount(accountId: AccountId, types: TxTypeRow[]) {
+  logger.info('updateThisAccount', { accountId });
   try {
     const txTask = await TxTasks.findOne({ accountId });
     if (txTask) {
-      logger.info('found a task', txTask.id);
+      // logger.info('found a task', txTask.id);
       if (txTask.isRunning === false) {
-        logger.info('isRunning === false');
+        // logger.info('isRunning === false');
         const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: STATEMENT_TIMEOUT, connectionTimeoutMillis: CONNECTION_TIMEOUT });
         await pgClient.connect();
-        logger.info('pgClient connected');
+        // logger.info('pgClient connected');
         const promisesOfAllTasks: Array<Promise<void>> = [];
         logger.info('pushing all updateTransactions.');
         for (const type of types) {
@@ -33,9 +33,9 @@ async function runThisTaskByAccountId(accountId: AccountId, types: TxTypeRow[]) 
           promisesOfAllTasks.push(promise);
         }
 
-        logger.debug('Awaiting all updateTransactions promises.');
+        logger.debug(`Awaiting all updateTransactions promises for ${accountId}.`);
         await Promise.all(promisesOfAllTasks);
-        logger.success('Finished awaiting all updateTransactions promises.');
+        logger.success(`Finished awaiting all updateTransactions promises for ${accountId}.`);
         await pgClient.end();
         try {
           await TxTasks.findOneAndUpdate(
@@ -68,8 +68,8 @@ export const runTaskForThisAccount = async (request: Request, response: Response
   try {
     const types = await getAllTypes();
     const { accountId } = request.body;
-    logger.info('runTaskForThisAccount', { accountId });
-    await runThisTaskByAccountId(accountId, types);
+    logger.info('updateThisAccount', { accountId });
+    await updateThisAccount(accountId, types);
     response.send(OK);
   } catch (error) {
     logger.error(error);
@@ -81,12 +81,13 @@ export const runAllNonRunningTasks = async (): Promise<void> => {
   const promisesOfAllTasks: Array<Promise<void>> = [];
   try {
     const [types, tasks] = await Promise.all([getAllTypes(), TxTasks.find({ isRunning: false })]);
-    logger.info(`types=${JSON.stringify(types.map((type) => type.name))}, tasks = ${JSON.stringify(tasks.map((task) => task.accountId))}`);
-    logger.info('pushing all runThisTaskByAccountId.');
+    logger.info(`types = ${JSON.stringify(types.map((type) => type.name))}`);
+    logger.info(`tasks = ${JSON.stringify(tasks.map((task) => task.accountId))}`);
+    logger.info('pushing all updateThisAccount.');
 
     for (const task of tasks) {
-      logger.info('About to call runThisTaskByAccountId', task.accountId);
-      const promise = runThisTaskByAccountId(task.accountId, types);
+      logger.info('About to call updateThisAccount', task.accountId);
+      const promise = updateThisAccount(task.accountId, types);
       promisesOfAllTasks.push(promise);
     }
 
@@ -104,7 +105,6 @@ async function getTransactions(pgClient: Client, accountId: AccountId, txTypeNam
   try {
     const txType: TxTypeRow | null = await TxTypes.findOne({ name: txTypeName });
     if (txType) {
-      logger.info('pgClient connected');
       logger.info(`getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
       const startTime = performance.now();
       const result = await pgClient.query(txType.sql, [accountId, blockTimestamp.toString(), length]);
@@ -148,6 +148,7 @@ async function processTransaction(accountId: AccountId, txType: string, transact
 
   try {
     await TxActions.findOneAndUpdate({ transaction_hash: clonedTransaction.transaction_hash, txType }, getTxActionModel(accountId, txType, clonedTransaction), { upsert: true });
+    logger.info(`Saved to Mongo cache (TxActions): ${accountId} ${clonedTransaction.transaction_hash}`);
   } catch (error) {
     logger.error(error);
   }
@@ -172,7 +173,7 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
   logger.info(`Starting the 'while' loop of updateTransactions ${txType}`);
   while (transactions.length > 0) {
     const promises: Array<Promise<void>> = [];
-    logger.info('Pushing all processTransaction promises.');
+    logger.info(`Pushing all processTransaction promises for ${accountId} ${txType}.`);
 
     for (const transaction of transactions) {
       logger.info('About to call processTransaction', transaction.transaction_hash);
@@ -181,8 +182,9 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
     }
 
     logger.success('Finished the `for` loop of pushing processTransaction promises (but not the `while` loop).');
+    logger.debug(`Awaiting all updateTransactions promises for ${accountId} ${txType}.`);
     await Promise.all(promises);
-    logger.success('Finished awaiting all promises (but still in the `while` loop).');
+    logger.success(`Finished awaiting all promises (but still in the 'while' loop) for ${accountId} ${txType}.`);
     // -------------------------------------------------
     // TODO: Document what is happening in this section:
     let nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;

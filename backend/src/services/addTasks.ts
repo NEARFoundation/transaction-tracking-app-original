@@ -16,7 +16,7 @@ const TOP_LEVEL_ACCOUNT_SUFFIX = `.${TOP_LEVEL_DOMAIN}`;
 
 const connection = getNearApiConnection(nodeUrl);
 
-const accountExists = async (accountId: AccountId) => {
+const accountExists = async (accountId: AccountId): Promise<boolean> => {
   try {
     await new nearAPI.Account(connection, accountId).state();
     return true;
@@ -25,20 +25,26 @@ const accountExists = async (accountId: AccountId) => {
   }
 };
 
+export async function addTaskForAccount(accountId: AccountId): Promise<void> {
+  await TxTasks.findOneAndUpdate({ accountId }, { accountId }, { upsert: true });
+}
+
 // eslint-disable-next-line consistent-return
-export const addTasks = async (request: Request, response: Response) => {
+export const addTasks = async (request: Request, response: Response): Promise<void> => {
   const { accountId } = request.body;
   console.log('addTasks', { accountId });
   try {
     if (!accountId.endsWith(TOP_LEVEL_ACCOUNT_SUFFIX) && accountId !== TOP_LEVEL_DOMAIN) {
-      return response.status(BAD_REQUEST).send({ error: `Not allowed. Account ID must end with '${TOP_LEVEL_ACCOUNT_SUFFIX}'.` });
+      response.status(BAD_REQUEST).send({ error: `Not allowed. Account ID must end with '${TOP_LEVEL_ACCOUNT_SUFFIX}'.` });
+      return;
     }
 
     if (!(await accountExists(accountId))) {
-      return response.status(BAD_REQUEST).send({ error: `Account does not exist in ${nodeUrl}.` });
+      response.status(BAD_REQUEST).send({ error: `Account does not exist in ${nodeUrl}.` });
+      return;
     }
 
-    await TxTasks.findOneAndUpdate({ accountId }, { accountId }, { upsert: true });
+    await addTaskForAccount(accountId);
 
     response.send(OK);
   } catch (error) {
