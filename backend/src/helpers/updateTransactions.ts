@@ -81,8 +81,14 @@ export const runAllNonRunningTasks = async (): Promise<void> => {
   const promisesOfAllTasks: Array<Promise<void>> = [];
   try {
     const [types, tasks] = await Promise.all([getAllTypes(), TxTasks.find({ isRunning: false })]);
-    logger.info(`types = ${JSON.stringify(types.map((type) => type.name))}`);
-    logger.info(`tasks = ${JSON.stringify(tasks.map((task) => task.accountId))}`);
+    logger.info(
+      `types`,
+      types.map((type) => type.name),
+    );
+    logger.info(
+      `tasks`,
+      tasks.map((task) => task.accountId),
+    );
     logger.info('pushing all updateThisAccount.');
 
     for (const task of tasks) {
