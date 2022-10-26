@@ -11,7 +11,8 @@ const nearConfig = getConfig();
 
 const { nodeUrl } = nearConfig;
 
-const TOP_LEVEL_ACCOUNT_SUFFIX = '.near'; // Should this come from shared/config.ts?
+const TOP_LEVEL_DOMAIN = 'near'; // Should this come from shared/config.ts?
+const TOP_LEVEL_ACCOUNT_SUFFIX = `.${TOP_LEVEL_DOMAIN}`;
 
 const connection = getNearApiConnection(nodeUrl);
 
@@ -33,7 +34,7 @@ export const addTasks = async (request: Request, response: Response): Promise<vo
   const { accountId } = request.body;
   console.log('addTasks', { accountId });
   try {
-    if (!accountId.endsWith(TOP_LEVEL_ACCOUNT_SUFFIX)) {
+    if (!accountId.endsWith(TOP_LEVEL_ACCOUNT_SUFFIX) && accountId !== TOP_LEVEL_DOMAIN) {
       response.status(BAD_REQUEST).send({ error: `Not allowed. Account ID must end with '${TOP_LEVEL_ACCOUNT_SUFFIX}'.` });
       return;
     }

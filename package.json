@@ -16,6 +16,7 @@
     "backend_dev": "(cd backend && yarn dev)"
   },
   "devDependencies": {
+    "@nearfoundation/near-prettier-config": "^1.0.1",
     "@shelf/jest-mongodb": "^4.1.1",
     "@types/jest": "^29.1.2",
     "csvjson-json2csv": "^1.0.3",
