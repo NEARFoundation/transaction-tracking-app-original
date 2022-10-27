@@ -18,7 +18,8 @@ for (const rowOfExpectedOutput of rowsOfExpectedOutput) {
   transactionHashes.push(`('${rowOfExpectedOutput.transaction_hash}')`);
 }
 
-const sqlOutput = `CREATE TEMP TABLE transactionHashes AS
+const sqlOutput = `DROP TABLE IF EXISTS transactionHashes;
+CREATE TEMP TABLE transactionHashes AS
 WITH t (transactionHash) AS (
  VALUES
  ${transactionHashes.join(',\n')}

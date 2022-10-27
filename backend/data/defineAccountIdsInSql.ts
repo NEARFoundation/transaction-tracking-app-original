@@ -12,7 +12,8 @@ const accountIds = JSON.parse(accountIdsToCheckJson);
 console.log({ accountIds });
 const accountIdsFilename = './backend/data/accountIds.sql';
 
-const sqlOutput = `CREATE TEMP TABLE accountIds AS
+const sqlOutput = `DROP TABLE IF EXISTS accountIds;
+CREATE TEMP TABLE accountIds AS
 WITH a (accountId) AS (
  VALUES
  ${accountIds.map((accountId: AccountId) => `('${accountId}')`).join(',\n')}
