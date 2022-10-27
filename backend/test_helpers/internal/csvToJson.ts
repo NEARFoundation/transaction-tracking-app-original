@@ -6,8 +6,7 @@ import fs from 'node:fs';
 import csv2json from 'csvjson-csv2json';
 
 import { type RowOfExpectedOutput } from '../../../shared/types';
-
-const subfolder = process.env.BACKEND_FOLDER ?? '';
+import { subfolder } from '../../src/helpers/config.js';
 
 const csvFilename = `./${subfolder}test_helpers/expectedOutput.csv`;
 
