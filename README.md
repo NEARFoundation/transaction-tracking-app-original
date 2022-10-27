@@ -62,7 +62,10 @@ Go ahead and play with the app and the code. As you make frontend code changes, 
 ## Setting up Mongo and MongoDB Shell
 
 ```
-brew install mongodb-community@5.0
+brew tap mongodb/brew
+brew update -v
+brew install mongodb-community@6.0
+brew services start mongodb-community@6.0
 brew install mongosh
 mongosh
 use admin
