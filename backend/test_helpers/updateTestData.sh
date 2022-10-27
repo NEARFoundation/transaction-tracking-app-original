@@ -1,6 +1,6 @@
 # Before using this file, ensure that backend/test_helpers/expectedOutput.csv contains the values that you want.
-# Run this file like `POSTGRESQL_CONNECTION_STRING=___ ./backend/test_helpers/updateTestData.sh`, but replace ___ with your 
-# value for POSTGRESQL_CONNECTION_STRING from your `backend/.env.development.local` file.
+# Run this file like `POSTGRESQL_CONNECTION_STRING=___ ./backend/test_helpers/updateTestData.sh`, but replace ___ with 
+# a value for POSTGRESQL_CONNECTION_STRING like in your `backend/.env.development.local` file but pointing to the remote indexer.
 
 # TABLES is a variable storing comma-separated table names each prepended with "temp_test_export_". These are the 6 tables of the indexer database that this app needs to read from. The prefix is meant to clarify to anyone who happens to be browsing the private indexer DB at the time that these tables are special ephemeral tables that are about to be deleted.
 TABLES=temp_test_export_transactions,temp_test_export_receipts,temp_test_export_execution_outcomes,temp_test_export_blocks,temp_test_export_action_receipt_actions,temp_test_export_transaction_actions

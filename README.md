@@ -42,10 +42,17 @@ To run this project locally:
    \du
    CREATE ROLE testuser WITH LOGIN PASSWORD 'secret';
    ALTER ROLE testuser CREATEDB;
+   CREATE ROLE dev WITH LOGIN PASSWORD 'public';
+   ALTER ROLE dev CREATEDB;
    \q
    psql postgres -U testuser
    CREATE DATABASE tta_test_db;
    GRANT ALL PRIVILEGES ON DATABASE tta_test_db TO testuser;
+   \list
+   \q
+   psql postgres -U dev
+   CREATE DATABASE local_explorer;
+   GRANT ALL PRIVILEGES ON DATABASE local_explorer TO dev;
    \list
    \q
    ```
@@ -107,6 +114,10 @@ The output of `updateTestData.sh` is `backend/test_helpers/internal/testData.sql
 The inputs for `backend/src/helpers/updateTransactions.test.ts` come from `expectedOutput.csv` (its transaction hashes and account IDs), and of course so do the expected outputs.
 
 Then run `yarn test` to run the tests.
+
+# Updating seed files for local database and test database
+
+# TODO: Explain how to get permissions.
 
 # Other Helpful Docs
 

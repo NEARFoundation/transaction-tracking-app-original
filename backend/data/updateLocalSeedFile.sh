@@ -1,6 +1,6 @@
 
-# Run this file like `POSTGRESQL_CONNECTION_STRING=___ ./backend/data/updateLocalSeedFile.sh`, but replace ___ with your 
-# value for POSTGRESQL_CONNECTION_STRING from your `backend/.env.development.local` file.
+# Run this file like `POSTGRESQL_CONNECTION_STRING=___ ./backend/data/updateLocalSeedFile.sh`, but replace ___ with 
+# a value for POSTGRESQL_CONNECTION_STRING like in your `backend/.env.development.local` file but pointing to the remote indexer.
 
 # TABLES is a variable storing comma-separated table names each prepended with "temp_test_export_". These are the 6 tables of the indexer database that this app needs to read from. The prefix is meant to clarify to anyone who happens to be browsing the private indexer DB at the time that these tables are special ephemeral tables that are about to be deleted.
 TABLES=temp_test_export_transactions,temp_test_export_receipts,temp_test_export_execution_outcomes,temp_test_export_blocks,temp_test_export_action_receipt_actions,temp_test_export_transaction_actions
@@ -28,7 +28,7 @@ echo "Calling createTempTablesFilteredToSpecificAccounts..."
 psql -Atx $POSTGRESQL_CONNECTION_STRING -af backend/data/createTempTablesFilteredToSpecificAccounts.sql
 
 echo "Downloading temp tables as schemas + INSERT statements..."
-# pg_dump downloads the data (as INSERT statements) to a file that gets committed to the repo because our tests will rely on this real-world data.
+# pg_dump downloads the data (as INSERT statements) to a file that gets committed to the repo so that all engineers can start with the same basic data set.
 pg_dump $POSTGRESQL_CONNECTION_STRING $chosenTables --column-inserts > backend/data/seedData.sql
 
 # Delete all of those temporary tables from the remote database (private indexer).
@@ -38,7 +38,7 @@ do
     psql -Atx $POSTGRESQL_CONNECTION_STRING -c "DROP TABLE IF EXISTS $i;";
 done
 
-# Clean the SQL insert commands so that they are ready for when a test file needs to use them to seed the local PostgreSQL database.
+# Clean the SQL insert commands so that they are ready to be executed to seed the local PostgreSQL database.
 ./backend/data/cleanTheSql.sh
 
 echo "Finished updating the seed file. Run `yarn seed` to seed the database."
