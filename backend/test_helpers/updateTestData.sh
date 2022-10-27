@@ -18,7 +18,7 @@ echo "Calling defineTransactionHashesInSql..."
 yarn ts-node  --esm ./backend/test_helpers/internal/defineTransactionHashesInSql.ts
 
 echo "Merging transactionHashes.sql with tableDefinitions.sql..."
-cat backend/test_helpers/internal/transactionHashes.sql backend/test_helpers/internal/tableDefinitions.sql > backend/test_helpers/internal/createTempTablesOfRowsWithSpecificTransactions.sql
+cat backend/test_helpers/internal/transactionHashes.sql backend/data/tableDefinitions.sql > backend/test_helpers/internal/createTempTablesOfRowsWithSpecificTransactions.sql
 
 echo "Calling createTempTablesOfRowsWithSpecificTransactions..."
 # Now that those 2 SQL files were merged into 1, it can be run to create the temporary tables that we need on the remote database (private indexer). Those tables will contain only the specific rows that our tests care about (because of the WHERE clauses). Otherwise, downloading those tables would take up too much space on each engineer's local machine because they are hundreds of gigabytes each.
