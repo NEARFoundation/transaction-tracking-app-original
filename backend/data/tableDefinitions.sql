@@ -29,8 +29,7 @@ SELECT
 	RECEIPT_CONVERSION_GAS_BURNT,
 	RECEIPT_CONVERSION_TOKENS_BURNT 
 FROM TRANSACTIONS T
-WHERE 
-T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
+WHERE T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
 /* =============================================================== */
 drop table if exists temp_test_export_receipts;
 CREATE TABLE temp_test_export_receipts AS 
@@ -46,8 +45,7 @@ SELECT
 	R.ORIGINATED_FROM_TRANSACTION_HASH
 FROM TRANSACTIONS T
 LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
-WHERE 
-T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
+WHERE T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
 /* =============================================================== */
 drop table if exists temp_test_export_execution_outcomes;
 CREATE TABLE temp_test_export_execution_outcomes AS 
@@ -64,8 +62,7 @@ SELECT
 FROM TRANSACTIONS T
 LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
 LEFT JOIN EXECUTION_OUTCOMES EO ON EO.RECEIPT_ID = R.RECEIPT_ID
-WHERE 
-T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
+WHERE T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
 /* =============================================================== */
 drop table if exists temp_test_export_blocks;
 CREATE TABLE temp_test_export_blocks AS 
@@ -80,8 +77,7 @@ SELECT
 FROM TRANSACTIONS T
 LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
 LEFT JOIN BLOCKS B ON B.BLOCK_HASH = R.INCLUDED_IN_BLOCK_HASH
-WHERE 
-T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
+WHERE T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
 /* =============================================================== */
 drop table if exists temp_test_export_action_receipt_actions;
 CREATE TABLE temp_test_export_action_receipt_actions AS 
@@ -96,8 +92,7 @@ SELECT
 FROM TRANSACTIONS T
 LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
 LEFT JOIN ACTION_RECEIPT_ACTIONS ARA ON ARA.RECEIPT_ID = R.RECEIPT_ID
-WHERE 
-T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
+WHERE T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
 /* =============================================================== */
 drop table if exists temp_test_export_transaction_actions;
 CREATE TABLE temp_test_export_transaction_actions AS 
@@ -107,5 +102,4 @@ SELECT
 	ta."action_kind", 
 	ta.args
 FROM TRANSACTION_ACTIONS ta
-WHERE 
-ta.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
+WHERE ta.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
