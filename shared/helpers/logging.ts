@@ -35,33 +35,23 @@ const myCustomLevels: { colors: { [key: string]: string }; levels: AbstractConfi
 const colorizerOptions: ColorizeOptions = { level: true, message: false };
 const colorizer = winston.format.colorize(colorizerOptions);
 
-function isArray(item: any): boolean {
-  // This function is necessary because of how winston.format.printf((info: TransformableInfo) => {}) works.
-  const splat = item[Symbol.for('splat')];
-  // console.log({ splat });
-  return Array.isArray(splat[0]);
-}
-
-function getCleanedArguments(providedArguments: Arguments): any {
-  // console.log({ providedArguments });
-  if (isArray(providedArguments)) {
-    // console.log('isArray');
-    const result: string[] = [];
-    for (const key of Object.keys(providedArguments)) {
-      result.push(providedArguments[key]);
-    }
-
-    return result;
-  } else {
-    return Object.fromEntries(Object.entries(providedArguments));
+function convertSplatToString(splat: Arguments) {
+  const result: string[] = [];
+  for (const key of Object.keys(splat)) {
+    const item = splat[key];
+    const withColors = util.inspect(item, { colors: true, depth: null, showHidden: false });
+    result.push(withColors);
   }
+
+  return result.join(', ');
 }
 
-function getArgumentsPreserved(providedArguments: Arguments): string {
+function getAllArgumentsWithColorsPreserved(providedArguments: Arguments): string {
   // https://stackoverflow.com/questions/74186705/how-to-preserve-default-syntax-highlighting-colors-in-javascript-console
-  if (Object.keys(providedArguments).length > 0) {
-    const copied = getCleanedArguments(providedArguments);
-    return util.inspect(copied, { colors: true, depth: null, showHidden: false });
+  const splat = providedArguments[Symbol.for('splat')];
+  if (splat) {
+    // console.log({ splat });
+    return convertSplatToString(splat);
   } else {
     return '';
   }
@@ -73,7 +63,7 @@ const simpleConsoleLogging = winston.format.combine(
   winston.format.printf((info: TransformableInfo) => {
     const { level, message, timestamp, ...rest } = info;
     const coloredTimestampAndLevel = colorizer.colorize(level, `${timestamp} ${level}:`);
-    const syntaxHighlightedObjects = getArgumentsPreserved(rest);
+    const syntaxHighlightedObjects = getAllArgumentsWithColorsPreserved(rest);
     return `${coloredTimestampAndLevel} ${message} ${syntaxHighlightedObjects}`; // https://github.com/winstonjs/winston/issues/1388#issuecomment-432932959
   }),
 );
