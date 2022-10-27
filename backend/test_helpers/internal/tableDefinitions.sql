@@ -11,6 +11,7 @@ https://dba.stackexchange.com/a/86726/
 
 
 /* =============================================================== */
+drop table if exists temp_test_export_transactions;
 CREATE TABLE temp_test_export_transactions AS 
 SELECT 
 	TRANSACTION_HASH,
@@ -29,8 +30,9 @@ SELECT
 	RECEIPT_CONVERSION_TOKENS_BURNT 
 FROM TRANSACTIONS T
 WHERE 
-TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
+T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
 /* =============================================================== */
+drop table if exists temp_test_export_receipts;
 CREATE TABLE temp_test_export_receipts AS 
 SELECT 
 	R.RECEIPT_ID,
@@ -47,6 +49,7 @@ LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
 WHERE 
 T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
 /* =============================================================== */
+drop table if exists temp_test_export_execution_outcomes;
 CREATE TABLE temp_test_export_execution_outcomes AS 
 SELECT 
 	EO.RECEIPT_ID,
@@ -64,6 +67,7 @@ LEFT JOIN EXECUTION_OUTCOMES EO ON EO.RECEIPT_ID = R.RECEIPT_ID
 WHERE 
 T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
 /* =============================================================== */
+drop table if exists temp_test_export_blocks;
 CREATE TABLE temp_test_export_blocks AS 
 SELECT 
 	B.BLOCK_HEIGHT,
@@ -79,6 +83,7 @@ LEFT JOIN BLOCKS B ON B.BLOCK_HASH = R.INCLUDED_IN_BLOCK_HASH
 WHERE 
 T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
 /* =============================================================== */
+drop table if exists temp_test_export_action_receipt_actions;
 CREATE TABLE temp_test_export_action_receipt_actions AS 
 SELECT 
 	ARA.RECEIPT_ID,
@@ -94,6 +99,7 @@ LEFT JOIN ACTION_RECEIPT_ACTIONS ARA ON ARA.RECEIPT_ID = R.RECEIPT_ID
 WHERE 
 T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
 /* =============================================================== */
+drop table if exists temp_test_export_transaction_actions;
 CREATE TABLE temp_test_export_transaction_actions AS 
 SELECT 
 	ta.transaction_hash, 
