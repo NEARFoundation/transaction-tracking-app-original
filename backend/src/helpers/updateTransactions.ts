@@ -45,7 +45,6 @@ async function updateThisAccount(accountId: AccountId, types: TxTypeRow[]) {
               isRunning: false,
             },
           );
-          logger.success('======== marked isRunning as false ============='); // TODO Remove this line
         } catch (error) {
           logger.error(error);
         }
