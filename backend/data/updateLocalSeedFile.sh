@@ -16,18 +16,18 @@ done
 echo "Calling defineAccountIdsInSql..."
 yarn ts-node  --esm ./backend/data/defineAccountIdsInSql.ts
 
-echo "Merging accountIds.sql with tableDefinitions.sql..."
-cat backend/data/accountIds.sql backend/data/tableDefinitions.sql > backend/data/createTempTablesFilteredToSpecificAccounts.sql
+echo "Cloning tableDefinitions to createTempTablesFilteredToSpecificAccounts..."
+cp backend/data/tableDefinitions.sql backend/data/createTempTablesFilteredToSpecificAccounts.sql
 
 ./backend/data/fixWhereClauses.sh
 
 echo "Calling createTempTablesFilteredToSpecificAccounts..."
 # Now that those 2 SQL files were merged into 1, it can be run to create the temporary tables that we need on the remote database (private indexer). Those tables will contain only the specific rows that are relevant to us based on the account IDs in our local environment variable (because of the WHERE clauses). Otherwise, downloading those tables would take up too much space on each engineer's local machine because they are hundreds of gigabytes each.
-#TODO psql -Atx $PRODUCTION_POSTGRESQL_CONNECTION_STRING -af backend/data/createTempTablesFilteredToSpecificAccounts.sql
+psql -Atx $PRODUCTION_POSTGRESQL_CONNECTION_STRING -af backend/data/createTempTablesFilteredToSpecificAccounts.sql
 
 echo "Downloading temp tables as schemas + INSERT statements..."
 # pg_dump downloads the data (as INSERT statements) to a file that gets committed to the repo so that all engineers can start with the same basic data set.
-#TODO pg_dump $PRODUCTION_POSTGRESQL_CONNECTION_STRING $chosenTables --column-inserts > backend/data/seedData.sql
+pg_dump $PRODUCTION_POSTGRESQL_CONNECTION_STRING $chosenTables --column-inserts > backend/data/seedData.sql
 
 # Delete all of those temporary tables from the remote database (private indexer).
 for i in ${TABLES//,/ }
@@ -39,6 +39,6 @@ done
 # Clean the SQL insert commands so that they are ready to be executed to seed the local PostgreSQL database.
 SQL_FILE=backend/data/seedData.sql ./backend/data/cleanTheSql.sh
 
-echo "Finished updating the seed file. Run `yarn seed` to seed the database."
+echo "Finished updating the seed file. Run 'yarn seed' to seed the database."
 
-# TODO: Create a separate file that an engineer can run to execute the SQL to seed the local database. Set `yarn seed` to run it.
+# TODO: Create a separate file that an engineer can run to execute the SQL to seed the local database. Set `yarn seed` to run it. It should use the local credentials at POSTGRESQL_CONNECTION_STRING in `backend/.env.development`.

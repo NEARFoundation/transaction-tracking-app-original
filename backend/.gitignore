@@ -36,7 +36,7 @@ target/
 
 docker/app/
 
-data/accountIds.sql
+data/accountIds.csv
 data/createTempTablesFilteredToSpecificAccounts.sql
 test_helpers/internal/createTempTablesOfRowsWithSpecificTransactions.sql
 test_helpers/internal/transactionHashes.sql
