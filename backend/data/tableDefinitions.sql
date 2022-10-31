@@ -101,5 +101,6 @@ SELECT
 	ta.index_in_transaction, 
 	ta."action_kind", 
 	ta.args
-FROM TRANSACTION_ACTIONS ta
-WHERE ta.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
+FROM TRANSACTIONS T
+LEFT JOIN TRANSACTION_ACTIONS ta ON T.TRANSACTION_HASH = TA.TRANSACTION_HASH
+WHERE T.TRANSACTION_HASH IN (SELECT transactionHash FROM transactionHashes);
