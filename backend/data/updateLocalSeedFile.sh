@@ -22,7 +22,7 @@ cp backend/data/tableDefinitions.sql backend/data/createTempTablesFilteredToSpec
 ./backend/data/fixWhereClauses.sh
 
 echo "Calling createTempTablesFilteredToSpecificAccounts..."
-# Now that those 2 SQL files were merged into 1, it can be run to create the temporary tables that we need on the remote database (private indexer). Those tables will contain only the specific rows that are relevant to us based on the account IDs in our local environment variable (because of the WHERE clauses). Otherwise, downloading those tables would take up too much space on each engineer's local machine because they are hundreds of gigabytes each.
+# Create the temporary tables that we need on the remote database (private indexer). Those tables will contain only the specific rows that are relevant to us based on the account IDs in our local environment variable (because of the WHERE clauses). Otherwise, downloading those tables would take up too much space on each engineer's local machine because they are hundreds of gigabytes each.
 psql -Atx $PRODUCTION_POSTGRESQL_CONNECTION_STRING -af backend/data/createTempTablesFilteredToSpecificAccounts.sql
 
 echo "Downloading temp tables as schemas + INSERT statements..."
