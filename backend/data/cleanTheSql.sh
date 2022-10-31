@@ -1,12 +1,11 @@
 # This file gets run automatically from within `backend/test_helpers/updateTestData.sh`
-# Or run manually via `./backend/data/cleanTheSql.sh`
+# Or run manually via `SQL_FILE=backend/test_helpers/internal/testData.sql ./backend/data/cleanTheSql.sh`
 
 # Note that many lines below needed to have operations split into multiple lines (using placeholder files rather than operating on the file directly) due to Mac security rules.
 
 
 DB_PREFIX='public.'
 TBL_PREFIX='temp_test_export_'
-SQL_FILE=backend/test_helpers/internal/testData.sql
 PLACEHOLDER_FILE=$SQL_FILE.new
 
 
