@@ -45,7 +45,6 @@ async function updateThisAccount(accountId: AccountId, types: TxTypeRow[]) {
               isRunning: false,
             },
           );
-          logger.success('======== marked isRunning as false ============='); // TODO Remove this line
         } catch (error) {
           logger.error(error);
         }
@@ -115,9 +114,12 @@ async function getTransactions(pgClient: Client, accountId: AccountId, txTypeNam
       const startTime = performance.now();
       const result = await pgClient.query(txType.sql, [accountId, blockTimestamp.toString(), length]);
       const endTime = performance.now();
-      logger.info(millisToMinutesAndSeconds(endTime - startTime), 'pgClient performance of getTransactions');
+      logger.info(
+        `pgClient performance of getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`,
+        millisToMinutesAndSeconds(endTime - startTime),
+      );
       const rows = result.rows as unknown as TxActionRow[];
-      // logger.info(JSON.stringify(rows));
+      logger.info(`${accountId}, ${txTypeName} rows`, JSON.stringify(rows));
       return rows;
     } else {
       return [];
