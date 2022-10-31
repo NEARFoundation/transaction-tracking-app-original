@@ -36,6 +36,6 @@ do
 done
 
 # Clean the SQL insert commands so that they are ready for when a test file needs to use them to seed the local PostgreSQL database.
-./backend/test_helpers/internal/cleanTheSql.sh
+./backend/data/cleanTheSql.sh
 
 echo "Finished! testData.sql is now ready. Test suites can use it to seed the local database."

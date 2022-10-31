@@ -1,5 +1,5 @@
 # This file gets run automatically from within `backend/test_helpers/updateTestData.sh`
-# Or run manually via `./backend/test_helpers/cleanTheSql.sh`
+# Or run manually via `./backend/data/cleanTheSql.sh`
 
 # Note that many lines below needed to have operations split into multiple lines (using placeholder files rather than operating on the file directly) due to Mac security rules.
 
