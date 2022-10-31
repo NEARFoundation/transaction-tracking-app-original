@@ -30,6 +30,15 @@ function AddNewAccountForm({ addNewAccount, handleNewAccountIdInputChange, newAc
   );
 }
 
+function moveToFirst(stringToMove: string, array: string[]) {
+  // https://stackoverflow.com/a/53913914/
+  if (array.includes(stringToMove)) {
+    const currentIndex = array.indexOf(stringToMove);
+    array.splice(currentIndex, 1);
+    array.unshift(stringToMove);
+  }
+}
+
 // eslint-disable-next-line max-lines-per-function
 export function AccountsTable({
   accountIds,
@@ -49,6 +58,8 @@ export function AccountsTable({
   runTaskForThisAccount,
   selectedAccountId,
 }: AccountsTableProps) {
+  accountIds.sort();
+  moveToFirst(selectedAccountId, accountIds);
   // console.log({ accountIds });
 
   function deleteFromLocalStorage(accountIdToDelete: AccountId) {
