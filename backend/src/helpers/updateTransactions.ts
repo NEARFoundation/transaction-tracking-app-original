@@ -85,13 +85,7 @@ async function saveTransactionFromIndexerToCache(accountId: AccountId, txType: s
 // eslint-disable-next-line max-lines-per-function
 export async function updateTransactions(pgClient: pg.Client, accountId: AccountId, txType: string, length: number): Promise<void> {
   logger.info(`updateTransactions(${accountId}, ${txType})`);
-  // eslint-disable-next-line promise/valid-params
-  await TxTasks.findOneAndUpdate(
-    { accountId },
-    {
-      isRunning: true,
-    },
-  );
+
   let minBlockTimestamp = await getMostRecentBlockTimestamp(accountId, txType);
   //  logger.info({ minBlockTimestamp });
 
@@ -151,6 +145,13 @@ async function updateThisAccount(accountId: AccountId, types: TxTypeRow[]) {
       // logger.info('found a task', txTask.id);
       if (txTask.isRunning === false) {
         // logger.info('isRunning === false');
+        // eslint-disable-next-line promise/valid-params
+        await TxTasks.findOneAndUpdate(
+          { accountId },
+          {
+            isRunning: true,
+          },
+        );
         const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: STATEMENT_TIMEOUT, connectionTimeoutMillis: CONNECTION_TIMEOUT });
         await pgClient.connect();
         // logger.info('pgClient connected');
