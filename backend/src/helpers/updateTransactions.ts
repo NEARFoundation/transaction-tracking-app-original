@@ -133,11 +133,32 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
 }
 
 /**
+ * Run the SQL query for each of these transaction types to find any matching transactions on the indexer that the cache doesn't already have.
+ * This is the only app function that uses the pg connection.
+ */
+async function fetchTransactionsForTheseTypes(accountId: AccountId, types: TxTypeRow[]): Promise<void> {
+  const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: STATEMENT_TIMEOUT, connectionTimeoutMillis: CONNECTION_TIMEOUT });
+  await pgClient.connect();
+  // logger.info('pgClient connected');
+  const promisesOfAllTasks: Array<Promise<void>> = [];
+  logger.info('pushing all updateTransactions.');
+  for (const type of types) {
+    const promise = updateTransactions(pgClient, accountId, type.name, DEFAULT_LENGTH);
+    promisesOfAllTasks.push(promise);
+  }
+
+  logger.debug(`Awaiting all updateTransactions promises for ${accountId}.`);
+  await Promise.all(promisesOfAllTasks);
+  logger.success(`Finished awaiting all updateTransactions promises for ${accountId}.`);
+  await pgClient.end();
+}
+
+/**
  *
  * For this accountId, call updateTransactions for each of the provided transaction types. When they've all finished, mark this account as updated.
  */
 // eslint-disable-next-line max-lines-per-function
-async function updateThisAccount(accountId: AccountId, types: TxTypeRow[]) {
+async function updateThisAccount(accountId: AccountId, types: TxTypeRow[]): Promise<void> {
   logger.info('updateThisAccount', { accountId });
   try {
     const txTask = await TxTasks.findOne({ accountId });
@@ -152,20 +173,7 @@ async function updateThisAccount(accountId: AccountId, types: TxTypeRow[]) {
             isRunning: true,
           },
         );
-        const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: STATEMENT_TIMEOUT, connectionTimeoutMillis: CONNECTION_TIMEOUT });
-        await pgClient.connect();
-        // logger.info('pgClient connected');
-        const promisesOfAllTasks: Array<Promise<void>> = [];
-        logger.info('pushing all updateTransactions.');
-        for (const type of types) {
-          const promise = updateTransactions(pgClient, txTask.accountId, type.name, DEFAULT_LENGTH);
-          promisesOfAllTasks.push(promise);
-        }
-
-        logger.debug(`Awaiting all updateTransactions promises for ${accountId}.`);
-        await Promise.all(promisesOfAllTasks);
-        logger.success(`Finished awaiting all updateTransactions promises for ${accountId}.`);
-        await pgClient.end();
+        await fetchTransactionsForTheseTypes(accountId, types);
         try {
           await TxTasks.findOneAndUpdate(
             { accountId: txTask.accountId },
