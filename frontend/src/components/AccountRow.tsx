@@ -33,9 +33,9 @@ export default function AccountRow({
     <td>
       <button
         style={{ backgroundColor: 'red', color: 'black' }}
-        onClick={() => {
+        onClick={async () => {
+          await deleteFromDatabase(accountId);
           deleteFromLocalStorage(accountId);
-          deleteFromDatabase(accountId);
         }}
       >
         Delete from DB
