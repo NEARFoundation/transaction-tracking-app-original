@@ -20,7 +20,7 @@ app.listen(port);
 
 await addDefaultTypesTx();
 
-logger.debug('Awaiting runAllNonRunningTasks().');
+// logger.debug('Awaiting runAllNonRunningTasks().');
 await runAllNonRunningTasks(); // Call once before cron job even starts.
 
 SyncedCron.start();

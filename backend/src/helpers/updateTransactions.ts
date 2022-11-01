@@ -225,10 +225,11 @@ export const runTaskForThisAccount = async (request: Request, response: Response
 /**
  * The cron job periodically calls this function, which calls updateThisAccount for any account that isn't already running from a previous call.
  */
-export const runAllNonRunningTasks = async (): Promise<void> => {
+export const runAllNonRunningTasks = async (): Promise<string[]> => {
   const promisesOfAllTasks: Array<Promise<void>> = [];
+  const accountsStillRunning: string[] = [];
   try {
-    const [types, tasks] = await Promise.all([getAllTypes(), TxTasks.find({ isRunning: false })]);
+    const [types, tasks] = await Promise.all([getAllTypes(), TxTasks.find({})]);
     logger.info(
       `types`,
       types.map((type) => type.name),
@@ -239,9 +240,13 @@ export const runAllNonRunningTasks = async (): Promise<void> => {
     );
 
     for (const task of tasks) {
-      logger.info(task.accountId, 'pushing updateThisAccount');
-      const promise = updateThisAccount(task.accountId, types);
-      promisesOfAllTasks.push(promise);
+      if (task.isRunning) {
+        accountsStillRunning.push(task.accountId);
+      } else {
+        logger.info(task.accountId, 'pushing updateThisAccount');
+        const promise = updateThisAccount(task.accountId, types);
+        promisesOfAllTasks.push(promise);
+      }
     }
 
     // logger.info('All promises have been started in runAllNonRunningTasks.');
@@ -249,7 +254,10 @@ export const runAllNonRunningTasks = async (): Promise<void> => {
     logger.error(error);
   }
 
-  logger.debug('Awaiting all runThisTaskByAccountId promises.');
+  // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
+  accountsStillRunning.sort();
+  // logger.debug('Awaiting all runThisTaskByAccountId promises.');
   await Promise.all(promisesOfAllTasks);
-  logger.success('Finished awaiting all runThisTaskByAccountId promises.');
+  logger.success('Finished awaiting all runThisTaskByAccountId promises.', { accountsStillRunning });
+  return accountsStillRunning;
 };
