@@ -15,6 +15,10 @@ import { TxTypes } from '../models/TxTypes.js';
 import { CONNECTION_STRING, CONNECTION_TIMEOUT, DEFAULT_LENGTH, STATEMENT_TIMEOUT } from './config.js';
 import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
 
+/**
+ * For this particular accountId, sorts all transactions of this type by their block timestamp and returns the most recent one (or zero if none found).
+ * This is useful for filtering indexer queries to exclude transactions that have already been saved to the cache.
+ */
 async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string): Promise<number> {
   const mostRecentTxAction = await TxActions.findOne({
     accountId,
@@ -25,16 +29,20 @@ async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string)
   return Number(mostRecentBlockTimestamp); // backend/src/models/TxActions.js uses Decimal128 for this field, which React can't display. https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-decimal.html
 }
 
-async function getTransactions(pgClient: Client, accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
+/**
+ * Run the SQL query of this transaction type to check whether the indexer has any transactions of this
+ * type for this accountId (in the period defined by blockTimestamp and length).
+ */
+async function getTransactionsFromIndexer(pgClient: Client, accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
   try {
     const txType: TxTypeRow | null = await TxTypes.findOne({ name: txTypeName });
     if (txType) {
-      logger.info(`getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
+      logger.info(`getTransactionsFromIndexer(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
       const startTime = performance.now();
       const result = await pgClient.query(txType.sql, [accountId, blockTimestamp.toString(), length]);
       const endTime = performance.now();
       logger.info(
-        `pgClient performance of getTransactions(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`,
+        `pgClient performance of getTransactionsFromIndexer(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`,
         millisToMinutesAndSeconds(endTime - startTime),
       );
       const rows = result.rows as unknown as TxActionRow[];
@@ -49,8 +57,11 @@ async function getTransactions(pgClient: Client, accountId: AccountId, txTypeNam
   }
 }
 
-async function processTransaction(accountId: AccountId, txType: string, transaction: TxActionRow): Promise<void> {
-  logger.info('processTransaction: ', accountId, transaction.transaction_hash, getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp));
+/**
+ * Having found a relevant transaction on the Postgres indexer, this function saves it to the Mongo cache (doing extra currency processing as necessary).
+ */
+async function saveTransactionFromIndexerToCache(accountId: AccountId, txType: string, transaction: TxActionRow): Promise<void> {
+  logger.info('saveTransactionFromIndexerToCache: ', accountId, transaction.transaction_hash, getFormattedDatetimeUtcFromBlockTimestamp(transaction.block_timestamp));
   const clonedTransaction = { ...transaction };
   if (clonedTransaction.get_currency_by_contract) {
     logger.info('fungibleTokenContractAccountId', clonedTransaction.get_currency_by_contract);
@@ -85,20 +96,20 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
   //  logger.info({ minBlockTimestamp });
 
   logger.debug('Awaiting getTransactions', accountId, txType);
-  let transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, length);
+  let transactions = await getTransactionsFromIndexer(pgClient, accountId, txType, minBlockTimestamp, length);
   // logger.info({ transactions });
   logger.info(`Starting the 'while' loop of updateTransactions ${txType}`);
   while (transactions.length > 0) {
     const promises: Array<Promise<void>> = [];
-    logger.info(`Pushing all processTransaction promises for ${accountId} ${txType}.`);
+    logger.info(`Pushing all saveTransactionFromIndexerToCache promises for ${accountId} ${txType}.`);
 
     for (const transaction of transactions) {
-      logger.info('About to call processTransaction', transaction.transaction_hash);
-      const promise = processTransaction(accountId, txType, transaction);
+      logger.info('About to call saveTransactionFromIndexerToCache', transaction.transaction_hash);
+      const promise = saveTransactionFromIndexerToCache(accountId, txType, transaction);
       promises.push(promise);
     }
 
-    logger.success('Finished the `for` loop of pushing processTransaction promises (but not the `while` loop).');
+    logger.success('Finished the `for` loop of pushing saveTransactionFromIndexerToCache promises (but not the `while` loop).');
     logger.debug(`Awaiting all updateTransactions promises for ${accountId} ${txType}.`);
     await Promise.all(promises);
     logger.success(`Finished awaiting all promises (but still in the 'while' loop) for ${accountId} ${txType}.`);
@@ -109,7 +120,7 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
     while (nextBlockTimestamp === minBlockTimestamp && transactions.length === length * index) {
       index += 1;
       const increasedLength = length * index;
-      transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, increasedLength);
+      transactions = await getTransactionsFromIndexer(pgClient, accountId, txType, minBlockTimestamp, increasedLength);
       nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
     }
 
@@ -119,7 +130,7 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
 
     if (index === 1) {
       minBlockTimestamp = nextBlockTimestamp;
-      transactions = await getTransactions(pgClient, accountId, txType, minBlockTimestamp, length);
+      transactions = await getTransactionsFromIndexer(pgClient, accountId, txType, minBlockTimestamp, length);
     }
     // -------------------------------------------------
   }
@@ -127,6 +138,10 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
   logger.success(`Finished the 'while' loop of updateTransactions ${txType}`);
 }
 
+/**
+ *
+ * For this accountId, call updateTransactions for each of the provided transaction types. When they've all finished, mark this account as updated.
+ */
 // eslint-disable-next-line max-lines-per-function
 async function updateThisAccount(accountId: AccountId, types: TxTypeRow[]) {
   logger.info('updateThisAccount', { accountId });
@@ -171,11 +186,20 @@ async function updateThisAccount(accountId: AccountId, types: TxTypeRow[]) {
   }
 }
 
+/**
+ *
+ * During server startup, a folder of SQL queries gets read and saved into the Mongo cache, defining the various transaction types.
+ * These transaction types should be mutually exclusive and collectively exhaustive.
+ */
 async function getAllTypes(): Promise<TxTypeRow[]> {
   const types: TxTypeRow[] = await TxTypes.find({});
   return types;
 }
 
+/**
+ *
+ * Simple API endpoint for calling updateThisAccount via  accountId parameter.
+ */
 export const runTaskForThisAccount = async (request: Request, response: Response): Promise<void> => {
   try {
     const types = await getAllTypes();
@@ -189,6 +213,9 @@ export const runTaskForThisAccount = async (request: Request, response: Response
   }
 };
 
+/**
+ * The cron job periodically calls this function, which calls updateThisAccount for any account that isn't already running from a previous call.
+ */
 export const runAllNonRunningTasks = async (): Promise<void> => {
   const promisesOfAllTasks: Array<Promise<void>> = [];
   try {
