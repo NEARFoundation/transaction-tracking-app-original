@@ -13,17 +13,15 @@ do
 done
 
 
-echo "Calling defineAccountIdsInSql..."
-yarn ts-node  --esm ./backend/data/defineAccountIdsInSql.ts
+echo "Calling defineTransactionHashesInSql..."
+yarn ts-node  --esm ./backend/data/defineTransactionHashesInSql.ts
 
-echo "Cloning tableDefinitions to createTempTablesFilteredToSpecificAccounts..."
-cp backend/data/tableDefinitions.sql backend/data/createTempTablesFilteredToSpecificAccounts.sql
-
-./backend/data/fixWhereClauses.sh
+echo "Merging transactionHashes.sql with tableDefinitions.sql..."
+cat backend/data/transactionHashes.sql backend/data/tableDefinitions.sql > backend/data/createTempTablesOfRowsWithSpecificTransactions.sql
 
 echo "Calling createTempTablesFilteredToSpecificAccounts..."
 # Create the temporary tables that we need on the remote database (private indexer). Those tables will contain only the specific rows that are relevant to us based on the account IDs in our local environment variable (because of the WHERE clauses). Otherwise, downloading those tables would take up too much space on each engineer's local machine because they are hundreds of gigabytes each.
-psql -Atx $PRODUCTION_POSTGRESQL_CONNECTION_STRING -af backend/data/createTempTablesFilteredToSpecificAccounts.sql
+psql -Atx $PRODUCTION_POSTGRESQL_CONNECTION_STRING -af backend/data/createTempTablesOfRowsWithSpecificTransactions.sql
 
 echo "Downloading temp tables as schemas + INSERT statements..."
 # pg_dump downloads the data (as INSERT statements) to a file that gets committed to the repo so that all engineers can start with the same basic data set.

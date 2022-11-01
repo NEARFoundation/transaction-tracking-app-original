@@ -5,7 +5,8 @@ import mongoose, { type Mongoose } from 'mongoose';
 import pg from 'pg';
 
 import { type RowOfExpectedOutput, type TxActionRow, type AccountId } from '../../../shared/types';
-import { getRowsOfExpectedOutput } from '../../test_helpers/internal/csvToJson';
+import { getRowsOfExpectedOutput } from '../../data/csvToJson';
+import { expectedOutputFilename } from '../../test_helpers/internal/defineTransactionHashesInSql';
 import jsonToCsv from '../../test_helpers/internal/jsonToCsv';
 import { seedTheMockIndexerDatabase } from '../../test_helpers/internal/updateTestData';
 import { TxActions, convertFromModelToTxActionRow, cleanExpectedOutputFromCsv } from '../models/TxActions';
@@ -49,7 +50,7 @@ describe('updateTransactions', () => {
 
   jest.setTimeout(3_000);
 
-  const rowsOfExpectedOutput: RowOfExpectedOutput[] = getRowsOfExpectedOutput();
+  const rowsOfExpectedOutput: RowOfExpectedOutput[] = getRowsOfExpectedOutput(expectedOutputFilename);
 
   // console.log({ rowsOfExpectedOutput });
 

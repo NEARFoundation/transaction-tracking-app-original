@@ -58,6 +58,7 @@ To run this project locally:
    ```
 
 1. Install dependencies for frontend and backend: `yarn install_all`
+1. Seed the local dev database via `yarn seed`.
 1. `POSTGRESQL_CONNECTION_STRING=___ ./backend/test_helpers/updateTestData.sh` (where `___` is the mainnet Postgres credentials string)
 1. `yarn test`
 1. Start the backend: `yarn backend_dev`
