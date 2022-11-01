@@ -1,4 +1,6 @@
 /* eslint-disable canonical/filename-match-exported */
+import { type LogObject } from 'winston-cloudwatch';
+
 const contractName = process.env.CONTRACT_NAME ?? 'near-transactions-accounting-report';
 const localHome = process.env.HOME;
 const CHAIN = process.env.REACT_APP_CHAIN ?? process.env.CHAIN ?? 'mainnet';
@@ -13,7 +15,7 @@ export const cloudwatchConfig = {
   awsAccessKeyId: process.env.CLOUDWATCH_ACCESS_KEY_ID,
   awsSecretKey: process.env.CLOUDWATCH_SECRET_KEY,
   awsRegion: process.env.CLOUDWATCH_REGION,
-  messageFormatter: ({ level, message, additionalInfo }) => `[${level}]: ${message} \nAdditional Info: ${JSON.stringify(additionalInfo)}}`,
+  messageFormatter: ({ level, message, additionalInfo }: LogObject) => `[${level}]: ${message} \nAdditional Info: ${JSON.stringify(additionalInfo)}}`,
 };
 
 // eslint-disable-next-line max-lines-per-function
