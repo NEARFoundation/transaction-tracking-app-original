@@ -18,7 +18,6 @@ When you specify one or more NEAR acccount IDs, those account IDs get saved to y
   - `/frontend/src/index.html` is a great place to start exploring. Note that it loads in `/frontend/src/index.tsx`, where you can learn how the frontend connects to the NEAR blockchain.
 - The backend is an Express app (with cron jobs and a Mongo database) in the "backend" folder.
   - The backend relies on a private [clone](https://github.com/near/near-indexer-for-explorer/) of the [NEAR Explorer](https://explorer.near.org) indexer, a large PostgreSQL database (certain tables are ~1 TB). We use our own clone of NEAR Explorer (on a bare metal Hetzner server) instead of using the public credentials of the actual NEAR Explorer because the complicated queries take too long and time out.
-  - There are also old notes about [Docker](/backend/docker/README.md) even though the team hasn't used it recently.
 - There is also a folder called "shared" for code that both apps use.
 - Tests use [jest](https://jestjs.io/docs/getting-started#using-typescript). You can run via `yarn test`.
 
@@ -28,11 +27,11 @@ When you specify one or more NEAR acccount IDs, those account IDs get saved to y
 
 To run this project locally:
 
-1. Make sure you've installed [Node.js] ≥ 18. `nvm use 18`.
-1. Install [Mongo](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/) using the instructions in its own section below.
+1. Make sure you've installed [Node.js](https://nodejs.org/en/download/package-manager/) ≥ 18. `nvm use 18`.
+1. Install and start [Mongo](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/) using the instructions in its own section below.
 1. `cp frontend/.env.development frontend/.env.development.local && cp backend/.env.development backend/.env.development.local`
 1. Edit the values for each of those local env files. If you set REACT_APP_ALLOW_DELETING_FROM_DATABASE to "true" in `frontend/.env.development.local` and ALLOW_DELETING_FROM_DATABASE to "true" in `backend/.env.development.local`, you will see a button in the frontend that allows you to delete records from the database, which is useful when you are manually testing whether transaction processing is working after editing the SQL queries.
-1. Start Mongo (unless you'll be starting Docker) with something like `brew services start mongodb-community@5.0`.
+   - Similarly, if you ever want to nuke your local Mongo cache, you can run `yarn drop_actions_and_tasks_and_types`.
 1. Install PostreSQL:
 
    ```bash
@@ -59,10 +58,10 @@ To run this project locally:
 
 1. Install dependencies for frontend and backend: `yarn install_all`
 1. Seed the local dev database via `yarn seed`.
-1. `POSTGRESQL_CONNECTION_STRING=___ ./backend/test_helpers/updateTestData.sh` (where `___` is the mainnet Postgres credentials string)
+1. (optional) `POSTGRESQL_CONNECTION_STRING=___ ./backend/test_helpers/updateTestData.sh` (where `___` is the mainnet Postgres credentials string)
 1. `yarn test`
 1. Start the backend: `yarn backend_dev`
-1. In a second terminal, start the frontend: `yarn dev` (see `package.json` for a full list of `scripts` you can run with `yarn`)
+1. In a second terminal, start the frontend: `yarn dev` (see `package.json` for a full list of `scripts` you can run with `yarn`). TODO: Check whether https://www.npmjs.com/package/concurrently would help.
 1. Visit http://localhost:1234/ in the browser.
 
 Go ahead and play with the app and the code. As you make frontend code changes, the app will automatically reload.
@@ -124,7 +123,6 @@ Then run `yarn test` to run the tests.
 
 - [react](https://reactjs.org/)
 - [create-near-app](https://github.com/near/create-near-app)
-- [node.js](https://nodejs.org/en/download/package-manager/)
 - [near accounts](https://docs.near.org/docs/concepts/account)
 - [near wallet](https://wallet.testnet.near.org/)
 - [near-cli](https://github.com/near/near-cli)
