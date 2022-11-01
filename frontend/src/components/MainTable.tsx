@@ -6,7 +6,7 @@ export const MainTable = ({ transactions, explorerUrl, divisorPower, decimalPlac
   const readableAmountHeader = divisorPower ? `amount_transferred_divided_by_1e${divisorPower.toString()}` : `amount_transferred_readable`;
   return (
     <div>
-      <div>{transactions.length} rows</div>
+      <div>{transactions.length.toLocaleString()} rows</div>
       <table className={isLoading ? 'blur' : ''}>
         <thead>
           <tr>
