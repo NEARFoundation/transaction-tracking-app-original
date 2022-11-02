@@ -3,6 +3,8 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
+import { logger } from '../shared/helpers/logging.js';
+
 import { TxActions } from './src/models/TxActions.js';
 import { TxTasks } from './src/models/TxTasks.js';
 import { TxTypes } from './src/models/TxTypes.js';
@@ -12,19 +14,19 @@ if (result.error) {
   throw result.error;
 }
 
-console.log(result.parsed);
+// logger.info(result.parsed);
 
 async function main() {
   const mongoConnectionString = process.env.MONGO ?? '';
-  console.log({ mongoConnectionString });
+  // logger.info({ mongoConnectionString });
   await mongoose.connect(mongoConnectionString);
   await TxActions.deleteMany({});
-  console.log('Deleted all TxActions.');
+  logger.info('Deleted all TxActions.');
   await TxTasks.deleteMany({});
-  console.log('Deleted all TxTasks.');
+  logger.info('Deleted all TxTasks.');
   await TxTypes.deleteMany({});
-  console.log('Deleted all TxTypes.');
-  console.log('Finished.');
+  logger.info('Deleted all TxTypes.');
+  logger.info('Finished.');
   process.exit(0); // https://stackoverflow.com/a/52461246/
 }
 
