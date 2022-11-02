@@ -28,6 +28,7 @@ async function getTransactionsFromIndexer(pgClient: Client, accountId: AccountId
 
       return diff;
     } else {
+      logger.error('TxType not found', txTypeName);
       return null;
     }
   } catch (error) {
@@ -35,6 +36,13 @@ async function getTransactionsFromIndexer(pgClient: Client, accountId: AccountId
     return null;
   }
 }
+
+type Results = {
+  [key: string]: {
+    diff: number;
+    humanReadableDiff: string | null;
+  };
+};
 
 async function runBenchmark() {
   const connection = await mongoose.connect(mongoConnectionString);
@@ -45,20 +53,30 @@ async function runBenchmark() {
   const rowsOfExpectedOutput: RowOfExpectedOutput[] = getRowsOfExpectedOutput(expectedOutputFilename);
 
   // console.log({ rowsOfExpectedOutput });
-  const results = {};
+  const results: Results = {};
+  const missingTxTypeErrors: string[] = [];
 
   for (const rowOfExpectedOutput of rowsOfExpectedOutput) {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { accountId, txType } = rowOfExpectedOutput;
     logger.info(`Awaiting getTransactionsFromIndexer for ${txType}`);
     const diff = await getTransactionsFromIndexer(pgClient, accountId, txType, blockTimestamp, DEFAULT_LENGTH);
-    const humanReadableDiff = diff ? millisToMinutesAndSeconds(diff) : null;
-    results[txType] = { diff, humanReadableDiff };
+    if (diff) {
+      const humanReadableDiff = millisToMinutesAndSeconds(diff);
+      results[txType] = { diff, humanReadableDiff };
+    } else {
+      missingTxTypeErrors.push(txType);
+    }
   }
 
   await pgClient.end();
   await connection.disconnect();
-  console.log({ results }, JSON.stringify(results));
+  const sortable = Object.fromEntries(
+    Object.entries(results).sort(([, a], [, b]) => {
+      return b.diff - a.diff;
+    }),
+  );
+  logger.info('result', { sortable, missingTxTypeErrors }, JSON.stringify(sortable));
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
