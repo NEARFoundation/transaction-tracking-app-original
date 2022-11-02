@@ -3,7 +3,7 @@ import fs from 'node:fs';
 // eslint-disable-next-line canonical/id-match
 import json2csv from 'csvjson-json2csv'; // https://www.npmjs.com/package/csvjson-json2csv
 
-const subfolder = process.env.BACKEND_FOLDER ?? '';
+import { subfolder } from '../../../shared/config.js';
 
 const csvFilename = `./${subfolder}test_helpers/internal/possibleExpectedOutput.csv`;
 

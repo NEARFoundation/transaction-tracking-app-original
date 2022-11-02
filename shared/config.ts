@@ -5,8 +5,12 @@ const contractName = process.env.CONTRACT_NAME ?? 'near-transactions-accounting-
 const localHome = process.env.HOME;
 const CHAIN = process.env.REACT_APP_CHAIN ?? process.env.CHAIN ?? 'mainnet';
 export const LOG_TO_CONSOLE = process.env.LOG_TO_CONSOLE ?? 'true';
-export const LOG_TO_CLOUDWATCH = process.env.LOG_TO_CLOUDWATCH ?? 'true';
-// console.log({ LOG_TO_CONSOLE, LOG_TO_CLOUDWATCH });
+export const LOG_TO_CLOUDWATCH = process.env.LOG_TO_CLOUDWATCH ?? 'false'; // TODO: Figure out how to change this default to 'true' without breaking tests and scripts.
+
+const PREPEND_BACKEND_SUBFOLDER = process.env.PREPEND_BACKEND_SUBFOLDER ?? 'false';
+export const subfolder = PREPEND_BACKEND_SUBFOLDER === 'true' ? 'backend/' : ''; // Useful for when calling a script from the parent/root folder instead of within 'backend'.
+
+console.log({ LOG_TO_CONSOLE, LOG_TO_CLOUDWATCH });
 
 export const cloudwatchConfig = {
   // https://javascript.plainenglish.io/set-up-a-logger-for-your-node-app-with-winston-and-cloudwatch-in-5-minutes-dec0c6c0d5b8

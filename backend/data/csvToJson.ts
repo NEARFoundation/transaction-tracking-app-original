@@ -5,8 +5,8 @@ import fs from 'node:fs';
 // eslint-disable-next-line canonical/id-match
 import csv2json from 'csvjson-csv2json';
 
+import { subfolder } from '../../shared/config.js';
 import { type RowOfExpectedOutput } from '../../shared/types';
-import { subfolder } from '../src/helpers/config.js';
 
 // console.log({ subfolder });
 

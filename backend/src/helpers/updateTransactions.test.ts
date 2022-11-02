@@ -4,6 +4,7 @@
 import mongoose, { type Mongoose } from 'mongoose';
 import pg from 'pg';
 
+import { subfolder } from '../../../shared/config.js';
 import { type RowOfExpectedOutput, type TxActionRow, type AccountId } from '../../../shared/types';
 import { getRowsOfExpectedOutput } from '../../data/csvToJson';
 import { expectedOutputFilename } from '../../test_helpers/internal/defineTransactionHashesInSql';
@@ -16,7 +17,6 @@ import { addTransactionTypeSqlToDatabase, DOT_SQL, getSqlFolder } from './addDef
 import { CONNECTION_STRING, DEFAULT_LENGTH, mongoConnectionString, STATEMENT_TIMEOUT } from './config';
 import { updateTransactions } from './updateTransactions';
 
-const subfolder = process.env.BACKEND_FOLDER ?? '';
 const prefix = '_tx_'; // This also gets used in the `t` script of `/package.json`.
 
 // eslint-disable-next-line max-lines-per-function

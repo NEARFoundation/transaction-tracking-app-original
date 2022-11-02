@@ -6,9 +6,10 @@
 
 import fs from 'node:fs';
 
+import { subfolder } from '../../../shared/config.js';
 import { getRowsOfExpectedOutput } from '../../data/csvToJson.js';
 
-const transactionHashesFilename = './backend/test_helpers/internal/transactionHashes.sql';
+const transactionHashesFilename = `./${subfolder}test_helpers/internal/transactionHashes.sql`;
 export const expectedOutputFilename = 'test_helpers/expectedOutput.csv';
 const rowsOfExpectedOutput = getRowsOfExpectedOutput(expectedOutputFilename);
 

@@ -2,9 +2,10 @@ import fs from 'fs/promises';
 
 import pg from 'pg';
 
+import { subfolder } from '../../../shared/config.js';
+
 const NODE_ENV = process.env.NODE_ENV;
 export const POSTGRESQL_CONNECTION_STRING = process.env.POSTGRESQL_CONNECTION_STRING ?? '';
-const subfolder = process.env.BACKEND_FOLDER ?? '';
 
 console.log({ NODE_ENV, subfolder }, `process.cwd()) = ${process.cwd()}`);
 
