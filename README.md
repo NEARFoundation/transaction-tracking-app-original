@@ -117,6 +117,16 @@ Then run `yarn test` to run the tests.
 
 # Updating seed files for local database and test database
 
+1. Visit https://docs.google.com/spreadsheets/d/1g3yymiHP2QJqwLrJdwma8gu-J92XCbZR-DDpObmu_2o/edit#gid=726351924 The FLO team has decided that this is the official list of transaction types.
+1. Search the sheet for occurrences of "E+". If any numeric values are using this kind of (exponential) notation, you need to correct the cell (write out the full number instead). You might need to prepend the value with a single quote (').
+1. Search also for errors like "#N/A" since we don't want those in our sheet.
+1. Sort the rows by the "txType" column, ascending. (Creating a sorted "filter view" won't work because the next step of Download doesn't honor filter views.)
+1. File > Download > .ods (choose a temporary folder somewhere). We need this extra step before CSV because Google Sheets doesn't save the double-quotes correctly.
+1. Open the .ods file in LibreOffice.
+1. File > Save As > Text CSV (.csv)
+1. Choose to save to `backend/test_helpers/expectedOutput.csv`
+1. Check the boxes for "Save cell content as shown" and "Quote all text cells"
+
 # TODO: Explain how to get permissions.
 
 # Other Helpful Docs
