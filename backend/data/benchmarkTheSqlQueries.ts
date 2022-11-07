@@ -5,9 +5,9 @@ import pg, { type Client } from 'pg';
 
 import { millisToMinutesAndSeconds } from '../../shared/helpers/datetime.js';
 import { logger } from '../../shared/helpers/logging.js';
-import { type AccountId, type TxTypeRow, type RowOfExpectedOutput } from '../../shared/types';
+import { type AccountId, type RowOfExpectedOutput } from '../../shared/types';
+import { getSqlFolder, getTransactionTypeSql } from '../src/helpers/addDefaultTypesTx.js';
 import { CONNECTION_TIMEOUT, DEFAULT_LENGTH, mongoConnectionString, PRODUCTION_POSTGRESQL_CONNECTION_STRING, QUERY_TIMEOUT, STATEMENT_TIMEOUT } from '../src/helpers/config.js';
-import { TxTypes } from '../src/models/TxTypes.js';
 import { expectedOutputFilename } from '../test_helpers/internal/defineTransactionHashesInSql.js';
 
 import { getRowsOfExpectedOutput } from './csvToJson.js';
@@ -15,22 +15,17 @@ import { getRowsOfExpectedOutput } from './csvToJson.js';
 const connectionString = PRODUCTION_POSTGRESQL_CONNECTION_STRING;
 
 /**
- * This function is nearly a duplicate of the one in `backend/src/helpers/updateTransactions.ts` but adjusted for benchmarking.
+ * This function partially duplicates the one in `backend/src/helpers/updateTransactions.ts` but adjusted for benchmarking.
  */
 async function getTransactionsFromIndexer(pgClient: Client, accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<number | null> {
   try {
-    const txType: TxTypeRow | null = await TxTypes.findOne({ name: txTypeName });
-    if (txType) {
-      const startTime = performance.now();
-      const result = await pgClient.query(txType.sql, [accountId, blockTimestamp.toString(), length]);
-      const endTime = performance.now();
-      const diff = endTime - startTime;
-
-      return diff;
-    } else {
-      logger.error('TxType not found', txTypeName);
-      return null;
-    }
+    const sqlFolder = getSqlFolder();
+    const sql = getTransactionTypeSql(sqlFolder, `${txTypeName}.sql`);
+    const startTime = performance.now();
+    const result = await pgClient.query(sql, [accountId, blockTimestamp.toString(), length]);
+    const endTime = performance.now();
+    const diff = endTime - startTime;
+    return diff;
   } catch (error) {
     logger.error('getTransactionsFromIndexer', error);
     return null;
