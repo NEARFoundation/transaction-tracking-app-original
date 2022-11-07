@@ -6,7 +6,7 @@ import pg, { type Client } from 'pg';
 import { millisToMinutesAndSeconds } from '../../shared/helpers/datetime.js';
 import { logger } from '../../shared/helpers/logging.js';
 import { type AccountId, type TxTypeRow, type RowOfExpectedOutput } from '../../shared/types';
-import { CONNECTION_TIMEOUT, DEFAULT_LENGTH, mongoConnectionString, PRODUCTION_POSTGRESQL_CONNECTION_STRING, STATEMENT_TIMEOUT } from '../src/helpers/config.js';
+import { CONNECTION_TIMEOUT, DEFAULT_LENGTH, mongoConnectionString, PRODUCTION_POSTGRESQL_CONNECTION_STRING, QUERY_TIMEOUT, STATEMENT_TIMEOUT } from '../src/helpers/config.js';
 import { TxTypes } from '../src/models/TxTypes.js';
 import { expectedOutputFilename } from '../test_helpers/internal/defineTransactionHashesInSql.js';
 
@@ -32,7 +32,7 @@ async function getTransactionsFromIndexer(pgClient: Client, accountId: AccountId
       return null;
     }
   } catch (error) {
-    logger.error(error);
+    logger.error('getTransactionsFromIndexer', error);
     return null;
   }
 }
@@ -47,7 +47,7 @@ type Results = {
 async function runBenchmark() {
   const connection = await mongoose.connect(mongoConnectionString);
   const blockTimestamp = 0;
-  const pgClient = new pg.Client({ connectionString, statement_timeout: STATEMENT_TIMEOUT, connectionTimeoutMillis: CONNECTION_TIMEOUT });
+  const pgClient = new pg.Client({ connectionString, statement_timeout: STATEMENT_TIMEOUT, connectionTimeoutMillis: CONNECTION_TIMEOUT, query_timeout: QUERY_TIMEOUT });
   await pgClient.connect();
   // logger.info('pgClient connected');
   const rowsOfExpectedOutput: RowOfExpectedOutput[] = getRowsOfExpectedOutput(expectedOutputFilename);

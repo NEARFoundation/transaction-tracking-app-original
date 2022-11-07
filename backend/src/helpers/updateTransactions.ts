@@ -12,7 +12,7 @@ import { TxActions, getTxActionModel } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
 import { TxTypes } from '../models/TxTypes.js';
 
-import { CONNECTION_STRING, CONNECTION_TIMEOUT, DEFAULT_LENGTH, STATEMENT_TIMEOUT } from './config.js';
+import { CONNECTION_STRING, CONNECTION_TIMEOUT, DEFAULT_LENGTH, QUERY_TIMEOUT, STATEMENT_TIMEOUT } from './config.js';
 import { getCurrencyByPool, getCurrencyByContract } from './getCurrency.js';
 
 /**
@@ -53,7 +53,7 @@ async function getTransactionsFromIndexer(pgClient: Client, accountId: AccountId
       return [];
     }
   } catch (error) {
-    logger.error(error);
+    logger.error('getTransactionsFromIndexer', error);
     return [];
   }
 }
@@ -138,7 +138,12 @@ export async function updateTransactions(pgClient: pg.Client, accountId: Account
  * This is the only app function that uses the pg connection.
  */
 async function fetchTransactionsForTheseTypes(accountId: AccountId, types: TxTypeRow[]): Promise<void> {
-  const pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: STATEMENT_TIMEOUT, connectionTimeoutMillis: CONNECTION_TIMEOUT });
+  const pgClient = new pg.Client({
+    connectionString: CONNECTION_STRING,
+    statement_timeout: STATEMENT_TIMEOUT,
+    connectionTimeoutMillis: CONNECTION_TIMEOUT,
+    query_timeout: QUERY_TIMEOUT,
+  });
   await pgClient.connect();
   // logger.info('pgClient connected');
   const promisesOfAllTasks: Array<Promise<void>> = [];
