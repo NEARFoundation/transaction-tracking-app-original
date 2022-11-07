@@ -33,6 +33,16 @@ export const getCsvFilename = (accountIds: string[], startDate: Date, endDate: D
   return filename;
 };
 
+export function getStartOfDayUtc(date: Date): Date {
+  // console.log('getStartOfDayUtc', date);
+  return dayjs.utc(date).startOf('day').toDate(); // https://day.js.org/docs/en/manipulate/start-of
+}
+
+export function getEndOfDayUtc(date: Date): Date {
+  // console.log('getEndOfDayUtc', date);
+  return dayjs.utc(date).endOf('day').toDate(); // https://day.js.org/docs/en/manipulate/end-of
+}
+
 export const getDefaultStartUtc = (): Date => {
   const start = new Date(Date.UTC(2_020, 9, 1, 0, 0, 0));
   return new Date(start);
@@ -40,9 +50,7 @@ export const getDefaultStartUtc = (): Date => {
 
 export const getEndOfTodayUtc = (): Date => {
   const moment = new Date();
-  moment.setUTCHours(23, 59, 59, 999);
-  moment.setDate(moment.getDate() + 1);
-  return new Date(moment);
+  return getEndOfDayUtc(moment);
 };
 
 /**
