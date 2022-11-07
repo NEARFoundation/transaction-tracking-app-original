@@ -53,7 +53,7 @@ async function getTransactionsFromIndexer(pgClient: Client, accountId: AccountId
       return [];
     }
   } catch (error) {
-    logger.error('getTransactionsFromIndexer', error);
+    logger.error(`getTransactionsFromIndexer(${accountId}, ${txTypeName}`, error);
     return [];
   }
 }
