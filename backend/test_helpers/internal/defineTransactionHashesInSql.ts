@@ -15,16 +15,16 @@ const rowsOfExpectedOutput = getRowsOfExpectedOutput(expectedOutputFilename);
 
 // console.log({ rowsOfExpectedOutput });
 
-const transactionHashes: string[] = [];
+const transactionHashes: Set<string> = new Set();
 for (const rowOfExpectedOutput of rowsOfExpectedOutput) {
-  transactionHashes.push(`('${rowOfExpectedOutput.transaction_hash}')`);
+  transactionHashes.add(`('${rowOfExpectedOutput.transaction_hash}')`);
 }
 
 const sqlOutput = `DROP TABLE IF EXISTS transactionHashes;
 CREATE TEMP TABLE transactionHashes AS
 WITH t (transactionHash) AS (
  VALUES
- ${transactionHashes.join(',\n')}
+ ${Array.from(transactionHashes).join(',\n')}
  )
 SELECT * FROM t;`;
 // console.log(sqlOutput);
