@@ -1,6 +1,8 @@
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import MultiSelect from 'react-select'; // https://react-select.com/home
+
+import { AccountId, OptionType } from '../../../shared/types';
+
+import { DatePickerUtc } from './DatePickerUtc';
 
 const MultiSelectStyles = {
   option: (base: any) => ({
@@ -14,13 +16,36 @@ const MultiSelectStyles = {
   }),
 };
 
-export function TransactionsFilterControls({ accountIds, startDate, setStartDate, endDate, setEndDate, types, selectedTypes, onChangeTypes }): JSX.Element {
+type Props = {
+  accountIds: AccountId[];
+  startDate: Date;
+  setStartDate: any;
+  endDate: Date;
+  setEndDate: any;
+  types: OptionType[];
+  selectedTypes: OptionType[];
+  onChangeTypes: (value: any, event: any) => void;
+};
+
+// eslint-disable-next-line max-lines-per-function
+export function TransactionsFilterControls({ accountIds, startDate, setStartDate, endDate, setEndDate, types, selectedTypes, onChangeTypes }: Props): JSX.Element {
+  // If you experience weirdness when switching between certain commits, try deleting startDate and endDate from your localStorage.
+  const datePickerProps = {
+    showMonthDropdown: true,
+    showYearDropdown: true,
+    dateFormat: 'yyyy-MM-dd',
+    isEndOfDay: false,
+  };
+  const datePickerPropsEndOfDay = {
+    ...datePickerProps,
+    isEndOfDay: true,
+  };
   if (accountIds.length > 0) {
     return (
       <>
         <div style={{ paddingBottom: '6px', textAlign: 'center' }}>
-          From: <DatePicker selected={startDate} onChange={(date: any) => setStartDate(date)} showMonthDropdown showYearDropdown dateFormat="yyyy-MM-dd" />
-          To: <DatePicker selected={endDate} onChange={(date: any) => setEndDate(date)} showMonthDropdown showYearDropdown dateFormat="yyyy-MM-dd" />
+          From: <DatePickerUtc selected={startDate} onChange={(utcDate: Date) => setStartDate(utcDate)} {...datePickerProps} />
+          To: <DatePickerUtc selected={endDate} onChange={(utcDate: Date) => setEndDate(utcDate)} {...datePickerPropsEndOfDay} />
         </div>
 
         <MultiSelect

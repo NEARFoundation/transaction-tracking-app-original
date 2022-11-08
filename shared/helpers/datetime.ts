@@ -2,9 +2,12 @@ import dayjs from 'dayjs';
 // eslint-disable-next-line import/extensions
 import relativeTime from 'dayjs/plugin/relativeTime.js';
 import utc from 'dayjs/plugin/utc.js';
+// eslint-disable-next-line import/order
+import timezone from 'dayjs/plugin/timezone.js'; // dependent on utc plugin https://day.js.org/docs/en/plugin/timezone
 
 dayjs.extend(utc); // https://day.js.org/docs/en/plugin/utc
 dayjs.extend(relativeTime); // https://day.js.org/docs/en/plugin/relative-time
+dayjs.extend(timezone);
 
 /**
  *
@@ -52,6 +55,21 @@ export const getEndOfTodayUtc = (): Date => {
   const moment = new Date();
   return getEndOfDayUtc(moment);
 };
+
+export function treatLocalDateAsUtcMidnight(localDate: Date): Date {
+  const moment = dayjs(localDate).tz('UTC', true); // https://day.js.org/docs/en/plugin/timezone
+  const utcMidnight = getStartOfDayUtc(moment.toDate());
+  console.log({ localDate, utcMidnight });
+  return utcMidnight;
+}
+
+export function treatUtcMidnightAsLocalDate(utcMidnight: Date): Date {
+  const sliceOfJustTheDatePart = utcMidnight.toISOString().slice(0, 10);
+  const localDate = dayjs(sliceOfJustTheDatePart).toDate();
+
+  console.log({ localDate, sliceOfJustTheDatePart, utcMidnight });
+  return localDate;
+}
 
 /**
  *
