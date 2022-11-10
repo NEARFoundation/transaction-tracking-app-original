@@ -10,8 +10,8 @@ import { subfolder } from '../../../shared/config.js';
 import { getRowsOfExpectedOutput } from '../../data/csvToJson.js';
 
 const transactionHashesFilename = `./${subfolder}test_helpers/internal/transactionHashes.sql`;
-export const expectedOutputFilename = 'test_helpers/expectedOutput.csv';
-const rowsOfExpectedOutput = getRowsOfExpectedOutput(expectedOutputFilename);
+export const EXPECTED_OUTPUT_FILENAME = 'test_helpers/expectedOutput.csv';
+const rowsOfExpectedOutput = getRowsOfExpectedOutput(EXPECTED_OUTPUT_FILENAME);
 
 // console.log({ rowsOfExpectedOutput });
 

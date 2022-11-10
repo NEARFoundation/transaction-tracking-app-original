@@ -1,7 +1,7 @@
 // Run via `yarn test backend/src/helpers/getCurrency.test.ts`.
 import mongoose, { type Mongoose } from 'mongoose';
 
-import { mongoConnectionString } from './config';
+import { MONGO_CONNECTION_STRING } from './config';
 import { getCurrencyByContract } from './getCurrency';
 
 // https://jestjs.io/docs/setup-teardown#scoping
@@ -11,7 +11,7 @@ describe('getCurrency', () => {
   let connection: Mongoose;
 
   beforeAll(async () => {
-    connection = await mongoose.connect(mongoConnectionString);
+    connection = await mongoose.connect(MONGO_CONNECTION_STRING);
   });
 
   afterAll(async () => {

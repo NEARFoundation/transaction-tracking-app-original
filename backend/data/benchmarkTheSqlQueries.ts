@@ -7,8 +7,8 @@ import { millisToMinutesAndSeconds } from '../../shared/helpers/datetime.js';
 import { logger } from '../../shared/helpers/logging.js';
 import { type AccountId, type RowOfExpectedOutput } from '../../shared/types';
 import { getSqlFolder, getTransactionTypeSql } from '../src/helpers/addDefaultTypesTx.js';
-import { CONNECTION_TIMEOUT, DEFAULT_LENGTH, mongoConnectionString, PRODUCTION_POSTGRESQL_CONNECTION_STRING, QUERY_TIMEOUT, STATEMENT_TIMEOUT } from '../src/helpers/config.js';
-import { expectedOutputFilename } from '../test_helpers/internal/defineTransactionHashesInSql.js';
+import { CONNECTION_TIMEOUT, DEFAULT_LENGTH, MONGO_CONNECTION_STRING, PRODUCTION_POSTGRESQL_CONNECTION_STRING, QUERY_TIMEOUT, STATEMENT_TIMEOUT } from '../src/helpers/config.js';
+import { EXPECTED_OUTPUT_FILENAME } from '../test_helpers/internal/defineTransactionHashesInSql.js';
 
 import { getRowsOfExpectedOutput } from './csvToJson.js';
 
@@ -40,12 +40,12 @@ type Results = {
 };
 
 async function runBenchmark() {
-  const connection = await mongoose.connect(mongoConnectionString);
+  const connection = await mongoose.connect(MONGO_CONNECTION_STRING);
   const blockTimestamp = 0;
   const pgClient = new pg.Client({ connectionString, statement_timeout: STATEMENT_TIMEOUT, connectionTimeoutMillis: CONNECTION_TIMEOUT, query_timeout: QUERY_TIMEOUT });
   await pgClient.connect();
   // logger.info('pgClient connected');
-  const rowsOfExpectedOutput: RowOfExpectedOutput[] = getRowsOfExpectedOutput(expectedOutputFilename);
+  const rowsOfExpectedOutput: RowOfExpectedOutput[] = getRowsOfExpectedOutput(EXPECTED_OUTPUT_FILENAME);
 
   // console.log({ rowsOfExpectedOutput });
   const results: Results = {};

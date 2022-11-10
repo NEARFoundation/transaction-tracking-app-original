@@ -5,18 +5,18 @@ import mongoose from 'mongoose';
 import { logger } from '../../shared/helpers/logging.js';
 
 import { addDefaultTypesTx } from './helpers/addDefaultTypesTx.js';
-import { mongoConnectionString, port } from './helpers/config.js';
+import { MONGO_CONNECTION_STRING, PORT } from './helpers/config.js';
 import { SyncedCron } from './helpers/syncedCron.js';
 import { runAllNonRunningTasks } from './helpers/updateTransactions.js';
 import { routes } from './routes/collector.routes.js';
 
-await mongoose.connect(mongoConnectionString);
+await mongoose.connect(MONGO_CONNECTION_STRING);
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 routes(app);
-app.listen(port);
+app.listen(PORT);
 
 await addDefaultTypesTx();
 

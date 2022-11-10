@@ -19,8 +19,6 @@ export const CRON_SCHEDULE = process.env.CRON_SCHEDULE ?? '* * * * *'; // every 
 // '* * * * * *', // every second. Only for careful local development purposes. https://www.freeformatter.com/cron-expression-generator-quartz.html
 // '*/10 * * * * *', // every 10 seconds. https://stackoverflow.com/a/59800039/ https://www.freeformatter.com/cron-expression-generator-quartz.html
 
-export const accountIdsToCheckJson = process.env.ACCOUNT_IDS_TO_CHECK_JSON ?? '[]';
-
-export const mongoConnectionString = process.env.MONGO ?? '';
-export const port = process.env.PORT;
-// console.log({ mongoConnectionString });
+export const MONGO_CONNECTION_STRING = process.env.MONGO ?? '';
+export const PORT = process.env.PORT;
+// console.log({ MONGO_CONNECTION_STRING });

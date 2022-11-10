@@ -7,14 +7,14 @@ import pg from 'pg';
 import { subfolder } from '../../../shared/config.js';
 import { type RowOfExpectedOutput, type TxActionRow, type AccountId } from '../../../shared/types';
 import { getRowsOfExpectedOutput } from '../../data/csvToJson';
-import { expectedOutputFilename } from '../../test_helpers/internal/defineTransactionHashesInSql';
+import { EXPECTED_OUTPUT_FILENAME } from '../../test_helpers/internal/defineTransactionHashesInSql';
 import jsonToCsv from '../../test_helpers/internal/jsonToCsv';
 import { seedTheMockIndexerDatabase } from '../../test_helpers/internal/updateTestData';
 import { TxActions, convertFromModelToTxActionRow, cleanExpectedOutputFromCsv } from '../models/TxActions';
 import { TxTypes } from '../models/TxTypes';
 
 import { addTransactionTypeSqlToDatabase, DOT_SQL, getSqlFolder } from './addDefaultTypesTx';
-import { CONNECTION_STRING, DEFAULT_LENGTH, mongoConnectionString, STATEMENT_TIMEOUT } from './config';
+import { CONNECTION_STRING, DEFAULT_LENGTH, MONGO_CONNECTION_STRING, STATEMENT_TIMEOUT } from './config';
 import { updateTransactions } from './updateTransactions';
 
 const prefix = '_tx_'; // This also gets used in the `t` script of `/package.json`.
@@ -27,7 +27,7 @@ describe('updateTransactions', () => {
 
   beforeAll(async () => {
     // Before any of this suite starts running, connect to Mongo, connect to PostgreSQL, seed the PostgreSQL test database, and close the PostgreSQL test database connection.
-    connection = await mongoose.connect(mongoConnectionString);
+    connection = await mongoose.connect(MONGO_CONNECTION_STRING);
     sqlFolder = getSqlFolder(subfolder);
     const txTypesCountDocuments = await TxTypes.countDocuments();
     console.log({ txTypesCountDocuments, CONNECTION_STRING });
@@ -50,7 +50,7 @@ describe('updateTransactions', () => {
 
   jest.setTimeout(3_000);
 
-  const rowsOfExpectedOutput: RowOfExpectedOutput[] = getRowsOfExpectedOutput(expectedOutputFilename);
+  const rowsOfExpectedOutput: RowOfExpectedOutput[] = getRowsOfExpectedOutput(EXPECTED_OUTPUT_FILENAME);
 
   // console.log({ rowsOfExpectedOutput });
 

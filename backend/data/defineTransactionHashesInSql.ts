@@ -2,9 +2,9 @@ import fs from 'node:fs';
 
 import { getRowsOfExpectedOutput } from './csvToJson.js';
 
-const transactionHashesFilename = './backend/data/transactionHashes.sql';
-const transactionHashesCsv = 'data/transactionHashes.csv';
-const rowsOfExpectedOutput = getRowsOfExpectedOutput(transactionHashesCsv);
+const TRANSACTION_HASHES_FILENAME = './backend/data/transactionHashes.sql';
+const TRANSACTION_HASHES_CSV = 'data/transactionHashes.csv';
+const rowsOfExpectedOutput = getRowsOfExpectedOutput(TRANSACTION_HASHES_CSV);
 
 // console.log({ rowsOfExpectedOutput });
 
@@ -22,4 +22,4 @@ WITH t (transactionHash) AS (
 SELECT * FROM t;`;
 // console.log(sqlOutput);
 
-fs.writeFileSync(transactionHashesFilename, sqlOutput);
+fs.writeFileSync(TRANSACTION_HASHES_FILENAME, sqlOutput);
