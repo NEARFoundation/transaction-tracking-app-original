@@ -31,7 +31,7 @@ describe('updateTransactions', () => {
     sqlFolder = getSqlFolder(subfolder);
     const txTypesCountDocuments = await TxTypes.countDocuments();
     console.log({ txTypesCountDocuments, CONNECTION_STRING });
-    await seedTheMockIndexerDatabase();
+    // await seedTheMockIndexerDatabase(); // Commenting this out temporarily while running tests against the remote production database since seeding the local test database doesn't fully work yet.
     pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: STATEMENT_TIMEOUT });
     await pgClient.connect();
   });
@@ -48,7 +48,7 @@ describe('updateTransactions', () => {
     await TxActions.deleteMany({});
   });
 
-  jest.setTimeout(3_000);
+  jest.setTimeout(1_500);
 
   const rowsOfExpectedOutput: RowOfExpectedOutput[] = getRowsOfExpectedOutput(EXPECTED_OUTPUT_FILENAME);
 
@@ -58,48 +58,42 @@ describe('updateTransactions', () => {
     return rowsOfExpectedOutput.filter((row) => row.accountId === accountId && row.txType === txType).map((row) => cleanExpectedOutputFromCsv(row));
   }
 
-  async function runTest(accountId: AccountId, txType: string) {
-    test(`${prefix} ${txType}`, async () => {
-      const file = `${txType}${DOT_SQL}`;
-      await addTransactionTypeSqlToDatabase(sqlFolder, file);
-      await updateTransactions(pgClient, accountId, txType, DEFAULT_LENGTH);
-      const txActions = await TxActions.find({
-        accountId,
-        txType,
-      }).sort([['block_timestamp', -1]]);
-      const txActionsConverted: TxActionRow[] = [];
-      for (const txAction of txActions) {
-        const txActionConverted = convertFromModelToTxActionRow(txAction);
-        txActionsConverted.push(txActionConverted);
-      }
+  async function runQueryTests() {
+    for (const rowOfExpectedOutput of rowsOfExpectedOutput) {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const { accountId, txType, transaction_hash } = rowOfExpectedOutput;
+      if (txType) {
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
+        test(`${prefix} ${txType}`, async () => {
+          const file = `${txType}${DOT_SQL}`;
+          await addTransactionTypeSqlToDatabase(sqlFolder, file);
+          await updateTransactions(pgClient, accountId, txType, DEFAULT_LENGTH);
+          const txActions = await TxActions.find({
+            accountId,
+            txType,
+          }).sort([['block_timestamp', -1]]);
+          const txActionsConverted: TxActionRow[] = [];
+          for (const txAction of txActions) {
+            const txActionConverted = convertFromModelToTxActionRow(txAction);
+            txActionsConverted.push(txActionConverted);
+          }
 
-      // console.log({ txActionsConverted });
-      const relevantRowsOfExpectedOutput = getRelevantRowsOfExpectedOutput(accountId, txType);
-      expect(txActionsConverted).toEqual(relevantRowsOfExpectedOutput.sort((a, b) => b.block_timestamp - a.block_timestamp));
-    });
-  }
-
-  for (const rowOfExpectedOutput of rowsOfExpectedOutput) {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { accountId, txType, transaction_hash } = rowOfExpectedOutput;
-    if (txType) {
-      runTest(accountId, txType)
-        // eslint-disable-next-line promise/prefer-await-to-then
-        .then((result) => {
-          // console.log({ result });
-        })
-        // eslint-disable-next-line promise/prefer-await-to-then
-        .catch((error) => {
-          console.error({ error });
+          // console.log({ txActionsConverted });
+          const relevantRowsOfExpectedOutput = getRelevantRowsOfExpectedOutput(accountId, txType);
+          expect(txActionsConverted).toEqual(relevantRowsOfExpectedOutput.sort((a, b) => b.block_timestamp - a.block_timestamp));
         });
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-loop-func
-      test(`${prefix} ${transaction_hash}`, () => {
-        const hint = 'Where is the txType etc?'; // This test is kind of a fake test just to highlight within the test results (via test failure) that something unexpected is happening here. We don't actually expect transaction_hash to equal `hint`.
-        expect(transaction_hash).toEqual(hint);
-      });
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
+        test(`${prefix} ${transaction_hash}`, () => {
+          const hint = 'Where is the txType etc?'; // This test is kind of a fake test just to highlight within the test results (via test failure) that something unexpected is happening here. We don't actually expect transaction_hash to equal `hint`.
+          expect(transaction_hash).toEqual(hint);
+        });
+      }
     }
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  runQueryTests();
 
   test('overwrite possibleExpectedOutput', async () => {
     const txActionsConverted: TxActionRow[] = [];
