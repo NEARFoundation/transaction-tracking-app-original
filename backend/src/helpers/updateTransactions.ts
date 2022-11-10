@@ -33,27 +33,22 @@ async function getMostRecentBlockTimestamp(accountId: AccountId, txType: string)
  * Run the SQL query of this transaction type to check whether the indexer has any transactions of this
  * type for this accountId (in the period defined by blockTimestamp and length).
  */
-async function getTransactionsFromIndexer(pgClient: Client, accountId: AccountId, txTypeName: string, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
+async function getTransactionsFromIndexer(pgClient: Client, accountId: AccountId, txType: TxTypeRow, blockTimestamp: number, length: number): Promise<TxActionRow[]> {
   try {
-    const txType: TxTypeRow | null = await TxTypes.findOne({ name: txTypeName });
-    if (txType) {
-      logger.info(accountId, `getTransactionsFromIndexer(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
-      const startTime = performance.now();
-      const result = await pgClient.query(txType.sql, [accountId, blockTimestamp.toString(), length]);
-      const endTime = performance.now();
-      logger.info(
-        accountId,
-        `pgClient performance of getTransactionsFromIndexer(${accountId}, ${txTypeName}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`,
-        millisToMinutesAndSeconds(endTime - startTime),
-      );
-      const rows = result.rows as unknown as TxActionRow[];
-      logger.info(accountId, `${txTypeName} rows`, JSON.stringify(rows));
-      return rows;
-    } else {
-      return [];
-    }
+    logger.info(accountId, `getTransactionsFromIndexer(${accountId}, ${txType.name}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`);
+    const startTime = performance.now();
+    const result = await pgClient.query(txType.sql, [accountId, blockTimestamp.toString(), length]);
+    const endTime = performance.now();
+    logger.info(
+      accountId,
+      `pgClient performance of getTransactionsFromIndexer(${accountId}, ${txType.name}, ${getFormattedDatetimeUtcFromBlockTimestamp(blockTimestamp)}, ${length})`,
+      millisToMinutesAndSeconds(endTime - startTime),
+    );
+    const rows = result.rows as unknown as TxActionRow[];
+    logger.info(accountId, `${txType.name} rows`, JSON.stringify(rows));
+    return rows;
   } catch (error) {
-    logger.error(`getTransactionsFromIndexer(${accountId}, ${txTypeName}`, error);
+    logger.error(`getTransactionsFromIndexer(${accountId}, ${txType.name}`, error);
     return [];
   }
 }
@@ -84,53 +79,57 @@ async function saveTransactionFromIndexerToCache(accountId: AccountId, txType: s
 }
 
 // eslint-disable-next-line max-lines-per-function
-export async function updateTransactions(pgClient: pg.Client, accountId: AccountId, txType: string, length: number): Promise<void> {
-  logger.info(accountId, `updateTransactions(${accountId}, ${txType})`);
+export async function updateTransactions(pgClient: pg.Client, accountId: AccountId, txTypeName: string, length: number): Promise<void> {
+  logger.info(accountId, `updateTransactions(${accountId}, ${txTypeName})`);
+  const txType: TxTypeRow | null = await TxTypes.findOne({ name: txTypeName });
+  if (txType) {
+    let minBlockTimestamp = await getMostRecentBlockTimestamp(accountId, txTypeName);
+    //  logger.info({ minBlockTimestamp });
 
-  let minBlockTimestamp = await getMostRecentBlockTimestamp(accountId, txType);
-  //  logger.info({ minBlockTimestamp });
+    logger.debug(accountId, 'Awaiting getTransactions', accountId, txType.name);
+    let transactions = await getTransactionsFromIndexer(pgClient, accountId, txType, minBlockTimestamp, length);
+    // logger.info({ transactions });
+    logger.info(accountId, `Starting the 'while' loop of updateTransactions ${txTypeName}`);
+    while (transactions.length > 0) {
+      const promises: Array<Promise<void>> = [];
+      logger.info(accountId, `Pushing all saveTransactionFromIndexerToCache promises for ${accountId} ${txTypeName}.`);
 
-  logger.debug(accountId, 'Awaiting getTransactions', accountId, txType);
-  let transactions = await getTransactionsFromIndexer(pgClient, accountId, txType, minBlockTimestamp, length);
-  // logger.info({ transactions });
-  logger.info(accountId, `Starting the 'while' loop of updateTransactions ${txType}`);
-  while (transactions.length > 0) {
-    const promises: Array<Promise<void>> = [];
-    logger.info(accountId, `Pushing all saveTransactionFromIndexerToCache promises for ${accountId} ${txType}.`);
+      for (const transaction of transactions) {
+        logger.info(accountId, 'About to call saveTransactionFromIndexerToCache', transaction.transaction_hash);
+        const promise = saveTransactionFromIndexerToCache(accountId, txTypeName, transaction);
+        promises.push(promise);
+      }
 
-    for (const transaction of transactions) {
-      logger.info(accountId, 'About to call saveTransactionFromIndexerToCache', transaction.transaction_hash);
-      const promise = saveTransactionFromIndexerToCache(accountId, txType, transaction);
-      promises.push(promise);
+      // logger.success('Finished the `for` loop of pushing saveTransactionFromIndexerToCache promises (but not the `while` loop).');
+      logger.debug(accountId, `Awaiting all updateTransactions promises for ${accountId} ${txTypeName}.`);
+      await Promise.all(promises);
+      logger.success(accountId, `Finished awaiting all promises (but still in the 'while' loop) for ${accountId} ${txTypeName}.`);
+      // -------------------------------------------------
+      // TODO: Document what is happening in this section:
+      let nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
+      let index = 1;
+      while (nextBlockTimestamp === minBlockTimestamp && transactions.length === length * index) {
+        index += 1;
+        const increasedLength = length * index;
+        transactions = await getTransactionsFromIndexer(pgClient, accountId, txType, minBlockTimestamp, increasedLength);
+        nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
+      }
+
+      if (nextBlockTimestamp === minBlockTimestamp) {
+        break;
+      }
+
+      if (index === 1) {
+        minBlockTimestamp = nextBlockTimestamp;
+        transactions = await getTransactionsFromIndexer(pgClient, accountId, txType, minBlockTimestamp, length);
+      }
+      // -------------------------------------------------
     }
 
-    // logger.success('Finished the `for` loop of pushing saveTransactionFromIndexerToCache promises (but not the `while` loop).');
-    logger.debug(accountId, `Awaiting all updateTransactions promises for ${accountId} ${txType}.`);
-    await Promise.all(promises);
-    logger.success(accountId, `Finished awaiting all promises (but still in the 'while' loop) for ${accountId} ${txType}.`);
-    // -------------------------------------------------
-    // TODO: Document what is happening in this section:
-    let nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
-    let index = 1;
-    while (nextBlockTimestamp === minBlockTimestamp && transactions.length === length * index) {
-      index += 1;
-      const increasedLength = length * index;
-      transactions = await getTransactionsFromIndexer(pgClient, accountId, txType, minBlockTimestamp, increasedLength);
-      nextBlockTimestamp = transactions[transactions.length - 1].block_timestamp;
-    }
-
-    if (nextBlockTimestamp === minBlockTimestamp) {
-      break;
-    }
-
-    if (index === 1) {
-      minBlockTimestamp = nextBlockTimestamp;
-      transactions = await getTransactionsFromIndexer(pgClient, accountId, txType, minBlockTimestamp, length);
-    }
-    // -------------------------------------------------
+    logger.success(accountId, `Finished the 'while' loop of updateTransactions ${accountId} ${txTypeName}`);
+  } else {
+    logger.error(accountId, `updateTransactions: txType ${txTypeName} not found`);
   }
-
-  logger.success(accountId, `Finished the 'while' loop of updateTransactions ${accountId} ${txType}`);
 }
 
 /**
