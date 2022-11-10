@@ -6,6 +6,8 @@ import { respondWithServerError } from '../helpers/errors.js';
 import { TxActions } from '../models/TxActions.js';
 import { TxTasks } from '../models/TxTasks.js';
 
+import { addTaskForAccount } from './addTasks.js';
+
 // eslint-disable-next-line max-lines-per-function
 export const getAccounts = async (request: Request, response: Response) => {
   const { body } = request;
@@ -33,7 +35,16 @@ export const getAccounts = async (request: Request, response: Response) => {
           lastUpdate = getFormattedUtcDatetime(new Date(txTaskForAccount.lastUpdate));
         }
       } else {
-        status = 'The account is not monitored. Please add the account again.';
+        // Here, it seems that the frontend localStorage had 1 or more account IDs that are missing from the Mongo cache called TxTasks. Automatically add the corresponding TxTask as necessary:
+        status = 'The cache for this account seems missing. Re-downloading account data now. You can refresh this page soon to check.';
+
+        addTaskForAccount(accountId)
+          // eslint-disable-next-line promise/prefer-await-to-then, @typescript-eslint/no-empty-function
+          .then((value: any) => {})
+          // eslint-disable-next-line promise/prefer-await-to-then
+          .catch((error) => {
+            console.error(error);
+          });
       }
 
       accounts.push({ accountId, lastUpdate, status });

@@ -93,3 +93,5 @@ export type AccountsTableProps = {
 export type CsvTransaction = any;
 
 export type RowOfExpectedOutput = any;
+
+export type Arguments = { [key: string | symbol]: any };

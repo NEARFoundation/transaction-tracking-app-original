@@ -8,7 +8,7 @@ export function AccountUpdatedLabel({ selectedAccountId, lastUpdate, isLoading }
           </div>
         ) : (
           <div>
-            {selectedAccountId}. {isLoading ? 'Loading...' : 'Check back later'}
+            {selectedAccountId}. {isLoading ? 'Loading...' : '(Still in progress downloading.)'}
           </div>
         )}
       </>

@@ -1373,6 +1373,11 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
+"@nearfoundation/near-prettier-config@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@nearfoundation/near-prettier-config/-/near-prettier-config-1.0.1.tgz#f77a23b736b3fc6bc2db49f81e24687e18894bcc"
+  integrity sha512-O2bxnHk08AFcU9nlr8VPt93Rw7OZBYuZcUoHLi/3y7059mu3OnHYyWdujgzZQjd+si/yf7iq+cbtoka2eZyB9A==
+
 "@next/eslint-plugin-next@^12.2.5":
   version "12.3.1"
   resolved "https://registry.yarnpkg.com/@next/eslint-plugin-next/-/eslint-plugin-next-12.3.1.tgz#b821f27b0f175954d8d18e5d323fce040ecc79a6"

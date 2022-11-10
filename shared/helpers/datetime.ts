@@ -2,9 +2,12 @@ import dayjs from 'dayjs';
 // eslint-disable-next-line import/extensions
 import relativeTime from 'dayjs/plugin/relativeTime.js';
 import utc from 'dayjs/plugin/utc.js';
+// eslint-disable-next-line import/order
+import timezone from 'dayjs/plugin/timezone.js'; // dependent on utc plugin https://day.js.org/docs/en/plugin/timezone
 
 dayjs.extend(utc); // https://day.js.org/docs/en/plugin/utc
 dayjs.extend(relativeTime); // https://day.js.org/docs/en/plugin/relative-time
+dayjs.extend(timezone);
 
 /**
  *
@@ -33,6 +36,16 @@ export const getCsvFilename = (accountIds: string[], startDate: Date, endDate: D
   return filename;
 };
 
+export function getStartOfDayUtc(date: Date): Date {
+  // console.log('getStartOfDayUtc', date);
+  return dayjs.utc(date).startOf('day').toDate(); // https://day.js.org/docs/en/manipulate/start-of
+}
+
+export function getEndOfDayUtc(date: Date): Date {
+  // console.log('getEndOfDayUtc', date);
+  return dayjs.utc(date).endOf('day').toDate(); // https://day.js.org/docs/en/manipulate/end-of
+}
+
 export const getDefaultStartUtc = (): Date => {
   const start = new Date(Date.UTC(2_020, 9, 1, 0, 0, 0));
   return new Date(start);
@@ -40,10 +53,23 @@ export const getDefaultStartUtc = (): Date => {
 
 export const getEndOfTodayUtc = (): Date => {
   const moment = new Date();
-  moment.setUTCHours(23, 59, 59, 999);
-  moment.setDate(moment.getDate() + 1);
-  return new Date(moment);
+  return getEndOfDayUtc(moment);
 };
+
+export function treatLocalDateAsUtcMidnight(localDate: Date): Date {
+  const moment = dayjs(localDate).tz('UTC', true); // https://day.js.org/docs/en/plugin/timezone
+  const utcMidnight = getStartOfDayUtc(moment.toDate());
+  console.log({ localDate, utcMidnight });
+  return utcMidnight;
+}
+
+export function treatUtcMidnightAsLocalDate(utcMidnight: Date): Date {
+  const sliceOfJustTheDatePart = utcMidnight.toISOString().slice(0, 10);
+  const localDate = dayjs(sliceOfJustTheDatePart).toDate();
+
+  console.log({ localDate, sliceOfJustTheDatePart, utcMidnight });
+  return localDate;
+}
 
 /**
  *

@@ -1,7 +1,6 @@
 import { getFormattedUtcDatetime, getRelativeTimeOrUtc } from '../../../shared/helpers/datetime';
 import { AccountId, AccountRowProps } from '../../../shared/types';
 import { ALLOW_DELETING_FROM_DATABASE, API_BASE_URL, defaultRequestOptions } from '../helpers/config';
-import { addTaskForAccountId } from '../helpers/transactions';
 
 async function deleteFromDatabase(accountId: AccountId) {
   console.log('deleteFromDb', accountId);
@@ -13,7 +12,6 @@ async function deleteFromDatabase(accountId: AccountId) {
     .then(async (response) => {
       const data = await response.json();
       console.log(data);
-      addTaskForAccountId(accountId);
     })
     .catch((error) => {
       console.error(error);
@@ -35,9 +33,9 @@ export default function AccountRow({
     <td>
       <button
         style={{ backgroundColor: 'red', color: 'black' }}
-        onClick={() => {
+        onClick={async () => {
+          await deleteFromDatabase(accountId);
           deleteFromLocalStorage(accountId);
-          deleteFromDatabase(accountId);
         }}
       >
         Delete from DB
@@ -54,7 +52,7 @@ export default function AccountRow({
           {accountId}
         </div>
       </td>
-      <td>{accountStatus ? accountStatus.status : null}</td>
+      <td className="max-width-none">{accountStatus ? accountStatus.status : null}</td>
       <td className="fixed-width" title={utc}>
         {getRelativeTimeOrUtc(utc)}
       </td>

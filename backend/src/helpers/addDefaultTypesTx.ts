@@ -8,12 +8,17 @@ export const DOT_SQL = '.sql';
 
 export function getSqlFolder(subfolder = ''): string {
   const sqlFolder = `${subfolder}src/helpers/TxTypes/`;
-  console.log({ sqlFolder });
+  // console.log({ sqlFolder });
   return sqlFolder;
 }
 
-export async function addTransactionTypeSqlToDatabase(sqlFolder: string, file: string) {
+export function getTransactionTypeSql(sqlFolder: string, file: string): string {
   const data = fs.readFileSync(sqlFolder + file, 'utf8');
+  return data;
+}
+
+export async function addTransactionTypeSqlToDatabase(sqlFolder: string, file: string) {
+  const data = getTransactionTypeSql(sqlFolder, file);
 
   // console.log({ file, data }); // Or use `console.log(path.parse(file).name);` if you don't want the extension.
   // eslint-disable-next-line promise/valid-params
