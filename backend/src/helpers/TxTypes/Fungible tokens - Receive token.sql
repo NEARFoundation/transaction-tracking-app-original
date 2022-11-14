@@ -5,7 +5,7 @@ SELECT
   convert_from(decode(ara.args ->> 'args_base64', 'base64'), 'UTF8') args_base64,
   r.originated_from_transaction_hash transaction_hash,
   ara.args -> 'args_json' ->> 'amount' amount_transferred,
-  'token' currency_transferred,
+  r.receiver_account_id get_currency_by_contract,
   /* The ticker symbol later gets looked up in `backend/src/helpers/getCurrency.ts`. */
   ara.args -> 'args_json' ->> 'receiver_id' receiver_owner_account
 FROM

@@ -1,6 +1,7 @@
 import * as nearAPI from 'near-api-js'; // https://docs.near.org/tools/near-api-js/quick-reference#import
 
 import getConfig from '../../../shared/config.js';
+import { logger } from '../../../shared/helpers/logging.js';
 import { type AccountId } from '../../../shared/types/index.js';
 import { getNearApiConnection } from '../helpers/nearConnection.js';
 import { PoolsCurrencies } from '../models/PoolsCurrencies.js';
@@ -29,7 +30,7 @@ export const getCurrencyByPool = async (poolId: number): Promise<[string, string
       from_index: poolId,
       limit: 1,
     });
-    console.log(poolsResult);
+    logger.info(poolsResult);
     const ftMetadataResult1 = await new nearAPI.Account(connection, '').viewFunction(poolsResult[0].token_account_ids[0], 'ft_metadata', {});
     // eslint-disable-next-line promise/valid-params
     await PoolsCurrencies.findOneAndUpdate(
@@ -45,7 +46,7 @@ export const getCurrencyByPool = async (poolId: number): Promise<[string, string
       { upsert: true },
     )
       .then()
-      .catch((error) => console.error(error));
+      .catch((error) => logger.error(error));
 
     const ftMetadataResult2 = await new nearAPI.Account(connection, '').viewFunction(poolsResult[0].token_account_ids[1], 'ft_metadata', {});
     try {
@@ -62,7 +63,7 @@ export const getCurrencyByPool = async (poolId: number): Promise<[string, string
         { upsert: true },
       );
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
 
     return [ftMetadataResult1.symbol, ftMetadataResult2.symbol];
@@ -76,14 +77,14 @@ async function getCurrencyByContractFromNear(fungibleTokenContractAccountId: Acc
 }
 
 export const getCurrencyByContract = async (fungibleTokenContractAccountId: AccountId): Promise<string> => {
-  // console.log('getCurrencyByContract', fungibleTokenContractAccountId);
+  // logger.info('getCurrencyByContract', fungibleTokenContractAccountId);
   const currency = await PoolsCurrencies.findOne({ contract: fungibleTokenContractAccountId });
   if (currency) {
-    // console.log('Found currency', currency.currency);
+    // logger.info('Found currency', currency.currency);
     return currency.currency;
   } else {
     try {
-      console.log('Using near-api-js to check for the FT symbol for contract', fungibleTokenContractAccountId);
+      logger.info('Using near-api-js to check for the FT symbol for contract', fungibleTokenContractAccountId);
       const { symbol, name, decimals } = await getCurrencyByContractFromNear(fungibleTokenContractAccountId);
       // eslint-disable-next-line promise/valid-params
       await PoolsCurrencies.findOneAndUpdate(
@@ -96,10 +97,10 @@ export const getCurrencyByContract = async (fungibleTokenContractAccountId: Acco
         },
         { upsert: true },
       );
-      console.log('Get currency symbol', symbol);
+      logger.info('Get currency symbol', symbol);
       return symbol;
     } catch (error) {
-      console.error({ nearAPI, error });
+      logger.error('getCurrencyByContract error', { nearAPI, error });
     }
 
     return '';
