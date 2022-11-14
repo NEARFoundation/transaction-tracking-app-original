@@ -1,0 +1,91 @@
+version: "3.3"
+
+services:
+  backend:
+    #image: nearfoundation/txtrackingbackend:local
+    image: 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/transactionsbackend:develop
+    build:
+      context: ./
+      dockerfile: ./docker/backend/Dockerfile
+    environment:
+      - REACT_APP_API_BASE_URL=http://localhost:8086
+      # Remember to use NODE_ENV=production if you're using mainnet (so that the appropriate explorerUrl gets used in the frontend)
+      - MONGO=mongodb://mongodb:27017/
+      - MONGODB_PASSWORD=
+      - NODE_ENV=production
+      - POSTGRESQL_CONNECTION_STRING=postgresql://pguser:pgpass@postgres:5432/tta_db_local
+      - MONGODB_USER=mongouser
+      - MONGODB_PASSWORD=mongopass
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - NODE_ENV=development
+      - ALLOW_DELETING_FROM_DATABASE=false
+      - CHAIN=testnet
+      - REACT_APP_ENVIRONMENT=development
+# todo
+
+# chain mainnet
+# remove allow-delete variable
+# node-env = production
+# react-app = production
+
+# change / add url / cname
+# mongo migration
+# postgres pointer
+# 2x mongos (mongo = cache data)
+#
+
+# cname for transactions.nearfoundation.engineering
+# cname for transactions.develop.nearfoundation.engineering
+
+
+
+
+      - MONGO=mongodb://mongodb:27017/near_accounting_report_dev?authSource=admin&readPreference=primary&directConnection=true&ssl=false
+      # postgres
+    depends_on:
+      - postgres
+      - mongodb
+    ports:
+      - 8086:8086
+  frontend:
+    #image: nearfoundation/transactionsfrontend:develop
+    image: 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/transactionsfrontend
+    build:
+      context: ./
+      dockerfile: ./docker/frontend/Dockerfile
+    environment:
+      - REACT_APP_API_BASE_URL=http://localhost:8086
+      # Remember to use NODE_ENV=production if you're using mainnet (so that the appropriate explorerUrl gets used in the frontend)
+      - REACT_APP_ENVIRONMENT=development
+      - REACT_APP_ALLOW_DELETING_FROM_DATABASE="false"
+      - BACKEND_FOLDER=../backend/
+    ports:
+      - 8085:8085
+    depends_on:
+      - backend
+  postgres:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    restart: always
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpass
+      POSTGRES_DB: tta_db_local
+  mongodb:
+    image: mongo:5.0.2
+    restart: always
+    environment:
+      - MONGODB_USER=mongouser
+      - MONGODB_PASSWORD=mongopass
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+    ports:
+      - 27017:27017
+      #- "${MONGODB_LOCAL_PORT}:${MONGODB_DOCKER_PORT}"
+    volumes:
+      - db:/data/db
+
+volumes:
+  db:
