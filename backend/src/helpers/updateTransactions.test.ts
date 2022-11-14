@@ -5,6 +5,7 @@ import mongoose, { type Mongoose } from 'mongoose';
 import pg from 'pg';
 
 import { subfolder } from '../../../shared/config.js';
+import { logger } from '../../../shared/helpers/logging.js';
 import { type RowOfExpectedOutput, type TxActionRow, type AccountId } from '../../../shared/types';
 import { getRowsOfExpectedOutput } from '../../data/csvToJson';
 import { EXPECTED_OUTPUT_FILENAME } from '../../test_helpers/internal/defineTransactionHashesInSql';
@@ -33,8 +34,8 @@ describe('updateTransactions', () => {
     connection = await mongoose.connect(MONGO_CONNECTION_STRING);
     sqlFolder = getSqlFolder(subfolder);
     const txTypesCountDocuments = await TxTypes.countDocuments();
-    console.log({ txTypesCountDocuments, CONNECTION_STRING });
-    // await seedTheMockIndexerDatabase(); // Commenting this out temporarily while running tests against the remote production database since seeding the local test database doesn't fully work yet.
+    logger.info({ txTypesCountDocuments, CONNECTION_STRING });
+    await seedTheMockIndexerDatabase(); // Commenting this out temporarily while running tests against the remote production database since seeding the local test database doesn't fully work yet.
     pgClient = new pg.Client({ connectionString: CONNECTION_STRING, statement_timeout: STATEMENT_TIMEOUT });
     await pgClient.connect();
   });
@@ -55,7 +56,7 @@ describe('updateTransactions', () => {
 
   const rowsOfExpectedOutput: RowOfExpectedOutput[] = getRowsOfExpectedOutput(EXPECTED_OUTPUT_FILENAME);
 
-  // console.log({ rowsOfExpectedOutput });
+  // logger.info({ rowsOfExpectedOutput });
 
   function getRelevantRowsOfExpectedOutput(accountId: AccountId, txType: string) {
     return rowsOfExpectedOutput.filter((row) => row.accountId === accountId && row.txType === txType).map((row) => cleanExpectedOutputFromCsv(row));
@@ -81,7 +82,7 @@ describe('updateTransactions', () => {
             txActionsConverted.push(txActionConverted);
           }
 
-          // console.log({ txActionsConverted });
+          // logger.info({ txActionsConverted });
           const relevantRowsOfExpectedOutput = getRelevantRowsOfExpectedOutput(accountId, txType);
           expect(txActionsConverted).toEqual(relevantRowsOfExpectedOutput.sort((a, b) => b.block_timestamp - a.block_timestamp));
         });
@@ -118,9 +119,9 @@ describe('updateTransactions', () => {
       }
     }
 
-    // console.log('json', JSON.stringify(txActionsConverted, null, 2));
+    // logger.info('json', JSON.stringify(txActionsConverted, null, 2));
     jsonToCsv(txActionsConverted);
-    console.log(
+    logger.info(
       "If you overwrite `expectedOutput.csv` via `cp backend/test_helpers/internal/possibleExpectedOutput.csv backend/test_helpers/expectedOutput.csv`, the tests will pass. Obviously, you'll need to manually check whether those values are accurate.",
     );
     expect(true).toEqual(true);
