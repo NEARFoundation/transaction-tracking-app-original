@@ -17,7 +17,10 @@ import { addTransactionTypeSqlToDatabase, DOT_SQL, getSqlFolder } from './addDef
 import { CONNECTION_STRING, DEFAULT_LENGTH, MONGO_CONNECTION_STRING, STATEMENT_TIMEOUT } from './config';
 import { updateTransactions } from './updateTransactions';
 
-const prefix = '_tx_'; // This also gets used in the `t` script of `/package.json`.
+const PREFIX = 'sqlTest'; // This also gets used in the `sqlTests` script of `/package.json`.
+const TIMEOUT_MS = 3_500; // 3.5 seconds.
+
+// const flushPromises = async () => await new Promise(setImmediate);
 
 // eslint-disable-next-line max-lines-per-function
 describe('updateTransactions', () => {
@@ -48,7 +51,7 @@ describe('updateTransactions', () => {
     await TxActions.deleteMany({});
   });
 
-  jest.setTimeout(1_500);
+  jest.setTimeout(TIMEOUT_MS);
 
   const rowsOfExpectedOutput: RowOfExpectedOutput[] = getRowsOfExpectedOutput(EXPECTED_OUTPUT_FILENAME);
 
@@ -64,7 +67,7 @@ describe('updateTransactions', () => {
       const { accountId, txType, transaction_hash } = rowOfExpectedOutput;
       if (txType) {
         // eslint-disable-next-line @typescript-eslint/no-loop-func
-        test(`${prefix} ${txType}`, async () => {
+        test(`${PREFIX} ${txType}`, async () => {
           const file = `${txType}${DOT_SQL}`;
           await addTransactionTypeSqlToDatabase(sqlFolder, file);
           await updateTransactions(pgClient, accountId, txType, DEFAULT_LENGTH);
@@ -84,7 +87,7 @@ describe('updateTransactions', () => {
         });
       } else {
         // eslint-disable-next-line @typescript-eslint/no-loop-func
-        test(`${prefix} ${transaction_hash}`, () => {
+        test(`${PREFIX} ${transaction_hash}`, () => {
           const hint = 'Where is the txType etc?'; // This test is kind of a fake test just to highlight within the test results (via test failure) that something unexpected is happening here. We don't actually expect transaction_hash to equal `hint`.
           expect(transaction_hash).toEqual(hint);
         });

@@ -13,7 +13,7 @@
     "update_test_data": "export $(grep -v '^#' backend/.env.development.local | xargs) && PREPEND_BACKEND_SUBFOLDER=true ./backend/test_helpers/updateTestData.sh",
     "seed": "export $(grep -v '^#' backend/.env.development.local | xargs) && PREPEND_BACKEND_SUBFOLDER=true ./backend/data/seedLocalDatabase.sh",
     "test": "DOTENV_CONFIG_PATH=.env.test jest",
-    "t": "(cd backend && DOTENV_CONFIG_PATH=.env.test jest --testNamePattern=\"_tx_\" src/helpers/updateTransactions.test.ts)",
+    "sqlTests": "(cd backend && DOTENV_CONFIG_PATH=.env.test jest --testNamePattern=\"sqlTest\" src/helpers/updateTransactions.test.ts)",
     "overwrite": "(cd backend && DOTENV_CONFIG_PATH=.env.test jest --testNamePattern=\"possibleExpectedOutput\")",
     "backend_dev": "(cd backend && yarn dev)",
     "benchmark": "(cd backend && yarn ts-node --esm ./data/benchmarkTheSqlQueries.ts)"
