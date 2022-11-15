@@ -39,5 +39,6 @@ docker/app/
 data/createTempTablesOfRowsWithSpecificTransactions.sql
 data/transactionHashes.sql
 test_helpers/internal/createTempTablesOfRowsWithSpecificTransactions.sql
+test_helpers/internal/testData.sql
 test_helpers/internal/transactionHashes.sql
 test_helpers/internal/possibleExpectedOutput.csv

@@ -30,12 +30,72 @@ SELECT
 FROM
     TRANSACTIONS T
     LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
-WHERE
-    T.TRANSACTION_HASH IN (
-        SELECT
-            transactionHash
-        FROM
-            transactionHashes);
+WHERE (t.block_timestamp >= 1632824080000000000
+    AND t.block_timestamp <= 1632825580000000000)
+    OR (t.block_timestamp >= 1646392507000000000
+        AND t.block_timestamp <= 1646394007000000000)
+    OR (t.block_timestamp >= 1646393141000000000
+        AND t.block_timestamp <= 1646394641000000000)
+    OR (t.block_timestamp >= 1646393197000000000
+        AND t.block_timestamp <= 1646394697000000000)
+    OR (t.block_timestamp >= 1646393287000000000
+        AND t.block_timestamp <= 1646394787000000000)
+    OR (t.block_timestamp >= 1646393379000000000
+        AND t.block_timestamp <= 1646394879000000000)
+    OR (t.block_timestamp >= 1646393447000000000
+        AND t.block_timestamp <= 1646394947000000000)
+    OR (t.block_timestamp >= 1646393719000000000
+        AND t.block_timestamp <= 1646395219000000000)
+    OR (t.block_timestamp >= 1646394047000000000
+        AND t.block_timestamp <= 1646395547000000000)
+    OR (t.block_timestamp >= 1646394131000000000
+        AND t.block_timestamp <= 1646395631000000000)
+    OR (t.block_timestamp >= 1646394338000000000
+        AND t.block_timestamp <= 1646395838000000000)
+    OR (t.block_timestamp >= 1646394497000000000
+        AND t.block_timestamp <= 1646395997000000000)
+    OR (t.block_timestamp >= 1646394563000000000
+        AND t.block_timestamp <= 1646396063000000000)
+    OR (t.block_timestamp >= 1646394733000000000
+        AND t.block_timestamp <= 1646396233000000000)
+    OR (t.block_timestamp >= 1646727222000000000
+        AND t.block_timestamp <= 1646728722000000000)
+    OR (t.block_timestamp >= 1646727372000000000
+        AND t.block_timestamp <= 1646728872000000000)
+    OR (t.block_timestamp >= 1646727498000000000
+        AND t.block_timestamp <= 1646728998000000000)
+    OR (t.block_timestamp >= 1646727574000000000
+        AND t.block_timestamp <= 1646729074000000000)
+    OR (t.block_timestamp >= 1646728188000000000
+        AND t.block_timestamp <= 1646729688000000000)
+    OR (t.block_timestamp >= 1646728239000000000
+        AND t.block_timestamp <= 1646729739000000000)
+    OR (t.block_timestamp >= 1646728293000000000
+        AND t.block_timestamp <= 1646729793000000000)
+    OR (t.block_timestamp >= 1646728351000000000
+        AND t.block_timestamp <= 1646729851000000000)
+    OR (t.block_timestamp >= 1646728446000000000
+        AND t.block_timestamp <= 1646729946000000000)
+    OR (t.block_timestamp >= 1646728498000000000
+        AND t.block_timestamp <= 1646729998000000000)
+    OR (t.block_timestamp >= 1646728530000000000
+        AND t.block_timestamp <= 1646730030000000000)
+    OR (t.block_timestamp >= 1646728710000000000
+        AND t.block_timestamp <= 1646730210000000000)
+    OR (t.block_timestamp >= 1646728973000000000
+        AND t.block_timestamp <= 1646730473000000000)
+    OR (t.block_timestamp >= 1646729110000000000
+        AND t.block_timestamp <= 1646730610000000000)
+    OR (t.block_timestamp >= 1646729307000000000
+        AND t.block_timestamp <= 1646730807000000000)
+    OR (t.block_timestamp >= 1646733868000000000
+        AND t.block_timestamp <= 1646735368000000000)
+    OR (t.block_timestamp >= 1646734039000000000
+        AND t.block_timestamp <= 1646735539000000000)
+    OR (t.block_timestamp >= 1651504866000000000
+        AND t.block_timestamp <= 1651506366000000000)
+    OR (t.block_timestamp >= 1659424977000000000
+        AND t.block_timestamp <= 1659426477000000000);
 
 
 /* =============================================================== */
@@ -55,12 +115,72 @@ SELECT
 FROM
     TRANSACTIONS T
     LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
-WHERE
-    T.TRANSACTION_HASH IN (
-        SELECT
-            transactionHash
-        FROM
-            transactionHashes);
+WHERE (t.block_timestamp >= 1632824080000000000
+    AND t.block_timestamp <= 1632825580000000000)
+    OR (t.block_timestamp >= 1646392507000000000
+        AND t.block_timestamp <= 1646394007000000000)
+    OR (t.block_timestamp >= 1646393141000000000
+        AND t.block_timestamp <= 1646394641000000000)
+    OR (t.block_timestamp >= 1646393197000000000
+        AND t.block_timestamp <= 1646394697000000000)
+    OR (t.block_timestamp >= 1646393287000000000
+        AND t.block_timestamp <= 1646394787000000000)
+    OR (t.block_timestamp >= 1646393379000000000
+        AND t.block_timestamp <= 1646394879000000000)
+    OR (t.block_timestamp >= 1646393447000000000
+        AND t.block_timestamp <= 1646394947000000000)
+    OR (t.block_timestamp >= 1646393719000000000
+        AND t.block_timestamp <= 1646395219000000000)
+    OR (t.block_timestamp >= 1646394047000000000
+        AND t.block_timestamp <= 1646395547000000000)
+    OR (t.block_timestamp >= 1646394131000000000
+        AND t.block_timestamp <= 1646395631000000000)
+    OR (t.block_timestamp >= 1646394338000000000
+        AND t.block_timestamp <= 1646395838000000000)
+    OR (t.block_timestamp >= 1646394497000000000
+        AND t.block_timestamp <= 1646395997000000000)
+    OR (t.block_timestamp >= 1646394563000000000
+        AND t.block_timestamp <= 1646396063000000000)
+    OR (t.block_timestamp >= 1646394733000000000
+        AND t.block_timestamp <= 1646396233000000000)
+    OR (t.block_timestamp >= 1646727222000000000
+        AND t.block_timestamp <= 1646728722000000000)
+    OR (t.block_timestamp >= 1646727372000000000
+        AND t.block_timestamp <= 1646728872000000000)
+    OR (t.block_timestamp >= 1646727498000000000
+        AND t.block_timestamp <= 1646728998000000000)
+    OR (t.block_timestamp >= 1646727574000000000
+        AND t.block_timestamp <= 1646729074000000000)
+    OR (t.block_timestamp >= 1646728188000000000
+        AND t.block_timestamp <= 1646729688000000000)
+    OR (t.block_timestamp >= 1646728239000000000
+        AND t.block_timestamp <= 1646729739000000000)
+    OR (t.block_timestamp >= 1646728293000000000
+        AND t.block_timestamp <= 1646729793000000000)
+    OR (t.block_timestamp >= 1646728351000000000
+        AND t.block_timestamp <= 1646729851000000000)
+    OR (t.block_timestamp >= 1646728446000000000
+        AND t.block_timestamp <= 1646729946000000000)
+    OR (t.block_timestamp >= 1646728498000000000
+        AND t.block_timestamp <= 1646729998000000000)
+    OR (t.block_timestamp >= 1646728530000000000
+        AND t.block_timestamp <= 1646730030000000000)
+    OR (t.block_timestamp >= 1646728710000000000
+        AND t.block_timestamp <= 1646730210000000000)
+    OR (t.block_timestamp >= 1646728973000000000
+        AND t.block_timestamp <= 1646730473000000000)
+    OR (t.block_timestamp >= 1646729110000000000
+        AND t.block_timestamp <= 1646730610000000000)
+    OR (t.block_timestamp >= 1646729307000000000
+        AND t.block_timestamp <= 1646730807000000000)
+    OR (t.block_timestamp >= 1646733868000000000
+        AND t.block_timestamp <= 1646735368000000000)
+    OR (t.block_timestamp >= 1646734039000000000
+        AND t.block_timestamp <= 1646735539000000000)
+    OR (t.block_timestamp >= 1651504866000000000
+        AND t.block_timestamp <= 1651506366000000000)
+    OR (t.block_timestamp >= 1659424977000000000
+        AND t.block_timestamp <= 1659426477000000000);
 
 
 /* =============================================================== */
@@ -81,12 +201,72 @@ FROM
     TRANSACTIONS T
     LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
     LEFT JOIN EXECUTION_OUTCOMES EO ON EO.RECEIPT_ID = R.RECEIPT_ID
-WHERE
-    T.TRANSACTION_HASH IN (
-        SELECT
-            transactionHash
-        FROM
-            transactionHashes);
+WHERE (t.block_timestamp >= 1632824080000000000
+    AND t.block_timestamp <= 1632825580000000000)
+    OR (t.block_timestamp >= 1646392507000000000
+        AND t.block_timestamp <= 1646394007000000000)
+    OR (t.block_timestamp >= 1646393141000000000
+        AND t.block_timestamp <= 1646394641000000000)
+    OR (t.block_timestamp >= 1646393197000000000
+        AND t.block_timestamp <= 1646394697000000000)
+    OR (t.block_timestamp >= 1646393287000000000
+        AND t.block_timestamp <= 1646394787000000000)
+    OR (t.block_timestamp >= 1646393379000000000
+        AND t.block_timestamp <= 1646394879000000000)
+    OR (t.block_timestamp >= 1646393447000000000
+        AND t.block_timestamp <= 1646394947000000000)
+    OR (t.block_timestamp >= 1646393719000000000
+        AND t.block_timestamp <= 1646395219000000000)
+    OR (t.block_timestamp >= 1646394047000000000
+        AND t.block_timestamp <= 1646395547000000000)
+    OR (t.block_timestamp >= 1646394131000000000
+        AND t.block_timestamp <= 1646395631000000000)
+    OR (t.block_timestamp >= 1646394338000000000
+        AND t.block_timestamp <= 1646395838000000000)
+    OR (t.block_timestamp >= 1646394497000000000
+        AND t.block_timestamp <= 1646395997000000000)
+    OR (t.block_timestamp >= 1646394563000000000
+        AND t.block_timestamp <= 1646396063000000000)
+    OR (t.block_timestamp >= 1646394733000000000
+        AND t.block_timestamp <= 1646396233000000000)
+    OR (t.block_timestamp >= 1646727222000000000
+        AND t.block_timestamp <= 1646728722000000000)
+    OR (t.block_timestamp >= 1646727372000000000
+        AND t.block_timestamp <= 1646728872000000000)
+    OR (t.block_timestamp >= 1646727498000000000
+        AND t.block_timestamp <= 1646728998000000000)
+    OR (t.block_timestamp >= 1646727574000000000
+        AND t.block_timestamp <= 1646729074000000000)
+    OR (t.block_timestamp >= 1646728188000000000
+        AND t.block_timestamp <= 1646729688000000000)
+    OR (t.block_timestamp >= 1646728239000000000
+        AND t.block_timestamp <= 1646729739000000000)
+    OR (t.block_timestamp >= 1646728293000000000
+        AND t.block_timestamp <= 1646729793000000000)
+    OR (t.block_timestamp >= 1646728351000000000
+        AND t.block_timestamp <= 1646729851000000000)
+    OR (t.block_timestamp >= 1646728446000000000
+        AND t.block_timestamp <= 1646729946000000000)
+    OR (t.block_timestamp >= 1646728498000000000
+        AND t.block_timestamp <= 1646729998000000000)
+    OR (t.block_timestamp >= 1646728530000000000
+        AND t.block_timestamp <= 1646730030000000000)
+    OR (t.block_timestamp >= 1646728710000000000
+        AND t.block_timestamp <= 1646730210000000000)
+    OR (t.block_timestamp >= 1646728973000000000
+        AND t.block_timestamp <= 1646730473000000000)
+    OR (t.block_timestamp >= 1646729110000000000
+        AND t.block_timestamp <= 1646730610000000000)
+    OR (t.block_timestamp >= 1646729307000000000
+        AND t.block_timestamp <= 1646730807000000000)
+    OR (t.block_timestamp >= 1646733868000000000
+        AND t.block_timestamp <= 1646735368000000000)
+    OR (t.block_timestamp >= 1646734039000000000
+        AND t.block_timestamp <= 1646735539000000000)
+    OR (t.block_timestamp >= 1651504866000000000
+        AND t.block_timestamp <= 1651506366000000000)
+    OR (t.block_timestamp >= 1659424977000000000
+        AND t.block_timestamp <= 1659426477000000000);
 
 
 /* =============================================================== */
@@ -105,12 +285,72 @@ FROM
     TRANSACTIONS T
     LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
     LEFT JOIN BLOCKS B ON B.BLOCK_HASH = R.INCLUDED_IN_BLOCK_HASH
-WHERE
-    T.TRANSACTION_HASH IN (
-        SELECT
-            transactionHash
-        FROM
-            transactionHashes);
+WHERE (t.block_timestamp >= 1632824080000000000
+    AND t.block_timestamp <= 1632825580000000000)
+    OR (t.block_timestamp >= 1646392507000000000
+        AND t.block_timestamp <= 1646394007000000000)
+    OR (t.block_timestamp >= 1646393141000000000
+        AND t.block_timestamp <= 1646394641000000000)
+    OR (t.block_timestamp >= 1646393197000000000
+        AND t.block_timestamp <= 1646394697000000000)
+    OR (t.block_timestamp >= 1646393287000000000
+        AND t.block_timestamp <= 1646394787000000000)
+    OR (t.block_timestamp >= 1646393379000000000
+        AND t.block_timestamp <= 1646394879000000000)
+    OR (t.block_timestamp >= 1646393447000000000
+        AND t.block_timestamp <= 1646394947000000000)
+    OR (t.block_timestamp >= 1646393719000000000
+        AND t.block_timestamp <= 1646395219000000000)
+    OR (t.block_timestamp >= 1646394047000000000
+        AND t.block_timestamp <= 1646395547000000000)
+    OR (t.block_timestamp >= 1646394131000000000
+        AND t.block_timestamp <= 1646395631000000000)
+    OR (t.block_timestamp >= 1646394338000000000
+        AND t.block_timestamp <= 1646395838000000000)
+    OR (t.block_timestamp >= 1646394497000000000
+        AND t.block_timestamp <= 1646395997000000000)
+    OR (t.block_timestamp >= 1646394563000000000
+        AND t.block_timestamp <= 1646396063000000000)
+    OR (t.block_timestamp >= 1646394733000000000
+        AND t.block_timestamp <= 1646396233000000000)
+    OR (t.block_timestamp >= 1646727222000000000
+        AND t.block_timestamp <= 1646728722000000000)
+    OR (t.block_timestamp >= 1646727372000000000
+        AND t.block_timestamp <= 1646728872000000000)
+    OR (t.block_timestamp >= 1646727498000000000
+        AND t.block_timestamp <= 1646728998000000000)
+    OR (t.block_timestamp >= 1646727574000000000
+        AND t.block_timestamp <= 1646729074000000000)
+    OR (t.block_timestamp >= 1646728188000000000
+        AND t.block_timestamp <= 1646729688000000000)
+    OR (t.block_timestamp >= 1646728239000000000
+        AND t.block_timestamp <= 1646729739000000000)
+    OR (t.block_timestamp >= 1646728293000000000
+        AND t.block_timestamp <= 1646729793000000000)
+    OR (t.block_timestamp >= 1646728351000000000
+        AND t.block_timestamp <= 1646729851000000000)
+    OR (t.block_timestamp >= 1646728446000000000
+        AND t.block_timestamp <= 1646729946000000000)
+    OR (t.block_timestamp >= 1646728498000000000
+        AND t.block_timestamp <= 1646729998000000000)
+    OR (t.block_timestamp >= 1646728530000000000
+        AND t.block_timestamp <= 1646730030000000000)
+    OR (t.block_timestamp >= 1646728710000000000
+        AND t.block_timestamp <= 1646730210000000000)
+    OR (t.block_timestamp >= 1646728973000000000
+        AND t.block_timestamp <= 1646730473000000000)
+    OR (t.block_timestamp >= 1646729110000000000
+        AND t.block_timestamp <= 1646730610000000000)
+    OR (t.block_timestamp >= 1646729307000000000
+        AND t.block_timestamp <= 1646730807000000000)
+    OR (t.block_timestamp >= 1646733868000000000
+        AND t.block_timestamp <= 1646735368000000000)
+    OR (t.block_timestamp >= 1646734039000000000
+        AND t.block_timestamp <= 1646735539000000000)
+    OR (t.block_timestamp >= 1651504866000000000
+        AND t.block_timestamp <= 1651506366000000000)
+    OR (t.block_timestamp >= 1659424977000000000
+        AND t.block_timestamp <= 1659426477000000000);
 
 
 /* =============================================================== */
@@ -129,12 +369,72 @@ FROM
     TRANSACTIONS T
     LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
     LEFT JOIN ACTION_RECEIPT_ACTIONS ARA ON ARA.RECEIPT_ID = R.RECEIPT_ID
-WHERE
-    T.TRANSACTION_HASH IN (
-        SELECT
-            transactionHash
-        FROM
-            transactionHashes);
+WHERE (t.block_timestamp >= 1632824080000000000
+    AND t.block_timestamp <= 1632825580000000000)
+    OR (t.block_timestamp >= 1646392507000000000
+        AND t.block_timestamp <= 1646394007000000000)
+    OR (t.block_timestamp >= 1646393141000000000
+        AND t.block_timestamp <= 1646394641000000000)
+    OR (t.block_timestamp >= 1646393197000000000
+        AND t.block_timestamp <= 1646394697000000000)
+    OR (t.block_timestamp >= 1646393287000000000
+        AND t.block_timestamp <= 1646394787000000000)
+    OR (t.block_timestamp >= 1646393379000000000
+        AND t.block_timestamp <= 1646394879000000000)
+    OR (t.block_timestamp >= 1646393447000000000
+        AND t.block_timestamp <= 1646394947000000000)
+    OR (t.block_timestamp >= 1646393719000000000
+        AND t.block_timestamp <= 1646395219000000000)
+    OR (t.block_timestamp >= 1646394047000000000
+        AND t.block_timestamp <= 1646395547000000000)
+    OR (t.block_timestamp >= 1646394131000000000
+        AND t.block_timestamp <= 1646395631000000000)
+    OR (t.block_timestamp >= 1646394338000000000
+        AND t.block_timestamp <= 1646395838000000000)
+    OR (t.block_timestamp >= 1646394497000000000
+        AND t.block_timestamp <= 1646395997000000000)
+    OR (t.block_timestamp >= 1646394563000000000
+        AND t.block_timestamp <= 1646396063000000000)
+    OR (t.block_timestamp >= 1646394733000000000
+        AND t.block_timestamp <= 1646396233000000000)
+    OR (t.block_timestamp >= 1646727222000000000
+        AND t.block_timestamp <= 1646728722000000000)
+    OR (t.block_timestamp >= 1646727372000000000
+        AND t.block_timestamp <= 1646728872000000000)
+    OR (t.block_timestamp >= 1646727498000000000
+        AND t.block_timestamp <= 1646728998000000000)
+    OR (t.block_timestamp >= 1646727574000000000
+        AND t.block_timestamp <= 1646729074000000000)
+    OR (t.block_timestamp >= 1646728188000000000
+        AND t.block_timestamp <= 1646729688000000000)
+    OR (t.block_timestamp >= 1646728239000000000
+        AND t.block_timestamp <= 1646729739000000000)
+    OR (t.block_timestamp >= 1646728293000000000
+        AND t.block_timestamp <= 1646729793000000000)
+    OR (t.block_timestamp >= 1646728351000000000
+        AND t.block_timestamp <= 1646729851000000000)
+    OR (t.block_timestamp >= 1646728446000000000
+        AND t.block_timestamp <= 1646729946000000000)
+    OR (t.block_timestamp >= 1646728498000000000
+        AND t.block_timestamp <= 1646729998000000000)
+    OR (t.block_timestamp >= 1646728530000000000
+        AND t.block_timestamp <= 1646730030000000000)
+    OR (t.block_timestamp >= 1646728710000000000
+        AND t.block_timestamp <= 1646730210000000000)
+    OR (t.block_timestamp >= 1646728973000000000
+        AND t.block_timestamp <= 1646730473000000000)
+    OR (t.block_timestamp >= 1646729110000000000
+        AND t.block_timestamp <= 1646730610000000000)
+    OR (t.block_timestamp >= 1646729307000000000
+        AND t.block_timestamp <= 1646730807000000000)
+    OR (t.block_timestamp >= 1646733868000000000
+        AND t.block_timestamp <= 1646735368000000000)
+    OR (t.block_timestamp >= 1646734039000000000
+        AND t.block_timestamp <= 1646735539000000000)
+    OR (t.block_timestamp >= 1651504866000000000
+        AND t.block_timestamp <= 1651506366000000000)
+    OR (t.block_timestamp >= 1659424977000000000
+        AND t.block_timestamp <= 1659426477000000000);
 
 
 /* =============================================================== */
@@ -150,10 +450,70 @@ FROM
     TRANSACTIONS T
     LEFT JOIN TRANSACTION_ACTIONS ta ON T.TRANSACTION_HASH = TA.TRANSACTION_HASH
     LEFT JOIN RECEIPTS R ON T.CONVERTED_INTO_RECEIPT_ID = R.RECEIPT_ID
-WHERE
-    T.TRANSACTION_HASH IN (
-        SELECT
-            transactionHash
-        FROM
-            transactionHashes);
+WHERE (t.block_timestamp >= 1632824080000000000
+    AND t.block_timestamp <= 1632825580000000000)
+    OR (t.block_timestamp >= 1646392507000000000
+        AND t.block_timestamp <= 1646394007000000000)
+    OR (t.block_timestamp >= 1646393141000000000
+        AND t.block_timestamp <= 1646394641000000000)
+    OR (t.block_timestamp >= 1646393197000000000
+        AND t.block_timestamp <= 1646394697000000000)
+    OR (t.block_timestamp >= 1646393287000000000
+        AND t.block_timestamp <= 1646394787000000000)
+    OR (t.block_timestamp >= 1646393379000000000
+        AND t.block_timestamp <= 1646394879000000000)
+    OR (t.block_timestamp >= 1646393447000000000
+        AND t.block_timestamp <= 1646394947000000000)
+    OR (t.block_timestamp >= 1646393719000000000
+        AND t.block_timestamp <= 1646395219000000000)
+    OR (t.block_timestamp >= 1646394047000000000
+        AND t.block_timestamp <= 1646395547000000000)
+    OR (t.block_timestamp >= 1646394131000000000
+        AND t.block_timestamp <= 1646395631000000000)
+    OR (t.block_timestamp >= 1646394338000000000
+        AND t.block_timestamp <= 1646395838000000000)
+    OR (t.block_timestamp >= 1646394497000000000
+        AND t.block_timestamp <= 1646395997000000000)
+    OR (t.block_timestamp >= 1646394563000000000
+        AND t.block_timestamp <= 1646396063000000000)
+    OR (t.block_timestamp >= 1646394733000000000
+        AND t.block_timestamp <= 1646396233000000000)
+    OR (t.block_timestamp >= 1646727222000000000
+        AND t.block_timestamp <= 1646728722000000000)
+    OR (t.block_timestamp >= 1646727372000000000
+        AND t.block_timestamp <= 1646728872000000000)
+    OR (t.block_timestamp >= 1646727498000000000
+        AND t.block_timestamp <= 1646728998000000000)
+    OR (t.block_timestamp >= 1646727574000000000
+        AND t.block_timestamp <= 1646729074000000000)
+    OR (t.block_timestamp >= 1646728188000000000
+        AND t.block_timestamp <= 1646729688000000000)
+    OR (t.block_timestamp >= 1646728239000000000
+        AND t.block_timestamp <= 1646729739000000000)
+    OR (t.block_timestamp >= 1646728293000000000
+        AND t.block_timestamp <= 1646729793000000000)
+    OR (t.block_timestamp >= 1646728351000000000
+        AND t.block_timestamp <= 1646729851000000000)
+    OR (t.block_timestamp >= 1646728446000000000
+        AND t.block_timestamp <= 1646729946000000000)
+    OR (t.block_timestamp >= 1646728498000000000
+        AND t.block_timestamp <= 1646729998000000000)
+    OR (t.block_timestamp >= 1646728530000000000
+        AND t.block_timestamp <= 1646730030000000000)
+    OR (t.block_timestamp >= 1646728710000000000
+        AND t.block_timestamp <= 1646730210000000000)
+    OR (t.block_timestamp >= 1646728973000000000
+        AND t.block_timestamp <= 1646730473000000000)
+    OR (t.block_timestamp >= 1646729110000000000
+        AND t.block_timestamp <= 1646730610000000000)
+    OR (t.block_timestamp >= 1646729307000000000
+        AND t.block_timestamp <= 1646730807000000000)
+    OR (t.block_timestamp >= 1646733868000000000
+        AND t.block_timestamp <= 1646735368000000000)
+    OR (t.block_timestamp >= 1646734039000000000
+        AND t.block_timestamp <= 1646735539000000000)
+    OR (t.block_timestamp >= 1651504866000000000
+        AND t.block_timestamp <= 1651506366000000000)
+    OR (t.block_timestamp >= 1659424977000000000
+        AND t.block_timestamp <= 1659426477000000000);
 
