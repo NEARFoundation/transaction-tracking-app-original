@@ -10,11 +10,27 @@ import { type RowOfExpectedOutput } from '../../shared/types';
 
 // console.log({ subfolder });
 
+function removeSpecialColumns(rows: RowOfExpectedOutput[]): RowOfExpectedOutput[] {
+  const specialPrefix = '_';
+  return rows.map((row) => {
+    const cleanedRow = { ...row };
+    for (const key of Object.keys(cleanedRow)) {
+      if (key.startsWith(specialPrefix)) {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete cleanedRow[key];
+      }
+    }
+
+    return cleanedRow;
+  });
+}
+
 export function getRowsOfExpectedOutput(csvFilename: string): RowOfExpectedOutput[] {
   console.log({ csvFilename });
   const csv = fs.readFileSync(`./${subfolder}${csvFilename}`, 'utf8');
   // console.log({ csv });
   const rowsOfExpectedOutput: RowOfExpectedOutput[] = csv2json(csv, { parseNumbers: false, parseJSON: false }); // https://www.npmjs.com/package/csvjson-csv2json
   // console.log({ rowsOfExpectedOutput });
-  return rowsOfExpectedOutput;
+  const result = removeSpecialColumns(rowsOfExpectedOutput);
+  return result;
 }
