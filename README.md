@@ -126,6 +126,7 @@ Then run `yarn test` to run the tests.
 1. Ensure that column headers begin with "\_" if you want the column to be ignored during the import.
 1. Search for occurrences of "E+". If any numeric values are using this kind of (exponential) notation, you need to correct the cell (write out the full number instead).
    - You might need to prepend the value with a single quote (').
+1. Ensure that no cells have newline characters. E.g. check `args_base64`.
 1. File > Download > .csv.
 1. Choose to save to `backend/test_helpers/expectedOutput.csv`
 1. Delete any rows that you don't want (which you probably sorted to the bottom).
