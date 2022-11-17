@@ -7,7 +7,7 @@
     "install_all": "yarn install && (cd frontend && yarn install) && (cd backend && yarn install) && (cd shared && yarn install)",
     "build": "(cd ./frontend && yarn build)",
     "start": "(cd frontend && yarn start)",
-    "dev": "(cd frontend && yarn dev)",
+    "dev": "concurrently \"(cd frontend && yarn dev)\" \"(cd backend && yarn dev)\"",
     "drop_actions_and_tasks_and_types": "yarn ts-node --esm ./backend/dropActionsAndTasksAndTypes.ts",
     "update_local_seed_file": "export $(grep -v '^#' backend/.env.development.local | xargs) && PREPEND_BACKEND_SUBFOLDER=true ./backend/data/updateLocalSeedFile.sh",
     "update_test_data": "export $(grep -v '^#' backend/.env.development.local | xargs) && PREPEND_BACKEND_SUBFOLDER=true ./backend/test_helpers/updateTestData.sh",
@@ -15,13 +15,13 @@
     "test": "DOTENV_CONFIG_PATH=.env.test jest",
     "sqlTests": "(cd backend && DOTENV_CONFIG_PATH=.env.test jest --testNamePattern=\"sqlTest\" src/helpers/updateTransactions.test.ts)",
     "overwrite": "(cd backend && DOTENV_CONFIG_PATH=.env.test jest --testNamePattern=\"possibleExpectedOutput\")",
-    "backend_dev": "(cd backend && yarn dev)",
     "benchmark": "(cd backend && yarn ts-node --esm ./data/benchmarkTheSqlQueries.ts)"
   },
   "devDependencies": {
     "@nearfoundation/near-prettier-config": "^1.0.1",
     "@shelf/jest-mongodb": "^4.1.1",
     "@types/jest": "^29.1.2",
+    "concurrently": "^7.5.0",
     "csvjson-json2csv": "^1.0.3",
     "dotenv": "^16.0.3",
     "eslint": "^8.25.0",

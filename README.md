@@ -60,11 +60,12 @@ To run this project locally:
 1. Seed the local dev database via `yarn seed`.
 1. (optional) `POSTGRESQL_CONNECTION_STRING=___ ./backend/test_helpers/updateTestData.sh` (where `___` is the mainnet Postgres credentials string)
 1. `yarn test`
-1. Start the backend: `yarn backend_dev`
-1. In a second terminal, start the frontend: `yarn dev` (see `package.json` for a full list of `scripts` you can run with `yarn`). TODO: Check whether https://www.npmjs.com/package/concurrently would help.
+1. `yarn dev` starts both the backend and the frontend via https://www.npmjs.com/package/concurrently.
 1. Visit http://localhost:1234/ in the browser.
 
 Go ahead and play with the app and the code. As you make frontend code changes, the app will automatically reload.
+
+(See `package.json` for a full list of `scripts` you can run with `yarn`.)
 
 ## Setting up Mongo and MongoDB Shell
 
