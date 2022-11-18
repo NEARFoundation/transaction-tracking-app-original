@@ -8,7 +8,7 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to Docker Hub (to pull base images)"
-      #- docker login -u AWS -p $(aws ecr get-login-password --region us-east-1) 283114800351.dkr.ecr.us-east-1.amazonaws.com
+      - docker login -u AWS -p $(aws ecr get-login-password --region us-east-1) 283114800351.dkr.ecr.us-east-1.amazonaws.com
       #- aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       #- aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 283114800351.dkr.ecr.us-east-1.amazonaws.com
   build:
