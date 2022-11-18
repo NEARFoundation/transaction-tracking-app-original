@@ -25,7 +25,7 @@ WORKDIR /usr/src/frontend/
 #RUN npm install --force
 RUN yarn install
 #RUN yarn build:local
-RUN yarn build
+RUN yarn buildgeneric
 
 CMD ["npm", "start"]
 
