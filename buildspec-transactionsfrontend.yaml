@@ -11,6 +11,7 @@ phases:
       #- aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 283114800351.dkr.ecr.us-east-1.amazonaws.com
   build:
     commands:
-    - docker build -t transactions-frontend:latest -f ./docker/frontend/
+    - docker build ./ -t nearfoundation/transactionsfrontend:latest -f ./docker/frontend/Dockerfile --no-cache
+    - docker build -t transactionsfrontend:latest -f ./docker/frontend/
     - docker build -t 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/transactionsfrontend .
     - docker push 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/transactionsfrontend:latest
