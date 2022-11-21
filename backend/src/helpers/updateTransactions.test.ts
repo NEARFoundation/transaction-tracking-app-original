@@ -62,13 +62,22 @@ describe('updateTransactions', () => {
     return rowsOfExpectedOutput.filter((row) => row.accountId === accountId && row.txType === txType).map((row) => cleanExpectedOutputFromCsv(row));
   }
 
+  // eslint-disable-next-line max-lines-per-function
   async function runQueryTests() {
+    const transactionTypesDisambiguated = new Set<string>();
     for (const rowOfExpectedOutput of rowsOfExpectedOutput) {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       const { accountId, txType, transaction_hash } = rowOfExpectedOutput;
       if (txType) {
+        let testName = `${PREFIX} ${txType}`;
+        if (transactionTypesDisambiguated.has(txType)) {
+          testName += ` (${rowOfExpectedOutput.transaction_hash})`;
+        } else {
+          transactionTypesDisambiguated.add(txType);
+        }
+
         // eslint-disable-next-line @typescript-eslint/no-loop-func
-        test(`${PREFIX} ${txType}`, async () => {
+        test(testName, async () => {
           const file = `${txType}${DOT_SQL}`;
           await addTransactionTypeSqlToDatabase(sqlFolder, file);
           await updateTransactions(pgClient, accountId, txType, DEFAULT_LENGTH);
@@ -84,6 +93,7 @@ describe('updateTransactions', () => {
 
           // logger.info({ txActionsConverted });
           const relevantRowsOfExpectedOutput = getRelevantRowsOfExpectedOutput(accountId, txType);
+          logger.info('relevantRowsOfExpectedOutput', relevantRowsOfExpectedOutput, relevantRowsOfExpectedOutput.length);
           expect(txActionsConverted).toEqual(relevantRowsOfExpectedOutput.sort((a, b) => b.block_timestamp - a.block_timestamp));
         });
       } else {
