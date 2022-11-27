@@ -1,6 +1,6 @@
 #backend
 #FROM node:18
-FROM 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/node
+FROM 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/node:18
 
 MAINTAINER na
 
