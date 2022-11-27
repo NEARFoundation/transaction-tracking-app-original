@@ -4,7 +4,7 @@
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
-    "buildgeneric": "env-cmd -f .env.generic parcel src/index.html",
+    "buildgeneric": "env-cmd -f .env.generic parcel build src/index.html",
     "build": "env-cmd -f .env.local parcel build src/index.html --public-url ./",
     "start": "echo The app is starting! It will automatically open in your browser when ready && env-cmd -f ./.env.local parcel src/index.html --open",
     "dev": "nodemon --ext js --exec \"env-cmd -f ./.env.development.local parcel src/index.html\" --ignore \"dist\""
