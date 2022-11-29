@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "install_all": "yarn install && (cd frontend && yarn install) && (cd backend && yarn install) && (cd shared && yarn install)",
+    "record_commit_hash_and_build_time": "now=$(date -u \"+%Y-%m-%d %H:%M:%S\") && last_commit=$(git rev-parse HEAD) && echo \"{\\\"commit\\\": \\\"$last_commit\\\", \\\"build_time\\\": \\\"$now\\\"}\" > frontend/dist/version.json",
+    "prebuild": "yarn record_commit_hash_and_build_time",
     "build": "(cd ./frontend && yarn build)",
     "start": "(cd frontend && yarn start)",
     "dev": "(cd frontend && yarn dev)",
