@@ -13,6 +13,6 @@ phases:
 
   build:
     commands:
-    - docker build ./ -t transactionsfrontend:latest -f ./docker/frontend/Dockerfile --no-cache
-    - docker tag transactionsfrontend:latest 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/transactionsfrontend:latest
-    - docker push 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/transactionsfrontend:latest
+    - docker build ./ -t transactionsfrontend:$BUILD_TIER -f ./docker/frontend/Dockerfile --no-cache
+    - docker tag transactionsfrontend:$BUILD_TIER 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/transactionsfrontend:$BUILD_TIER
+    - docker push 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/transactionsfrontend:$BUILD_TIER

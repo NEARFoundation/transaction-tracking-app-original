@@ -25,7 +25,15 @@ When you specify one or more NEAR acccount IDs, those account IDs get saved to y
 
 # Getting Started
 
-To run this project locally:
+To run this project locally (as an operations engineer, or a developer looking to deliver code):
+
+- Get a Nix-based development environment (Linux, Mac, WSL).
+- Get and setup Docker for your environment.
+- Clone this repo and get into the project.
+- run `docker-compose up`
+- App will be available at: http://localhost:8085/ (frontend) and http://localhost:8086/ (backend)
+
+To run this project locally (as a developer running a fully local development environment)
 
 1. Make sure you've installed [Node.js](https://nodejs.org/en/download/package-manager/) ≥ 18. `nvm use 18`.
 1. Install and start [Mongo](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/) using the instructions in its own section below.

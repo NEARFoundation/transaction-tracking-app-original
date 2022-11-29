@@ -2,8 +2,8 @@ version: "3.3"
 
 services:
   backend:
-    #image: nearfoundation/txtrackingbackend:local
-    image: 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/transactionsbackend:develop
+    image: nearfoundation/txtrackingbackend:local
+    #image: 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/transactionsbackend:develop
     build:
       context: ./
       dockerfile: ./docker/backend/Dockerfile
@@ -22,25 +22,6 @@ services:
       - ALLOW_DELETING_FROM_DATABASE=false
       - CHAIN=testnet
       - REACT_APP_ENVIRONMENT=development
-# todo
-
-# chain mainnet
-# remove allow-delete variable
-# node-env = production
-# react-app = production
-
-# change / add url / cname
-# mongo migration
-# postgres pointer
-# 2x mongos (mongo = cache data)
-#
-
-# cname for transactions.nearfoundation.engineering
-# cname for transactions.develop.nearfoundation.engineering
-
-
-
-
       - MONGO=mongodb://mongodb:27017/near_accounting_report_dev?authSource=admin&readPreference=primary&directConnection=true&ssl=false
       # postgres
     depends_on:
@@ -49,8 +30,8 @@ services:
     ports:
       - 8086:8086
   frontend:
-    #image: nearfoundation/transactionsfrontend:develop
-    image: 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/transactionsfrontend
+    image: nearfoundation/transactionsfrontend:local
+    #image: 283114800351.dkr.ecr.us-east-1.amazonaws.com/nearfoundation/transactionsfrontend
     build:
       context: ./
       dockerfile: ./docker/frontend/Dockerfile
