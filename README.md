@@ -1,3 +1,8 @@
+# 🛑 IMPORTANT!
+
+Please see the newer repo at https://github.com/NEARFoundation/transaction-tracking-app instead of this repo, which is legacy.
+
+
 # NEAR Transaction Tracker App (also known as "Transactions Accounting Report")
 
 Transaction Tracker App (TTA) produces a report that helps teams across the ecosystem to see a simplified view of all transactions over a certain period (e.g. the Finance/Legal/Operations team uses it to reconcile their transactions and stay compliant).
